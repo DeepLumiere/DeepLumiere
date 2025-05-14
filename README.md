@@ -1,4 +1,3 @@
-<img src = "https://github.com/DeepLumiere/DeepLumiere/blob/main/sun_mountain4.png">
 - 👋 Hi, I’m Deep Joshi, Indian-American. Currently undergrad student in BTech CSE, Nirma University.
 - 👀 I’m interested in Brainstorming, Team-work, Research, and tons of data!
 - 🌱 I’m currently learning Python, C#, SQL and anything that's challenging. 
@@ -6,6 +5,9 @@
 - 📫 Mail me on: dudecomputerscience@gmail.com, LinkedIn: https://www.linkedin.com/in/deep-lumiere, Instagram: https://www.instagram.com/deep.lumiere
 - 😄 Pronouns: he/him
 - ⚡ Fun fact: I love to take up challenges and willing to talk and team up with everyone!
+
+<img src = "https://github.com/DeepLumiere/DeepLumiere/blob/main/sun_mountain4.png" height = "20%">
+
 
 <!---
 DeepLumiere/DeepLumiere is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
