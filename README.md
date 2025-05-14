@@ -1,3 +1,5 @@
+https://github.com/DeepLumiere/DeepLumiere/blob/main/sun_mountain4.png
+
 - 👋 Hi, I’m Deep Joshi, Indian-American. Currently undergrad student in BTech CSE, Nirma University.
 - 👀 I’m interested in Brainstorming, Team-work, Research, and tons of data!
 - 🌱 I’m currently learning Python, C#, SQL and anything that's challenging. 
