@@ -6,7 +6,7 @@
 - 😄 Pronouns: he/him
 - ⚡ Fun fact: I love to take up challenges and willing to talk and team up with everyone!
 
-<img src = "https://github.com/DeepLumiere/DeepLumiere/blob/main/sun_mountain4.png" height = "20%">
+<img src = "https://github.com/DeepLumiere/DeepLumiere/blob/main/design.png">
 
 
 <!---
