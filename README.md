@@ -1,6 +1,6 @@
 # 👋 Hi there, I’m Deep Joshi
 
-I’m an Indian undergrad student in **BTech CSE @ Nirma University**.
+I’m an undergrad student in **BTech CSE @ Nirma University**.
 
 ## 👀 Interests
 - Brainstorming & teamwork 💡  
