@@ -6,6 +6,7 @@ I’m an undergrad student in **BTech CSE @ Nirma University**.
 - Brainstorming & teamwork 💡  
 - Research-driven innovation 📚  
 - Tons of data! 📊  
+- Research, GreenAI, and Computer Vision 🔬🌱👁️  
 
 ## 🌱 Currently Learning
 - Python 🐍  
@@ -17,6 +18,12 @@ I’m an undergrad student in **BTech CSE @ Nirma University**.
 - Artificial Intelligence 🧠  
 - Data & Research 📈  
 - Ethics & Environment 🌱🌍  
+
+## 🧑‍💼 Leadership
+- Technical Head, IEEE Computer Society Nirma University  
+
+## 📝 Publications
+- [FedQ-Fraud — FIDTA Workshop at MobiHoc'25](https://dl.acm.org/doi/10.1145/3704413.3765511)
 
 ## 📫 Contact Me
 
