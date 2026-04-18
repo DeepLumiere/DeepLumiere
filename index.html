@@ -392,6 +392,7 @@
                 id="theme-toggle"
                 type="button"
                 aria-label="Toggle color theme"
+                aria-pressed="false"
               >
                 <span class="toggle-indicator"></span>
                 <span class="toggle-text" id="theme-label" aria-live="polite">Switch to Dawn</span>
@@ -549,12 +550,12 @@
           } catch {
             storedTheme = null;
             console.warn(
-              "Theme preference could not be read from localStorage; using system default."
+              "theme preference could not be read from localStorage; using system default."
             );
           }
         } else {
           console.warn(
-            "Theme preference storage is unavailable; defaults will be used and changes won't persist."
+            "theme preference storage is unavailable; defaults will be used and changes won't persist."
           );
         }
         let activeTheme =
@@ -581,6 +582,8 @@
           }
         };
 
+        const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
         const setPointerGlow = (x, y) => {
           if (prefersReducedMotion) {
             return;
@@ -589,8 +592,8 @@
           if (innerWidth === 0 || innerHeight === 0) {
             return;
           }
-          const clampedX = Math.max(0, Math.min(x, innerWidth));
-          const clampedY = Math.max(0, Math.min(y, innerHeight));
+          const clampedX = clamp(x, 0, innerWidth);
+          const clampedY = clamp(y, 0, innerHeight);
           root.style.setProperty(
             "--pointer-x",
             `${(clampedX / innerWidth) * 100}%`
@@ -611,7 +614,7 @@
                 localStorage.setItem("theme", nextTheme);
               } catch {
                 console.warn(
-                  "Theme preference could not be saved; changes apply only for this session."
+                  "theme preference could not be saved; changes apply only for this session."
                 );
               }
             }
