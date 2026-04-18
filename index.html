@@ -603,6 +603,24 @@
             `${(clampedY / innerHeight) * 100}%`
           );
         };
+        let glowFrame = null;
+        let pendingGlow = null;
+        const schedulePointerGlow = (x, y) => {
+          if (prefersReducedMotion) {
+            return;
+          }
+          pendingGlow = { x, y };
+          if (glowFrame) {
+            return;
+          }
+          glowFrame = requestAnimationFrame(() => {
+            if (pendingGlow) {
+              setPointerGlow(pendingGlow.x, pendingGlow.y);
+            }
+            pendingGlow = null;
+            glowFrame = null;
+          });
+        };
 
         applyTheme(activeTheme);
         if (themeToggle) {
@@ -707,12 +725,12 @@
           pointer.x = event.clientX;
           pointer.y = event.clientY;
           pointer.active = true;
-          setPointerGlow(event.clientX, event.clientY);
+          schedulePointerGlow(event.clientX, event.clientY);
         });
 
         window.addEventListener("pointerleave", () => {
           pointer.active = false;
-          setPointerGlow(window.innerWidth * 0.5, window.innerHeight * 0.2);
+          schedulePointerGlow(window.innerWidth * 0.5, window.innerHeight * 0.2);
         });
 
         resize();
