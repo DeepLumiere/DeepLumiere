@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Deep Joshi — BTech CSE student, researcher, and builder focused on GreenAI and computer vision."
+      content="Deep Joshi — BTech CSE student at Nirma University (CGPA 8.6/10), focused on GreenAI, computer vision, and research systems."
     />
     <title>Deep Joshi | DeepLumiere</title>
     <style>
@@ -23,6 +23,8 @@
         --accent-strong: #b6f1ff;
         --glow-1: rgba(122, 209, 255, 0.28);
         --glow-2: rgba(142, 91, 255, 0.24);
+        --glow-3: rgba(248, 113, 113, 0.22);
+        --glow-4: rgba(45, 212, 191, 0.2);
         --pointer-x: 50%;
         --pointer-y: 18%;
       }
@@ -41,6 +43,8 @@
         --accent-strong: #3b82f6;
         --glow-1: rgba(39, 93, 245, 0.25);
         --glow-2: rgba(56, 189, 248, 0.2);
+        --glow-3: rgba(249, 115, 22, 0.22);
+        --glow-4: rgba(16, 185, 129, 0.18);
       }
 
       * {
@@ -58,6 +62,8 @@
             transparent 45%
           ),
           radial-gradient(circle at 18% 20%, var(--glow-2), transparent 45%),
+          radial-gradient(circle at 84% 10%, var(--glow-3), transparent 45%),
+          radial-gradient(circle at 12% 82%, var(--glow-4), transparent 50%),
           linear-gradient(120deg, var(--bg) 0%, var(--bg-soft) 100%);
         transition: background 0.6s ease, color 0.4s ease;
         overflow-x: hidden;
@@ -170,6 +176,30 @@
         flex-wrap: wrap;
         align-items: center;
         gap: 12px;
+      }
+
+      .header-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px 18px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+      }
+
+      .info-label {
+        display: block;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .info-value {
+        font-size: 0.95rem;
+        color: var(--text);
       }
 
       .lab-chip {
@@ -309,6 +339,57 @@
         margin-top: 8px;
       }
 
+      .cv-list {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+
+      .cv-list li {
+        margin-bottom: 6px;
+        line-height: 1.5;
+      }
+
+      .pill-list {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 0;
+        margin: 12px 0 0;
+      }
+
+      .pill {
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+        color: var(--text);
+        font-size: 0.9rem;
+      }
+
+      .item-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .item-links a {
+        text-decoration: none;
+        color: var(--accent);
+        border: 1px solid var(--panel-border);
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+      }
+
+      .item-links a:hover {
+        background: var(--panel);
+        border-color: var(--accent);
+      }
+
       .links {
         display: flex;
         flex-wrap: wrap;
@@ -401,29 +482,60 @@
           </div>
           <h1>Deep Joshi</h1>
           <p class="tagline">
-            BTech CSE @ Nirma University · Researcher-in-training building lab-grade systems for
-            sustainable AI and computer vision.
+            I dive into what I'm not good at—because the easy stuff doesn't ignite my spirit.
           </p>
+          <div class="header-info">
+            <div>
+              <span class="info-label">Nirma University</span>
+              <span class="info-value">Ahmedabad, India, 382481</span>
+            </div>
+            <div>
+              <span class="info-label">Phone</span>
+              <span class="info-value">
+                <a class="inline-link" href="tel:+919265641668">+91 92656 41668</a>
+              </span>
+            </div>
+            <div>
+              <span class="info-label">Email</span>
+              <span class="info-value">
+                <a class="inline-link" href="mailto:24bce152@nirmauni.ac.in"
+                  >24bce152@nirmauni.ac.in</a
+                >
+              </span>
+            </div>
+            <div>
+              <span class="info-label">Alternate</span>
+              <span class="info-value">
+                <a class="inline-link" href="mailto:deep@computer.org">deep@computer.org</a>
+              </span>
+            </div>
+          </div>
           <div class="signal-row">
             <div class="signal">
-              <span class="signal-title">Lab focus</span>
-              <span class="signal-value">GreenAI · Computer Vision · Applied Systems</span>
+              <span class="signal-title">CGPA</span>
+              <span class="signal-value">8.6/10 · Semester 4 completed</span>
+            </div>
+            <div class="signal">
+              <span class="signal-title">BTech timeline</span>
+              <span class="signal-value">August 2024 — August 2028</span>
+            </div>
+            <div class="signal">
+              <span class="signal-title">Focus areas</span>
+              <span class="signal-value">Computer Networking · Computer Vision · GreenAI</span>
             </div>
             <div class="signal">
               <span class="signal-title">Current role</span>
-              <span class="signal-value">Undergrad researcher @ Nirma University</span>
-            </div>
-            <div class="signal">
-              <span class="signal-title">Collaboration</span>
-              <span class="signal-value">Open to lab partnerships and applied research</span>
+              <span class="signal-value">Technical Head, IEEE Computer Society</span>
             </div>
           </div>
           <nav class="nav">
             <a href="#summary">Summary</a>
-            <a href="#focus">Lab Focus</a>
+            <a href="#projects">Projects</a>
             <a href="#experience">Experience</a>
             <a href="#education">Education</a>
-            <a href="#research">Publications</a>
+            <a href="#skills">Skills</a>
+            <a href="#publications">Publications</a>
+            <a href="#languages">Languages</a>
             <a href="#contact">Contact</a>
           </nav>
         </header>
@@ -431,26 +543,45 @@
         <section id="summary" class="cv-section">
           <h2>Summary</h2>
           <p>
-            Research-oriented computer science student focused on ethical, sustainable AI
-            and applied computer vision. I enjoy collaborative problem-solving and turning
-            lab discoveries into reliable, real-world systems.
+            BTech CSE student at Nirma University focused on research in computer networking,
+            computer vision, and GreenAI. I collaborate through IEEE initiatives and aim to
+            translate lab ideas into dependable systems.
           </p>
         </section>
 
-        <section id="focus" class="cv-section">
-          <h2>Lab Focus</h2>
-          <div class="focus-grid">
-            <div class="focus-card">
-              <h3>GreenAI Systems</h3>
-              <p>Energy-aware training, efficient inference, and sustainable ML workflows.</p>
+        <section id="projects" class="cv-section">
+          <h2>Projects</h2>
+          <div class="cv-item">
+            <div class="cv-role">Bit-per-Buck — AI Evaluation</div>
+            <div class="cv-meta">Research project · Evaluation framework</div>
+            <p class="cv-details">
+              We propose an evaluation framework where models are ranked by utility and by
+              the cost required to achieve that utility, highlighting diminishing returns
+              from scale.
+            </p>
+            <div class="item-links">
+              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+                >Project brief (link placeholder)</a
+              >
+              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+                >Repository (link placeholder)</a
+              >
             </div>
-            <div class="focus-card">
-              <h3>Computer Vision</h3>
-              <p>Vision pipelines that translate research prototypes into robust perception.</p>
-            </div>
-            <div class="focus-card">
-              <h3>Research Leadership</h3>
-              <p>Mentoring peers, coordinating initiatives, and shaping publishable results.</p>
+          </div>
+          <div class="cv-item">
+            <div class="cv-role">Agent Bodhi — Agentic AI</div>
+            <div class="cv-meta">IEEE CS chapter initiative · Technical lead</div>
+            <p class="cv-details">
+              Exploring how agentic AI can augment research workflows within the IEEE CS
+              chapter, with a focus on deployable research prototypes.
+            </p>
+            <div class="item-links">
+              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+                >Overview (link placeholder)</a
+              >
+              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+                >Demo (link placeholder)</a
+              >
             </div>
           </div>
         </section>
@@ -459,10 +590,11 @@
           <h2>Experience</h2>
           <div class="cv-item">
             <div class="cv-role">Technical Head, IEEE Computer Society</div>
-            <div class="cv-meta">Nirma University · Leadership</div>
+            <div class="cv-meta">Nirma University · Leadership · September 2025 — Present</div>
             <p class="cv-details">
-              Led technical initiatives, mentored peers, and coordinated research-focused
-              activities within the student chapter.
+              Lead technical initiatives, mentor peers, and coordinate research-focused
+              activities within the student chapter. I also manage external connections,
+              including a talk with HoS at Google Cloud India.
             </p>
           </div>
         
@@ -472,31 +604,73 @@
           <h2>Education</h2>
           <div class="cv-item">
             <div class="cv-role">BTech in Computer Science &amp; Engineering</div>
-            <div class="cv-meta">Nirma University · Undergraduate</div>
-            <p class="cv-details">Focus areas include AI research, data systems, and CV.</p>
+            <div class="cv-meta">Nirma University · August 2024 — August 2028</div>
+            <p class="cv-details">BTech in CS with research-centered coursework.</p>
+            <ul class="cv-list">
+              <li>CGPA: 8.6/10 (Semester 4 completed).</li>
+              <li>Current fields: Computer Networking, Computer Vision, GreenAI.</li>
+            </ul>
           </div>
         </section>
 
-        <section id="research" class="cv-section">
-          <h2>Research Papers</h2>
+        <section id="skills" class="cv-section">
+          <h2>Skills</h2>
+          <ul class="pill-list">
+            <li class="pill">PyTorch</li>
+            <li class="pill">Google ADK</li>
+            <li class="pill">C#</li>
+          </ul>
+        </section>
+
+        <section id="publications" class="cv-section">
+          <h2>Publications</h2>
           <div class="cv-item">
-            <div class="cv-role">FedQ-Fraud — FIDTA Workshop at MobiHoc'25</div>
-            <div class="cv-meta">Publication</div>
+            <div class="cv-role">
+              FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud
+              Detection
+            </div>
+            <div class="cv-meta">ACM MobiHoc'25 · FIDTA Workshop</div>
             <p class="cv-details">
-              <a
-                class="inline-link"
-                href="https://dl.acm.org/doi/10.1145/3704413.3765511"
-                target="_blank"
-                rel="noreferrer"
-                >View publication</a
-              >
+              Research paper detailing a federated learning approach for fraud detection.
             </p>
+            <div class="item-links">
+              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+                >Paper link (placeholder)</a
+              >
+              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+                >Slides (placeholder)</a
+              >
+            </div>
           </div>
+        </section>
+
+        <section id="languages" class="cv-section">
+          <h2>Languages</h2>
+          <ul class="pill-list">
+            <li class="pill">English</li>
+            <li class="pill">Gujarati</li>
+            <li class="pill">Hindi</li>
+            <li class="pill">French</li>
+          </ul>
         </section>
 
         <section id="contact" class="cv-section">
           <h2>Contact</h2>
           <p>Let’s connect for research, collaboration, or lab-scale project opportunities.</p>
+          <ul class="cv-list">
+            <li>Nirma University, Ahmedabad, India, 382481.</li>
+            <li>
+              Phone: <a class="inline-link" href="tel:+919265641668">+91 92656 41668</a>
+            </li>
+            <li>
+              Email:
+              <a class="inline-link" href="mailto:24bce152@nirmauni.ac.in"
+                >24bce152@nirmauni.ac.in</a
+              >
+              ·
+              <a class="inline-link" href="mailto:deep@computer.org">deep@computer.org</a>
+            </li>
+          </ul>
           <div class="links">
             <a href="https://www.linkedin.com/in/deep-lumiere" target="_blank" rel="noreferrer"
               >LinkedIn Profile</a
@@ -504,7 +678,9 @@
             <a href="https://github.com/DeepLumiere" target="_blank" rel="noreferrer"
               >GitHub</a
             >
-            <a href="mailto:dudecomputerscience@gmail.com">Email</a>
+            <a href="https://placeholder.url" target="_blank" rel="noreferrer"
+              >Research profile (placeholder)</a
+            >
           </div>
         </section>
 
