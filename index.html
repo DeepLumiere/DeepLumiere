@@ -8,6 +8,9 @@
       content="Deep Joshi — BTech CSE student at Nirma University (CGPA 8.6/10), focused on GreenAI, computer vision, and research systems."
     />
     <title>Deep Joshi | DeepLumiere</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <link rel="shortcut icon" href="favicon.svg" />
     <style>
       :root {
         color-scheme: dark;
@@ -192,6 +195,67 @@
         align-items: center;
         justify-content: space-between;
         gap: 14px;
+      }
+
+      .profile-photo {
+        position: relative;
+        width: clamp(120px, 18vw, 170px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        align-self: flex-start;
+        display: grid;
+        place-items: center;
+        margin: 6px 0 2px;
+      }
+
+      .profile-photo::before,
+      .profile-photo::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          #7ad1ff,
+          #b6f1ff,
+          #f87171,
+          #2dd4bf,
+          #8e5bff,
+          #7ad1ff
+        );
+        animation: profileSpin 10s linear infinite;
+      }
+
+      .profile-photo::before {
+        inset: -12px;
+        filter: blur(18px);
+        opacity: 0.6;
+        z-index: 0;
+      }
+
+      .profile-photo::after {
+        inset: -4px;
+        -webkit-mask: radial-gradient(
+          farthest-side,
+          transparent calc(100% - 6px),
+          #000 0
+        );
+        mask: radial-gradient(
+          farthest-side,
+          transparent calc(100% - 6px),
+          #000 0
+        );
+        z-index: 1;
+      }
+
+      .profile-photo img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        position: relative;
+        z-index: 2;
+        border: 2px solid rgba(12, 16, 33, 0.6);
+        background: var(--bg-soft);
       }
 
       .header-actions {
@@ -472,6 +536,15 @@
         }
       }
 
+      @keyframes profileSpin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         body {
           transition: none;
@@ -485,6 +558,11 @@
         #rainbow {
           animation: none;
         }
+
+        .profile-photo::before,
+        .profile-photo::after {
+          animation: none;
+        }
       }
 
       @media (max-width: 720px) {
@@ -494,6 +572,10 @@
 
         .card {
           padding: 32px 28px;
+        }
+
+        .profile-photo {
+          align-self: center;
         }
       }
     </style>
@@ -519,6 +601,12 @@
                 <span class="toggle-text" id="theme-label">Switch to Dawn</span>
               </button>
             </div>
+          </div>
+          <div class="profile-photo">
+            <img
+              src="https://placehold.co/260x260.png?text=Your+Photo"
+              alt="Portrait of Deep Joshi"
+            />
           </div>
           <h1>Deep Joshi</h1>
           <p class="tagline">
