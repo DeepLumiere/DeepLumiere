@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Deep Joshi — BTech CSE student, researcher, and builder focused on GreenAI and computer vision."
+    />
+    <title>Deep Joshi | DeepLumiere</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0d1c;
+        --card: rgba(12, 16, 33, 0.6);
+        --line: rgba(122, 209, 255, 0.15);
+        --text: #e6eef9;
+        --muted: #b6c3d6;
+        --accent: #7ad1ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top, #1b234a 0%, var(--bg) 55%);
+      }
+
+      #bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 80px 8vw;
+      }
+
+      .card {
+        max-width: 760px;
+        padding: 40px 42px;
+        border-radius: 28px;
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 60px rgba(2, 6, 23, 0.55);
+        backdrop-filter: blur(12px);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2.4rem, 3.5vw, 3.2rem);
+        letter-spacing: -0.02em;
+      }
+
+      h2 {
+        margin: 32px 0 12px;
+        font-size: 1.15rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+      }
+
+      p {
+        margin: 0 0 16px;
+        line-height: 1.6;
+        color: var(--muted);
+      }
+
+      .tagline {
+        font-size: 1.05rem;
+        color: var(--text);
+      }
+
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .pills li {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .links a {
+        text-decoration: none;
+        color: var(--accent);
+        border: 1px solid rgba(122, 209, 255, 0.3);
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+      }
+
+      .links a:hover {
+        background: rgba(122, 209, 255, 0.12);
+        border-color: rgba(122, 209, 255, 0.6);
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        margin: 12px 0 0;
+      }
+
+      .grid div {
+        border-left: 2px solid rgba(122, 209, 255, 0.4);
+        padding-left: 14px;
+      }
+
+      footer {
+        margin-top: 32px;
+        font-size: 0.85rem;
+        color: rgba(230, 238, 249, 0.6);
+      }
+
+      @media (max-width: 720px) {
+        main {
+          padding: 64px 6vw;
+        }
+
+        .card {
+          padding: 32px 28px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bg" aria-hidden="true"></canvas>
+    <main>
+      <section class="card">
+        <h1>Deep Joshi</h1>
+        <p class="tagline">
+          BTech CSE @ Nirma University · Research-driven builder focused on GreenAI and
+          Computer Vision.
+        </p>
+        <ul class="pills">
+          <li>Research &amp; Innovation</li>
+          <li>Data &amp; Systems</li>
+          <li>Ethics + Environment</li>
+          <li>Team Leadership</li>
+        </ul>
+
+        <h2>Work</h2>
+        <p>
+          For my experience, leadership roles, and projects, please visit my LinkedIn
+          profile. It’s the most up-to-date snapshot of my professional work.
+        </p>
+        <div class="links">
+          <a href="https://www.linkedin.com/in/deep-lumiere" target="_blank" rel="noreferrer"
+            >LinkedIn Profile</a
+          >
+          <a href="https://github.com/DeepLumiere" target="_blank" rel="noreferrer"
+            >GitHub</a
+          >
+          <a href="mailto:dudecomputerscience@gmail.com">Email</a>
+        </div>
+
+        <h2>Highlights</h2>
+        <div class="grid">
+          <div>Technical Head, IEEE Computer Society Nirma University</div>
+          <div>
+            Publication: FedQ-Fraud — FIDTA Workshop at MobiHoc'25
+            <a
+              href="https://dl.acm.org/doi/10.1145/3704413.3765511"
+              target="_blank"
+              rel="noreferrer"
+              style="color: var(--accent); text-decoration: none;"
+              >View</a
+            >
+          </div>
+          <div>Always open for research collaborations and impactful projects.</div>
+        </div>
+
+        <footer>© 2026 Deep Joshi · DeepLumiere</footer>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const canvas = document.getElementById("bg");
+        const ctx = canvas.getContext("2d");
+        const prefersReducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+        const pointer = { x: 0, y: 0, active: false };
+        const particles = [];
+        const maxLinkDistance = 140;
+        const color = { r: 122, g: 209, b: 255 };
+
+        const resize = () => {
+          const { innerWidth: width, innerHeight: height, devicePixelRatio: dpr } =
+            window;
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          canvas.style.width = `${width}px`;
+          canvas.style.height = `${height}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+
+        const targetCount = () =>
+          Math.min(70, Math.floor((window.innerWidth * window.innerHeight) / 24000));
+
+        const seedParticles = () => {
+          particles.length = 0;
+          for (let i = 0; i < targetCount(); i += 1) {
+            particles.push({
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight,
+              vx: (Math.random() - 0.5) * 0.4,
+              vy: (Math.random() - 0.5) * 0.4,
+              size: Math.random() * 1.6 + 0.6,
+            });
+          }
+        };
+
+        const draw = () => {
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+          for (let i = 0; i < particles.length; i += 1) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < 0 || p.x > window.innerWidth) p.vx *= -1;
+            if (p.y < 0 || p.y > window.innerHeight) p.vy *= -1;
+
+            if (pointer.active) {
+              const dx = pointer.x - p.x;
+              const dy = pointer.y - p.y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < 180 && dist > 1) {
+                p.vx += (dx / dist) * 0.004;
+                p.vy += (dy / dist) * 0.004;
+              }
+            }
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, 0.18)`;
+            ctx.fill();
+          }
+
+          for (let i = 0; i < particles.length; i += 1) {
+            for (let j = i + 1; j < particles.length; j += 1) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < maxLinkDistance) {
+                const opacity = 0.14 * (1 - dist / maxLinkDistance);
+                ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
+                ctx.beginPath();
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+              }
+            }
+          }
+        };
+
+        const tick = () => {
+          draw();
+          if (!prefersReducedMotion) {
+            requestAnimationFrame(tick);
+          }
+        };
+
+        window.addEventListener("resize", () => {
+          resize();
+          seedParticles();
+          draw();
+        });
+
+        window.addEventListener("pointermove", (event) => {
+          pointer.x = event.clientX;
+          pointer.y = event.clientY;
+          pointer.active = true;
+        });
+
+        window.addEventListener("pointerleave", () => {
+          pointer.active = false;
+        });
+
+        resize();
+        seedParticles();
+        tick();
+      })();
+    </script>
+  </body>
+</html>
