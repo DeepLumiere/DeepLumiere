@@ -43,12 +43,12 @@
         z-index: 1;
         min-height: 100vh;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         padding: 80px 8vw;
       }
 
       .card {
-        max-width: 760px;
+        max-width: 820px;
         padding: 40px 42px;
         border-radius: 28px;
         background: var(--card);
@@ -64,7 +64,7 @@
       }
 
       h2 {
-        margin: 32px 0 12px;
+        margin: 0 0 12px;
         font-size: 1.15rem;
         text-transform: uppercase;
         letter-spacing: 0.2em;
@@ -82,28 +82,81 @@
         color: var(--text);
       }
 
-      .pills {
+      .eyebrow {
+        margin: 0;
+        font-size: 0.85rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(230, 238, 249, 0.7);
+      }
+
+      .header {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+
+      .nav {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        margin: 18px 0 0;
+        margin: 0;
         padding: 0;
         list-style: none;
       }
 
-      .pills li {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 8px 14px;
+      .nav a {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 7px 12px;
         border-radius: 999px;
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+
+      .nav a:hover {
+        color: var(--text);
+        border-color: rgba(122, 209, 255, 0.6);
+      }
+
+      .cv-section {
+        margin-top: 28px;
+        scroll-margin-top: 120px;
+      }
+
+      .cv-item {
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .cv-item:last-child {
+        border-bottom: none;
+      }
+
+      .cv-role {
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .cv-meta {
+        margin-top: 4px;
         font-size: 0.9rem;
         color: var(--muted);
+      }
+
+      .cv-details {
+        margin-top: 8px;
       }
 
       .links {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 20px;
+        margin-top: 12px;
       }
 
       .links a {
@@ -121,15 +174,13 @@
         border-color: rgba(122, 209, 255, 0.6);
       }
 
-      .grid {
-        display: grid;
-        gap: 16px;
-        margin: 12px 0 0;
+      .inline-link {
+        color: var(--accent);
+        text-decoration: none;
       }
 
-      .grid div {
-        border-left: 2px solid rgba(122, 209, 255, 0.4);
-        padding-left: 14px;
+      .inline-link:hover {
+        text-decoration: underline;
       }
 
       footer {
@@ -153,48 +204,96 @@
     <canvas id="bg" aria-hidden="true"></canvas>
     <main>
       <section class="card">
-        <h1>Deep Joshi</h1>
-        <p class="tagline">
-          BTech CSE @ Nirma University · Research-driven builder focused on GreenAI and
-          Computer Vision.
-        </p>
-        <ul class="pills">
-          <li>Research &amp; Innovation</li>
-          <li>Data &amp; Systems</li>
-          <li>Ethics + Environment</li>
-          <li>Team Leadership</li>
-        </ul>
+        <header class="header">
+          <p class="eyebrow">Curriculum Vitae</p>
+          <h1>Deep Joshi</h1>
+          <p class="tagline">
+            BTech CSE @ Nirma University · Research-driven builder focused on GreenAI and
+            Computer Vision.
+          </p>
+          <nav class="nav">
+            <a href="#summary">Summary</a>
+            <a href="#experience">Experience</a>
+            <a href="#education">Education</a>
+            <a href="#research">Research</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </header>
 
-        <h2>Work</h2>
-        <p>
-          For my experience, leadership roles, and projects, please visit my LinkedIn
-          profile. It’s the most up-to-date snapshot of my professional work.
-        </p>
-        <div class="links">
-          <a href="https://www.linkedin.com/in/deep-lumiere" target="_blank" rel="noreferrer"
-            >LinkedIn Profile</a
-          >
-          <a href="https://github.com/DeepLumiere" target="_blank" rel="noreferrer"
-            >GitHub</a
-          >
-          <a href="mailto:dudecomputerscience@gmail.com">Email</a>
-        </div>
+        <section id="summary" class="cv-section">
+          <h2>Summary</h2>
+          <p>
+            Research-oriented computer science student focused on ethical, sustainable AI
+            and applied computer vision. I enjoy collaborative problem-solving and turning
+            data-driven ideas into practical systems.
+          </p>
+        </section>
 
-        <h2>Highlights</h2>
-        <div class="grid">
-          <div>Technical Head, IEEE Computer Society Nirma University</div>
-          <div>
-            Publication: FedQ-Fraud — FIDTA Workshop at MobiHoc'25
-            <a
-              href="https://dl.acm.org/doi/10.1145/3704413.3765511"
-              target="_blank"
-              rel="noreferrer"
-              style="color: var(--accent); text-decoration: none;"
-              >View</a
-            >
+        <section id="experience" class="cv-section">
+          <h2>Experience</h2>
+          <div class="cv-item">
+            <div class="cv-role">Technical Head, IEEE Computer Society</div>
+            <div class="cv-meta">Nirma University · Leadership</div>
+            <p class="cv-details">
+              Led technical initiatives, mentored peers, and coordinated research-focused
+              activities within the student chapter.
+            </p>
           </div>
-          <div>Always open for research collaborations and impactful projects.</div>
-        </div>
+          <div class="cv-item">
+            <div class="cv-role">Research &amp; Collaboration</div>
+            <div class="cv-meta">Open to AI, data, ethics, and sustainability projects</div>
+            <p class="cv-details">
+              Full work history, projects, and roles are kept current on
+              <a
+                class="inline-link"
+                href="https://www.linkedin.com/in/deep-lumiere"
+                target="_blank"
+                rel="noreferrer"
+                >LinkedIn</a
+              >.
+            </p>
+          </div>
+        </section>
+
+        <section id="education" class="cv-section">
+          <h2>Education</h2>
+          <div class="cv-item">
+            <div class="cv-role">BTech in Computer Science &amp; Engineering</div>
+            <div class="cv-meta">Nirma University · Undergraduate</div>
+            <p class="cv-details">Focus areas include AI research, data systems, and CV.</p>
+          </div>
+        </section>
+
+        <section id="research" class="cv-section">
+          <h2>Research Papers</h2>
+          <div class="cv-item">
+            <div class="cv-role">FedQ-Fraud — FIDTA Workshop at MobiHoc'25</div>
+            <div class="cv-meta">Publication</div>
+            <p class="cv-details">
+              <a
+                class="inline-link"
+                href="https://dl.acm.org/doi/10.1145/3704413.3765511"
+                target="_blank"
+                rel="noreferrer"
+                >View publication</a
+              >
+            </p>
+          </div>
+        </section>
+
+        <section id="contact" class="cv-section">
+          <h2>Contact</h2>
+          <p>Let’s connect for research, collaboration, or project opportunities.</p>
+          <div class="links">
+            <a href="https://www.linkedin.com/in/deep-lumiere" target="_blank" rel="noreferrer"
+              >LinkedIn Profile</a
+            >
+            <a href="https://github.com/DeepLumiere" target="_blank" rel="noreferrer"
+              >GitHub</a
+            >
+            <a href="mailto:dudecomputerscience@gmail.com">Email</a>
+          </div>
+        </section>
 
         <footer>© 2026 Deep Joshi · DeepLumiere</footer>
       </section>
