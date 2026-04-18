@@ -548,10 +548,14 @@
             storedTheme = localStorage.getItem("theme");
           } catch {
             storedTheme = null;
-            console.warn("Theme preference could not be read from localStorage.");
+            console.warn(
+              "Theme preference could not be read from localStorage; using system default."
+            );
           }
         } else {
-          console.warn("Theme preference storage is unavailable.");
+          console.warn(
+            "Theme preference storage is unavailable; defaults will be used and changes won't persist."
+          );
         }
         let activeTheme =
           storedTheme && themeColors[storedTheme]
@@ -578,6 +582,9 @@
         };
 
         const setPointerGlow = (x, y) => {
+          if (prefersReducedMotion) {
+            return;
+          }
           const { innerWidth, innerHeight } = window;
           if (innerWidth === 0 || innerHeight === 0) {
             return;
@@ -603,7 +610,9 @@
               try {
                 localStorage.setItem("theme", nextTheme);
               } catch {
-                console.warn("Theme preference could not be saved to localStorage.");
+                console.warn(
+                  "Theme preference could not be saved; changes apply only for this session."
+                );
               }
             }
           });
