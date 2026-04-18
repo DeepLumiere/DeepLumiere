@@ -38,7 +38,7 @@ I love taking up challenges and I'm always open to talk and team up. Feel free t
 
 ## 🖼️ And a bit of Vectors 
 
-<img src="https://github.com/DeepLumiere/DeepLumiere/blob/main/images/design-3.png" alt="My Design" width="100%">
+<img src="https://github.com/DeepLumiere/DeepLumiere/blob/main/images/design-2.png" alt="My Design" width="100%">
 
 ---
 
