@@ -106,10 +106,11 @@
           rgba(139, 92, 246, 0.16),
           rgba(236, 72, 153, 0.18)
         );
-        opacity: 0.28;
-        filter: blur(40px) saturate(120%);
+        opacity: 0.5;
+        filter: blur(34px) saturate(150%);
         mix-blend-mode: screen;
-        animation: rainbowShift 36s linear infinite;
+        background-size: 220% 220%;
+        animation: rainbowShift 22s linear infinite;
       }
 
       #bg {
@@ -220,6 +221,28 @@
       }
 
       .info-value {
+        font-size: 0.95rem;
+        color: var(--text);
+      }
+
+      .focus-highlight {
+        margin-top: 14px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+      }
+
+      .focus-label {
+        display: block;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .focus-value {
         font-size: 0.95rem;
         color: var(--text);
       }
@@ -434,15 +457,18 @@
       @keyframes rainbowShift {
         0% {
           transform: translate3d(0, 0, 0) rotate(0deg);
-          filter: blur(40px) saturate(120%) hue-rotate(0deg);
+          background-position: 0% 40%;
+          filter: blur(34px) saturate(150%) hue-rotate(0deg);
         }
         50% {
-          transform: translate3d(-4%, -2%, 0) rotate(8deg);
-          filter: blur(40px) saturate(120%) hue-rotate(180deg);
+          transform: translate3d(-6%, -4%, 0) rotate(10deg);
+          background-position: 80% 60%;
+          filter: blur(34px) saturate(150%) hue-rotate(180deg);
         }
         100% {
           transform: translate3d(0, 0, 0) rotate(360deg);
-          filter: blur(40px) saturate(120%) hue-rotate(360deg);
+          background-position: 0% 40%;
+          filter: blur(34px) saturate(150%) hue-rotate(360deg);
         }
       }
 
@@ -524,9 +550,13 @@
               </span>
             </div>
           </div>
+          <div class="focus-highlight">
+            <span class="focus-label">Focus Areas</span>
+            <span class="focus-value">Computer Networking · Computer Vision · GreenAI</span>
+          </div>
           <nav class="nav">
             <a href="#summary">Summary</a>
-            <a href="#interests">Interest Zones</a>
+            <a href="#focus-areas">Focus Areas</a>
             <a href="#projects">Projects</a>
             <a href="#experience">Experience</a>
             <a href="#education">Education</a>
@@ -538,14 +568,14 @@
         <section id="summary" class="cv-section">
           <h2>Summary</h2>
           <p>
-            BTech CSE student at Nirma University focused on research in GreenAI,
-            benchmarking, and computer vision. I collaborate through IEEE initiatives and aim
-            to translate lab ideas into dependable systems.
+            BTech CSE student at Nirma University with research interests in GreenAI,
+            benchmarking, and computer vision. I collaborate through IEEE initiatives and
+            aim to translate lab ideas into dependable systems.
           </p>
         </section>
 
-        <section id="interests" class="cv-section">
-          <h2>Interest Zones</h2>
+        <section id="focus-areas" class="cv-section">
+          <h2>Focus Areas</h2>
           <ul class="pill-list">
             <li class="pill">GreenAI</li>
             <li class="pill">Benchmarking</li>
@@ -559,18 +589,17 @@
             <div class="cv-role">Bit-per-Buck — AI Evaluation</div>
             <div class="cv-meta">Research project · Evaluation framework</div>
             <p class="cv-details">
-              This is a research project where we are proposing an evaluation framework where
-              models aren’t just ranked as per their utility, but also the cost behind
-              achieving that, and showcasing the diminishing returns from scale.
+              A research initiative proposing an evaluation framework that ranks models by
+              utility and the cost required to achieve that utility, highlighting diminishing
+              returns from scale.
             </p>
           </div>
           <div class="cv-item">
             <div class="cv-role">Agent Bodhi — Agentic AI</div>
             <div class="cv-meta">IEEE CS chapter initiative · Technical lead</div>
             <p class="cv-details">
-              This project is currently being worked on at my IEEE CS chapter, where we’re
-              working on agentic AI and discovering how it can work in our research work. In
-              this project, I am working as a technical lead.
+              An ongoing IEEE CS chapter initiative exploring how agentic AI can support
+              research workflows and prototyping. I serve as the technical lead.
             </p>
           </div>
         </section>
@@ -583,10 +612,9 @@
             </div>
             <div class="cv-meta">September 2025 - Present</div>
             <p class="cv-details">
-              In the role of Tech Head at the student chapter, I contribute to projects and
-              lead a few in the field of research and beyond. Along with technical work, I
-              also pursue an interest in meeting people. I manage external connections, such
-              as a talk with HoS at Google Cloud India, which I led.
+              As Technical Head at the student chapter, I contribute to projects and lead
+              research initiatives. I also manage external collaborations, including
+              organizing a talk with the HoS at Google Cloud India.
             </p>
           </div>
         </section>
@@ -598,7 +626,7 @@
             <div class="cv-meta">August 2024 - August 2028</div>
             <ul class="cv-list">
               <li>CGPA: 8.6/10</li>
-              <li>Semester 4 Completed</li>
+              <li>Semester 4 completed</li>
               <li>Current fields: Computer Networking, Computer Vision, and GreenAI</li>
             </ul>
           </div>
