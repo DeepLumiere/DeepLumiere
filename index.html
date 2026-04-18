@@ -200,45 +200,16 @@
         display: grid;
         place-items: center;
         margin: 6px 0 2px;
-      }
-
-      .profile-photo::before,
-      .profile-photo::after {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        background: conic-gradient(
-          from 0deg,
-          var(--accent),
-          var(--accent-strong),
-          var(--glow-1),
-          var(--accent),
-          var(--accent-strong),
-          var(--glow-1)
+        padding: 6px;
+        background: linear-gradient(
+          145deg,
+          color-mix(in srgb, var(--accent) 55%, transparent),
+          color-mix(in srgb, var(--accent-strong) 40%, transparent)
         );
-        animation: profileSpin 10s linear infinite;
-      }
-
-      .profile-photo::before {
-        inset: -12px;
-        filter: blur(18px);
-        opacity: 0.6;
-        z-index: 0;
-      }
-
-      .profile-photo::after {
-        inset: -4px;
-        -webkit-mask: radial-gradient(
-          farthest-side,
-          transparent calc(100% - 6px),
-          #000 0
-        );
-        mask: radial-gradient(
-          farthest-side,
-          transparent calc(100% - 6px),
-          #000 0
-        );
-        z-index: 1;
+        border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--panel-border));
+        box-shadow:
+          0 16px 36px rgba(2, 6, 23, 0.34),
+          0 0 0 6px color-mix(in srgb, var(--panel) 90%, transparent);
       }
 
       .profile-photo img {
@@ -246,9 +217,7 @@
         height: 100%;
         border-radius: 50%;
         object-fit: cover;
-        position: relative;
-        z-index: 2;
-        border: 2px solid rgba(12, 16, 33, 0.6);
+        border: 2px solid color-mix(in srgb, var(--bg-soft) 82%, #ffffff 18%);
         background: var(--bg-soft);
       }
 
@@ -374,6 +343,10 @@
       .cv-section {
         margin-top: 28px;
         scroll-margin-top: 120px;
+        padding: 18px 20px;
+        border-radius: 18px;
+        background: color-mix(in srgb, var(--panel) 85%, transparent);
+        border: 1px solid var(--panel-border);
       }
 
       .focus-grid {
@@ -391,22 +364,27 @@
       }
 
       .cv-item {
-        padding: 14px 0;
+        padding: 16px 0 16px 14px;
         border-bottom: 1px solid var(--panel-border);
+        border-left: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
       }
 
       .cv-item:last-child {
         border-bottom: none;
+        padding-bottom: 0;
       }
 
       .cv-role {
         font-weight: 600;
         color: var(--text);
+        letter-spacing: 0.01em;
       }
 
       .cv-meta {
         margin-top: 4px;
-        font-size: 0.9rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
         color: var(--muted);
       }
 
@@ -530,12 +508,6 @@
         }
       }
 
-      @keyframes profileSpin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
       @media (prefers-reduced-motion: reduce) {
         body {
           transition: none;
@@ -550,10 +522,6 @@
           animation: none;
         }
 
-        .profile-photo::before,
-        .profile-photo::after {
-          animation: none;
-        }
       }
 
       @media (max-width: 720px) {
@@ -596,12 +564,12 @@
           <div class="profile-photo">
             <img
               src="https://avatars.githubusercontent.com/u/173024745?v=4"
-              alt="Profile photo placeholder"
+              alt="Portrait of Deep Joshi"
             />
           </div>
           <h1>Deep Joshi</h1>
           <p class="tagline">
-            I dive into what I'm not good at—because the easy stuff doesn't ignite my spirit.
+            Building reliable, research-informed AI systems with a focus on practical impact.
           </p>
           <div class="header-info">
             <div>
@@ -668,14 +636,17 @@
             <div class="cv-role">Bit-per-Buck — AI Evaluation</div>
             <div class="cv-meta">Research project · Evaluation framework</div>
             <p class="cv-details">
-              This is a research project where we are proposing an evaluation framework where models aren’t just ranked as per their utility, but also the cost behind achieving that, and showcasing the diminishing returns from scale.
+              Developing an evaluation framework that ranks AI models by both utility and
+              compute cost to highlight performance-efficiency trade-offs and diminishing
+              returns from scale.
             </p>
           </div>
           <div class="cv-item">
             <div class="cv-role">Agent Bodhi — Agentic AI</div>
             <div class="cv-meta">IEEE CS chapter initiative · Technical lead</div>
             <p class="cv-details">
-              This project is currently being worked on at my IEEE CS chapter, where we’re working on agentic AI and discovering how it can work in our research work. In this project, I am working as a technical lead.
+              Leading technical execution for an IEEE CS initiative exploring agentic AI
+              workflows for research and student-led innovation projects.
             </p>
           </div>
         </section>
@@ -688,7 +659,8 @@
             </div>
             <div class="cv-meta">September 2025 - Present</div>
             <p class="cv-details">
-              In the role of Tech Head at the student chapter, I contribute to projects and lead a few in the fi eld of research and beyond. Along with technical work, I also pursue an interest in meeting people. I manage external connections, such as a talk with HoS at Google Cloud India, which I led.
+              Direct chapter technical initiatives, mentor project teams, and coordinate
+              external collaborations, including speaker engagements with industry leaders.
             </p>
           </div>
         </section>
@@ -701,7 +673,7 @@
             <ul class="cv-list">
               <li>CGPA: 8.6/10</li>
               <li>Semester 4 completed</li>
-              <li>Current fields: Computer Networking, Computer Vision, and GreenAI</li>
+              <li>Coursework: Computer Networking, Computer Vision, and GreenAI systems</li>
             </ul>
           </div>
         </section>
@@ -730,7 +702,10 @@
 
         <section id="contact" class="cv-section">
           <h2>Contact</h2>
-          <p>Let’s connect for research, collaboration, or lab-scale project opportunities.</p>
+          <p>
+            Available for research collaborations, technical leadership roles, and internship
+            opportunities.
+          </p>
           <ul class="cv-list">
             <li>Nirma University, Ahmedabad, India, 382481.</li>
             <li>
@@ -751,9 +726,6 @@
             >
             <a href="https://github.com/DeepLumiere" target="_blank" rel="noreferrer"
               >GitHub</a
-            >
-            <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-              >Research profile (placeholder)</a
             >
           </div>
         </section>
