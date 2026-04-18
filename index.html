@@ -388,7 +388,6 @@
                 id="theme-toggle"
                 type="button"
                 aria-label="Toggle color theme"
-                aria-live="polite"
               >
                 <span class="toggle-indicator"></span>
                 <span class="toggle-text" id="theme-label" aria-live="polite">Switch to Dawn</span>
@@ -534,6 +533,7 @@
           storedTheme = localStorage.getItem("theme");
         } catch {
           storedTheme = null;
+          console.warn("Theme preference could not be read from localStorage.");
         }
         let activeTheme =
           storedTheme && themeColors[storedTheme]
@@ -560,15 +560,19 @@
         };
 
         const setPointerGlow = (x, y) => {
-          const clampedX = Math.max(0, Math.min(x, window.innerWidth));
-          const clampedY = Math.max(0, Math.min(y, window.innerHeight));
+          const { innerWidth, innerHeight } = window;
+          if (!innerWidth || !innerHeight) {
+            return;
+          }
+          const clampedX = Math.max(0, Math.min(x, innerWidth));
+          const clampedY = Math.max(0, Math.min(y, innerHeight));
           root.style.setProperty(
             "--pointer-x",
-            `${(clampedX / window.innerWidth) * 100}%`
+            `${(clampedX / innerWidth) * 100}%`
           );
           root.style.setProperty(
             "--pointer-y",
-            `${(clampedY / window.innerHeight) * 100}%`
+            `${(clampedY / innerHeight) * 100}%`
           );
         };
 
@@ -580,6 +584,7 @@
             try {
               localStorage.setItem("theme", nextTheme);
             } catch {
+              console.warn("Theme preference could not be saved to localStorage.");
             }
           });
         }
