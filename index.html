@@ -357,6 +357,10 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
+        body {
+          transition: none;
+        }
+
         body::before,
         body::after {
           animation: none;
@@ -528,12 +532,26 @@
           midnight: "Switch to Dawn",
           dawn: "Switch to Midnight",
         };
+        const storageAvailable = (() => {
+          try {
+            const testKey = "__theme_pref__";
+            localStorage.setItem(testKey, testKey);
+            localStorage.removeItem(testKey);
+            return true;
+          } catch {
+            return false;
+          }
+        })();
         let storedTheme = null;
-        try {
-          storedTheme = localStorage.getItem("theme");
-        } catch {
-          storedTheme = null;
-          console.warn("Theme preference could not be read from localStorage.");
+        if (storageAvailable) {
+          try {
+            storedTheme = localStorage.getItem("theme");
+          } catch {
+            storedTheme = null;
+            console.warn("Theme preference could not be read from localStorage.");
+          }
+        } else {
+          console.warn("Theme preference storage is unavailable.");
         }
         let activeTheme =
           storedTheme && themeColors[storedTheme]
@@ -561,7 +579,7 @@
 
         const setPointerGlow = (x, y) => {
           const { innerWidth, innerHeight } = window;
-          if (!innerWidth || !innerHeight) {
+          if (innerWidth === 0 || innerHeight === 0) {
             return;
           }
           const clampedX = Math.max(0, Math.min(x, innerWidth));
@@ -581,10 +599,12 @@
           themeToggle.addEventListener("click", () => {
             const nextTheme = activeTheme === "midnight" ? "dawn" : "midnight";
             applyTheme(nextTheme);
-            try {
-              localStorage.setItem("theme", nextTheme);
-            } catch {
-              console.warn("Theme preference could not be saved to localStorage.");
+            if (storageAvailable) {
+              try {
+                localStorage.setItem("theme", nextTheme);
+              } catch {
+                console.warn("Theme preference could not be saved to localStorage.");
+              }
             }
           });
         }
