@@ -395,7 +395,9 @@
                 aria-pressed="false"
               >
                 <span class="toggle-indicator"></span>
-                <span class="toggle-text" id="theme-label" aria-live="polite">Switch to Dawn</span>
+                <span class="toggle-text" id="theme-label" aria-live="assertive"
+                  >Switch to Dawn</span
+                >
               </button>
             </div>
           </div>
@@ -525,6 +527,8 @@
         const pointer = { x: 0, y: 0, active: false };
         const particles = [];
         const maxLinkDistance = 140;
+        const DEFAULT_POINTER_X = 0.5;
+        const DEFAULT_POINTER_Y = 0.2;
         const themeColors = {
           midnight: { r: 122, g: 209, b: 255 },
           dawn: { r: 39, g: 93, b: 245 },
@@ -550,12 +554,12 @@
           } catch {
             storedTheme = null;
             console.warn(
-              "theme preference could not be read from localStorage; using system default."
+              "Theme preference could not be read from localStorage; using system default."
             );
           }
         } else {
           console.warn(
-            "theme preference storage is unavailable; defaults will be used and changes won't persist."
+            "Theme preference storage is unavailable; defaults will be used and changes won't persist."
           );
         }
         let activeTheme =
@@ -632,7 +636,7 @@
                 localStorage.setItem("theme", nextTheme);
               } catch {
                 console.warn(
-                  "theme preference could not be saved; changes apply only for this session."
+                  "Theme preference could not be saved; changes apply only for this session."
                 );
               }
             }
@@ -730,11 +734,17 @@
 
         window.addEventListener("pointerleave", () => {
           pointer.active = false;
-          schedulePointerGlow(window.innerWidth * 0.5, window.innerHeight * 0.2);
+          schedulePointerGlow(
+            window.innerWidth * DEFAULT_POINTER_X,
+            window.innerHeight * DEFAULT_POINTER_Y
+          );
         });
 
         resize();
-        setPointerGlow(window.innerWidth * 0.5, window.innerHeight * 0.2);
+        setPointerGlow(
+          window.innerWidth * DEFAULT_POINTER_X,
+          window.innerHeight * DEFAULT_POINTER_Y
+        );
         seedParticles();
         tick();
       })();
