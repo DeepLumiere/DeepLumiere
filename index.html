@@ -525,8 +525,8 @@
         const pointer = { x: 0, y: 0, active: false };
         const particles = [];
         const maxLinkDistance = 140;
-        const DEFAULT_POINTER_X = 0.5;
-        const DEFAULT_POINTER_Y = 0.2;
+        const DEFAULT_POINTER_X_FRACTION = 0.5;
+        const DEFAULT_POINTER_Y_FRACTION = 0.2;
         const themeColors = {
           midnight: { r: 122, g: 209, b: 255 },
           dawn: { r: 39, g: 93, b: 245 },
@@ -584,7 +584,7 @@
           }
         };
 
-        const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+        const clampToRange = (value, min, max) => Math.min(Math.max(value, min), max);
 
         const setPointerGlow = (x, y) => {
           if (prefersReducedMotion) {
@@ -594,8 +594,8 @@
           if (innerWidth === 0 || innerHeight === 0) {
             return;
           }
-          const clampedX = clamp(x, 0, innerWidth);
-          const clampedY = clamp(y, 0, innerHeight);
+          const clampedX = clampToRange(x, 0, innerWidth);
+          const clampedY = clampToRange(y, 0, innerHeight);
           root.style.setProperty(
             "--pointer-x",
             `${(clampedX / innerWidth) * 100}%`
@@ -733,15 +733,15 @@
         window.addEventListener("pointerleave", () => {
           pointer.active = false;
           schedulePointerGlow(
-            window.innerWidth * DEFAULT_POINTER_X,
-            window.innerHeight * DEFAULT_POINTER_Y
+            window.innerWidth * DEFAULT_POINTER_X_FRACTION,
+            window.innerHeight * DEFAULT_POINTER_Y_FRACTION
           );
         });
 
         resize();
         setPointerGlow(
-          window.innerWidth * DEFAULT_POINTER_X,
-          window.innerHeight * DEFAULT_POINTER_Y
+          window.innerWidth * DEFAULT_POINTER_X_FRACTION,
+          window.innerHeight * DEFAULT_POINTER_Y_FRACTION
         );
         seedParticles();
         tick();
