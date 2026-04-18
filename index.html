@@ -383,9 +383,15 @@
             <p class="eyebrow">Research Portfolio</p>
             <div class="header-actions">
               <span class="lab-chip">Systems &amp; Research Lab</span>
-              <button class="theme-toggle" id="theme-toggle" type="button">
+              <button
+                class="theme-toggle"
+                id="theme-toggle"
+                type="button"
+                aria-label="Toggle color theme"
+                aria-live="polite"
+              >
                 <span class="toggle-indicator"></span>
-                <span class="toggle-text" id="theme-label">Switch to Dawn</span>
+                <span class="toggle-text" id="theme-label" aria-live="polite">Switch to Dawn</span>
               </button>
             </div>
           </div>
@@ -549,7 +555,7 @@
             themeLabel.textContent = themeLabels[themeName];
           }
           if (themeToggle) {
-            themeToggle.setAttribute("aria-pressed", themeName === "dawn");
+            themeToggle.setAttribute("aria-pressed", String(themeName === "dawn"));
           }
         };
 
