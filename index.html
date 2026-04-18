@@ -90,6 +90,29 @@
         mix-blend-mode: screen;
       }
 
+      #rainbow {
+        position: fixed;
+        inset: -30%;
+        z-index: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          120deg,
+          rgba(255, 0, 0, 0.18),
+          rgba(255, 127, 0, 0.16),
+          rgba(255, 210, 64, 0.16),
+          rgba(34, 197, 94, 0.16),
+          rgba(14, 165, 233, 0.16),
+          rgba(59, 130, 246, 0.16),
+          rgba(139, 92, 246, 0.16),
+          rgba(236, 72, 153, 0.18)
+        );
+        opacity: 0.5;
+        filter: blur(34px) saturate(150%);
+        mix-blend-mode: screen;
+        background-size: 220% 220%;
+        animation: rainbowShift 22s linear infinite;
+      }
+
       #bg {
         position: fixed;
         inset: 0;
@@ -202,6 +225,28 @@
         color: var(--text);
       }
 
+      .focus-highlight {
+        margin-top: 14px;
+        padding: 12px 16px;
+        border-radius: 16px;
+        background: var(--panel);
+        border: 1px solid var(--panel-border);
+      }
+
+      .focus-label {
+        display: block;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .focus-value {
+        font-size: 0.95rem;
+        color: var(--text);
+      }
+
       .lab-chip {
         padding: 6px 12px;
         border-radius: 999px;
@@ -266,34 +311,6 @@
       .nav a:hover {
         color: var(--text);
         border-color: var(--accent);
-      }
-
-      .signal-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
-        margin: 10px 0 6px;
-      }
-
-      .signal {
-        padding: 12px 14px;
-        border-radius: 16px;
-        background: var(--panel);
-        border: 1px solid var(--panel-border);
-      }
-
-      .signal-title {
-        display: block;
-        font-size: 0.7rem;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: var(--muted);
-        margin-bottom: 6px;
-      }
-
-      .signal-value {
-        font-size: 0.95rem;
-        color: var(--text);
       }
 
       .cv-section {
@@ -437,6 +454,24 @@
         }
       }
 
+      @keyframes rainbowShift {
+        0% {
+          transform: translate3d(0, 0, 0) rotate(0deg);
+          background-position: 0% 40%;
+          filter: blur(34px) saturate(150%) hue-rotate(0deg);
+        }
+        50% {
+          transform: translate3d(-6%, -4%, 0) rotate(10deg);
+          background-position: 80% 60%;
+          filter: blur(34px) saturate(150%) hue-rotate(180deg);
+        }
+        100% {
+          transform: translate3d(0, 0, 0) rotate(360deg);
+          background-position: 0% 40%;
+          filter: blur(34px) saturate(150%) hue-rotate(360deg);
+        }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         body {
           transition: none;
@@ -444,6 +479,10 @@
 
         body::before,
         body::after {
+          animation: none;
+        }
+
+        #rainbow {
           animation: none;
         }
       }
@@ -460,6 +499,7 @@
     </style>
   </head>
   <body>
+    <div id="rainbow" aria-hidden="true"></div>
     <canvas id="bg" aria-hidden="true"></canvas>
     <main>
       <section class="card">
@@ -510,32 +550,17 @@
               </span>
             </div>
           </div>
-          <div class="signal-row">
-            <div class="signal">
-              <span class="signal-title">CGPA</span>
-              <span class="signal-value">8.6/10 · Semester 4 completed</span>
-            </div>
-            <div class="signal">
-              <span class="signal-title">BTech timeline</span>
-              <span class="signal-value">August 2024 — August 2028</span>
-            </div>
-            <div class="signal">
-              <span class="signal-title">Focus areas</span>
-              <span class="signal-value">Computer Networking · Computer Vision · GreenAI</span>
-            </div>
-            <div class="signal">
-              <span class="signal-title">Current role</span>
-              <span class="signal-value">Technical Head, IEEE Computer Society</span>
-            </div>
+          <div class="focus-highlight">
+            <span class="focus-label">Focus Areas</span>
+            <span class="focus-value">GreenAI · Benchmarking · Computer Vision</span>
           </div>
           <nav class="nav">
             <a href="#summary">Summary</a>
+            <a href="#focus-areas">Focus Areas</a>
             <a href="#projects">Projects</a>
             <a href="#experience">Experience</a>
             <a href="#education">Education</a>
-            <a href="#skills">Skills</a>
             <a href="#publications">Publications</a>
-            <a href="#languages">Languages</a>
             <a href="#contact">Contact</a>
           </nav>
         </header>
@@ -543,10 +568,19 @@
         <section id="summary" class="cv-section">
           <h2>Summary</h2>
           <p>
-            BTech CSE student at Nirma University focused on research in computer networking,
-            computer vision, and GreenAI. I collaborate through IEEE initiatives and aim to
-            translate lab ideas into dependable systems.
+            BTech CSE student at Nirma University with research interests in GreenAI,
+            benchmarking, and computer vision. I collaborate through IEEE initiatives and
+            aim to translate lab ideas into dependable systems.
           </p>
+        </section>
+
+        <section id="focus-areas" class="cv-section">
+          <h2>Focus Areas</h2>
+          <ul class="pill-list">
+            <li class="pill">GreenAI</li>
+            <li class="pill">Benchmarking</li>
+            <li class="pill">Computer Vision</li>
+          </ul>
         </section>
 
         <section id="projects" class="cv-section">
@@ -555,71 +589,47 @@
             <div class="cv-role">Bit-per-Buck — AI Evaluation</div>
             <div class="cv-meta">Research project · Evaluation framework</div>
             <p class="cv-details">
-              We propose an evaluation framework where models are ranked by utility and by
-              the cost required to achieve that utility, highlighting diminishing returns
-              from scale.
+              A research initiative proposing an evaluation framework that ranks models by
+              utility and the cost required to achieve that utility, highlighting diminishing
+              returns from scale.
             </p>
-            <div class="item-links">
-              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-                >Project brief (link placeholder)</a
-              >
-              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-                >Repository (link placeholder)</a
-              >
-            </div>
           </div>
           <div class="cv-item">
             <div class="cv-role">Agent Bodhi — Agentic AI</div>
             <div class="cv-meta">IEEE CS chapter initiative · Technical lead</div>
             <p class="cv-details">
-              Exploring how agentic AI can augment research workflows within the IEEE CS
-              chapter, with a focus on deployable research prototypes.
+              An ongoing IEEE CS chapter initiative exploring how agentic AI can support
+              research workflows and prototyping. I serve as the technical lead.
             </p>
-            <div class="item-links">
-              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-                >Overview (link placeholder)</a
-              >
-              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-                >Demo (link placeholder)</a
-              >
-            </div>
           </div>
         </section>
 
         <section id="experience" class="cv-section">
           <h2>Experience</h2>
           <div class="cv-item">
-            <div class="cv-role">Technical Head, IEEE Computer Society</div>
-            <div class="cv-meta">Nirma University · Leadership · September 2025 — Present</div>
+            <div class="cv-role">
+              IEEE Computer Society at Nirma University, India — Technical Head
+            </div>
+            <div class="cv-meta">September 2025 - Present</div>
             <p class="cv-details">
-              Lead technical initiatives, mentor peers, and coordinate research-focused
-              activities within the student chapter. I also manage external connections,
-              including a talk with HoS at Google Cloud India.
+              As Technical Head at the student chapter, I contribute to projects and lead
+              research initiatives. I also manage external collaborations, including
+              organizing a talk with the HoS at Google Cloud India.
             </p>
           </div>
-        
         </section>
 
         <section id="education" class="cv-section">
           <h2>Education</h2>
           <div class="cv-item">
-            <div class="cv-role">BTech in Computer Science &amp; Engineering</div>
-            <div class="cv-meta">Nirma University · August 2024 — August 2028</div>
-            <p class="cv-details">BTech in CS with research-centered coursework.</p>
+            <div class="cv-role">Nirma University, India — BTech in CS</div>
+            <div class="cv-meta">August 2024 - August 2028</div>
             <ul class="cv-list">
-              <li>CGPA: 8.6/10 (Semester 4 completed).</li>
-              <li>Current fields: Computer Networking, Computer Vision, GreenAI.</li>
+              <li>CGPA: 8.6/10</li>
+              <li>Semester 4 completed</li>
+              <li>Current fields: Computer Networking, Computer Vision, and GreenAI</li>
             </ul>
           </div>
-        </section>
-
-        <section id="skills" class="cv-section">
-          <h2>Skills</h2>
-          <ul class="pill-list">
-            <li class="pill">PyTorch</li>
-            <li class="pill">Google ADK</li>
-            <li class="pill">C#</li>
-          </ul>
         </section>
 
         <section id="publications" class="cv-section">
@@ -629,29 +639,19 @@
               FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud
               Detection
             </div>
-            <div class="cv-meta">ACM MobiHoc'25 · FIDTA Workshop</div>
+            <div class="cv-meta">ACM MobiHoc'25</div>
             <p class="cv-details">
               Research paper detailing a federated learning approach for fraud detection.
             </p>
             <div class="item-links">
-              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-                >Paper link (placeholder)</a
-              >
-              <a href="https://placeholder.url" target="_blank" rel="noreferrer"
-                >Slides (placeholder)</a
+              <a
+                href="https://dl.acm.org/doi/10.1145/3704413.3765511"
+                target="_blank"
+                rel="noreferrer"
+                >Paper</a
               >
             </div>
           </div>
-        </section>
-
-        <section id="languages" class="cv-section">
-          <h2>Languages</h2>
-          <ul class="pill-list">
-            <li class="pill">English</li>
-            <li class="pill">Gujarati</li>
-            <li class="pill">Hindi</li>
-            <li class="pill">French</li>
-          </ul>
         </section>
 
         <section id="contact" class="cv-section">
