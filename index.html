@@ -63,7 +63,7 @@
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 #scroller{
   height:100vh;
-  overflow-y:scroll;
+  overflow-y:hidden; /* Starts locked until animation finishes */
   overflow-x:hidden;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
@@ -93,7 +93,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 [data-theme="light"] .blob.c2 { background: rgba(42, 84, 232, 0.08); }
 [data-theme="light"] .blob.c3 { background: rgba(105, 119, 158, 0.07); }
 
-/* This animation organically changes the shape of the blob */
 @keyframes morph {
   0%   { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
   34%  { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
@@ -191,16 +190,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 #nav-chip-ring img{width:100%;height:100%;object-fit:cover}
 #nav-name{
   font-family:var(--serif);
-  font-size:1.1rem;font-weight:500;
+  font-size:18px; /* Hardcoded pixel size to match canvas math flawlessly */
+  font-weight:500;
   color:var(--text);
-  letter-spacing:-.01em;
-  transition:color .4s;
+  /* Removed letter-spacing so it perfectly mirrors canvas rendering */
+  opacity: 0; /* Starts completely invisible to allow particles to render */
 }
 #nav-name em{font-style:italic;color:var(--accent)}
 
 /* ── CV PAGE ─────────────────────────────── */
 #cv{
-  background:transparent; /* Allows blobs to show through */
+  background:transparent; 
   min-height:100vh;
   position:relative;
   z-index:1;
@@ -317,14 +317,13 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
 </head>
 <body>
 
-<div class="bg-blobs" id="blob-container">
-  </div>
+<div class="bg-blobs" id="blob-container"></div>
 
 <div id="scroller">
 
   <section id="intro">
     <canvas id="intro-canvas"></canvas>
-    <p id="hint">Move mouse to reveal</p>
+    <p id="hint">Move mouse or scroll to begin</p>
     <div id="scroll-hint">
       <span>Scroll</span>
       <div class="arr-down"></div>
@@ -490,38 +489,25 @@ const blobColors = ['c1', 'c2', 'c3'];
 
 function spawnBlob(isInitial = false) {
     const blob = document.createElement('div');
-    // Assign random color class
     blob.classList.add('blob', blobColors[Math.floor(Math.random() * blobColors.length)]);
     
-    // Random size between 30vw and 60vw
     const size = 30 + Math.random() * 30;
     blob.style.width = `${size}vw`;
     blob.style.height = `${size}vw`;
     
-    // Random horizontal starting position
     const startX = -10 + Math.random() * 80;
     blob.style.left = `${startX}vw`;
-    
-    // Randomize shape morphing duration so they don't look synchronized
     blob.style.animationDuration = `${8 + Math.random() * 6}s`;
     
     blobContainer.appendChild(blob);
 
-    // Randomize upward travel time between 25 and 40 seconds
     const fullDuration = 25000 + Math.random() * 15000;
-    
-    // If it's the initial load, scatter them across the screen so we don't start with a blank background
     const startY = isInitial ? (-20 + Math.random() * 120) : 120;
-    
-    // Calculate actual travel duration based on starting height to maintain consistent speed
     const distanceRatio = (startY + 100) / 220; 
     const actualDuration = fullDuration * distanceRatio;
-    
-    // Randomize end drift and slight rotation
     const endX = startX + (-15 + Math.random() * 30);
     const rot = Math.random() > 0.5 ? 45 : -45;
 
-    // Use Web Animations API to float them upwards
     const anim = blob.animate([
         { transform: `translateY(${startY}vh) translateX(0vw) rotate(0deg) scale(1)` },
         { transform: `translateY(-100vh) translateX(${endX - startX}vw) rotate(${rot}deg) scale(${0.8 + Math.random() * 0.4})` }
@@ -531,18 +517,12 @@ function spawnBlob(isInitial = false) {
         fill: 'forwards'
     });
 
-    // When the blob floats off the top, destroy it and spawn a new one at the bottom
     anim.onfinish = () => {
         blob.remove();
         spawnBlob(); 
     };
 }
-
-// Spawn 5 initial scattered blobs
-for(let i=0; i<5; i++) {
-    spawnBlob(true);
-}
-
+for(let i=0; i<5; i++) { spawnBlob(true); }
 
 /* ═══ ELEMENTS & SIZES ═════════════════════ */
 const scroller = document.getElementById('scroller');
@@ -556,13 +536,14 @@ const navNameSpan = document.getElementById('nav-name');
 
 let W=0, H=0, CX=0, CY=0, FR=0; 
 let navStartX = 82, navCenterY = 38;
-let fs = 60, navScale = 1;
+let navScale = 1;
 let textStartX = 0, textCenterY = 0;
 
 function updateNavTarget() {
   const style = getComputedStyle(navInner);
   const pl = parseFloat(style.paddingLeft) || 32;
   const pt = parseFloat(style.paddingTop) || 20;
+  // This explicitly maps to the 36px avatar + 14px flex gap to perfectly align the snap
   navStartX = pl + 36 + 14; 
   navCenterY = pt + 18;     
 }
@@ -594,7 +575,7 @@ function checkReady() {
   if (imageLoaded && fontReady) resize();
 }
 
-/* ═══ PARTICLES (PEELING EFFECT) ═══════════ */
+/* ═══ HIGH-RES ANTI-ALIASED PARTICLES ══════ */
 let particles=[]; 
 
 function rebuildTargets(){
@@ -603,7 +584,6 @@ function rebuildTargets(){
   iCanvas.width = iSize; iCanvas.height = iSize;
   const iCtx = iCanvas.getContext('2d');
   
-  // Anti-stretching image crop calculations
   let sWidth = imgObj.width;
   let sHeight = imgObj.height;
   let sSize = Math.min(sWidth, sHeight);
@@ -621,51 +601,58 @@ function rebuildTargets(){
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
   }
 
-  fs = clamp(W*.086, 40, 84);
-  
-  // Calculate exact scale to match the HTML element's final size natively
-  const targetFs = parseFloat(getComputedStyle(navNameSpan).fontSize) || 17.6;
-  navScale = targetFs / fs; 
-
+  const HD_fs = 180; 
   const tCanvas = document.createElement('canvas');
-  tCanvas.width = W; tCanvas.height = H;
+  tCanvas.width = 1600; 
+  tCanvas.height = 400;
   const tCtx = tCanvas.getContext('2d');
   tCtx.textBaseline = 'middle';
   
-  tCtx.font = `500 ${fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   const w1 = tCtx.measureText("Deep ").width;
-  tCtx.font = `italic 500 ${fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `italic 500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   const w2 = tCtx.measureText("Joshi").width;
   const totalW = w1 + w2;
   
-  textStartX = Math.floor(W/2 - totalW/2);
-  textCenterY = Math.floor(H/2);
+  const hdStartX = Math.floor(tCanvas.width/2 - totalW/2);
+  const hdCenterY = Math.floor(tCanvas.height/2);
 
   tCtx.fillStyle = '#ff0000';
-  tCtx.font = `500 ${fs}px 'Cormorant Garant', Georgia, serif`;
-  tCtx.fillText("Deep ", textStartX, textCenterY);
+  tCtx.font = `500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.fillText("Deep ", hdStartX, hdCenterY);
   
   tCtx.fillStyle = '#0000ff';
-  tCtx.font = `italic 500 ${fs}px 'Cormorant Garant', Georgia, serif`;
-  tCtx.fillText("Joshi", textStartX + w1, textCenterY);
+  tCtx.font = `italic 500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.fillText("Joshi", hdStartX + w1, hdCenterY);
 
-  const tData = tCtx.getImageData(0,0,W,H).data;
+  const tData = tCtx.getImageData(0,0,tCanvas.width,tCanvas.height).data;
   const textPixels = [];
   
   let step = 1;
   while(true) {
       textPixels.length = 0;
-      for(let y=0; y<H; y+=step) {
-          for(let x=0; x<W; x+=step) {
-              const idx = (y*W + x)*4;
-              if(tData[idx+3] > 128) {
+      for(let y=0; y<tCanvas.height; y+=step) {
+          for(let x=0; x<tCanvas.width; x+=step) {
+              const idx = (y*tCanvas.width + x)*4;
+              if(tData[idx+3] > 60) {
                   textPixels.push({ x, y, isAccent: tData[idx+2] > 128 });
               }
           }
       }
-      if(textPixels.length <= 5500 || step >= 4) break;
+      if(textPixels.length <= 11000 || step >= 4) break;
       step++;
   }
+  
+  window.particleStep = step;
+
+  const explosion_fs = clamp(W*.086, 40, 84);
+  const renderScale = explosion_fs / HD_fs;
+  
+  textStartX = (W/2) - (totalW * renderScale) / 2;
+  textCenterY = H/2;
+  
+  const targetFs = 18; // Exact matched size for smooth snapping
+  navScale = targetFs / explosion_fs; 
 
   particles = [];
   for(let i=0; i<textPixels.length; i++) {
@@ -682,33 +669,41 @@ function rebuildTargets(){
       const dist = r / (iSize/2);
       const delay = (1 - dist) * 0.4; 
       
+      const offsetX = tp.x - hdStartX;
+      const offsetY = tp.y - hdCenterY;
+      const screenTargetX = textStartX + offsetX * renderScale;
+      const screenTargetY = textCenterY + offsetY * renderScale;
+
       particles.push({
           startX: CX - iSize/2 + ix,
           startY: CY - iSize/2 + iy,
           startR: ir, startG: ig, startB: ib,
-          targetX: tp.x, targetY: tp.y,
+          targetX: screenTargetX,
+          targetY: screenTargetY,
           isAccent: tp.isAccent,
           delay: delay
       });
   }
 }
 
-/* ═══ ANIMATION STATE ══════════════════════ */
+/* ═══ ANIMATION STATE & AUTOTRIGGER ════════ */
 let prog=0; 
 let mouseMoved=false;
 let revealDone=false;
 
-function onUserInteraction(){
+// This intercepts ANY scroll/swipe to start the animation
+// but prevents actual page scrolling until animation finishes.
+function onUserInteraction(e){
   if(!mouseMoved){
     mouseMoved=true;
     hintEl.style.opacity='0';
     setTimeout(() => hintEl.style.display='none', 500);
   }
 }
+
+window.addEventListener('wheel', onUserInteraction, {passive: true});
+window.addEventListener('touchstart', onUserInteraction, {passive: true});
 intro.addEventListener('mousemove', onUserInteraction);
-intro.addEventListener('touchmove', onUserInteraction, {passive:true});
-scroller.addEventListener('scroll', onUserInteraction, {passive:true}); // Trigger morph strictly on scroll
-setTimeout(onUserInteraction, 3500);
 
 /* ═══ DRAW LOOP ════════════════════════════ */
 function draw(){
@@ -718,7 +713,16 @@ function draw(){
 
   if(!fontReady || !imageLoaded || particles.length === 0) return;
 
-  if(mouseMoved) prog = Math.min(prog + 0.006, 1);
+  if(mouseMoved) {
+      prog = Math.min(prog + 0.015, 1); // Increment morph frame
+  }
+
+  // Once morph hits 100%, unlock the scrollbar!
+  if(prog >= 1 && !revealDone){
+      revealDone = true;
+      scrollHint.style.opacity = '1';
+      scroller.style.overflowY = 'scroll'; // UNLOCK SCROLL
+  }
 
   const tc = theme === 'dark' ? {r:238, g:240, b:250} : {r:10, g:14, b:36};
   const ac = theme === 'dark' ? {r:126, g:184, b:247} : {r:26, g:59, b:204};
@@ -734,7 +738,6 @@ function draw(){
       const imgCenterY = CY - scrollOffset;
       ctx.beginPath(); ctx.arc(CX, imgCenterY, FR, 0, Math.PI*2); ctx.clip();
       
-      // Prevent original source image stretching here as well
       let sSize = Math.min(imgObj.width, imgObj.height);
       let sx = (imgObj.width - sSize) / 2;
       let sy = (imgObj.height - sSize) / 2;
@@ -744,30 +747,40 @@ function draw(){
       ctx.globalAlpha = 1;
   }
 
-  // Fade bounds
+  // Fade bounds for the background nav container ONLY
   const fadeStart = H - 90;
-  const fadeEnd = H - 10;
-  let pAlpha = 1;
-  let navAlpha = 0;
+  const fadeEnd = H;
+  let navBgAlpha = 0;
 
   if (scrollOffset >= fadeEnd) {
-      pAlpha = 0;
-      navAlpha = 1;
+      navBgAlpha = 1;
   } else if (scrollOffset > fadeStart) {
-      // mathematically clamp to prevent negative values applying broken opacity to DOM element
-      navAlpha = Math.max(0, Math.min(1, (scrollOffset - fadeStart) / (fadeEnd - fadeStart)));
-      pAlpha = 1 - Math.pow(navAlpha, 1.2); 
+      navBgAlpha = Math.max(0, Math.min(1, (scrollOffset - fadeStart) / (fadeEnd - fadeStart)));
+  }
+
+  navInner.style.opacity = navBgAlpha;
+  if (navBgAlpha >= 1) navInner.classList.add('show-border');
+  else navInner.classList.remove('show-border');
+
+  // PERFECT SNAP TRANSITION LOGIC:
+  // When scrolled to top, make particles invisible, and HTML text visible
+  let pAlpha = 1;
+  if (scrollOffset >= H - 1) { 
+      navNameSpan.style.opacity = '1';
+      pAlpha = 0;
   } else {
-      navAlpha = 0;
+      navNameSpan.style.opacity = '0';
       pAlpha = 1;
   }
 
-  navInner.style.opacity = navAlpha;
-  navInner.style.pointerEvents = navAlpha > 0 ? 'auto' : 'none';
-  if (navAlpha >= 1) navInner.classList.add('show-border');
-  else navInner.classList.remove('show-border');
-
   if (pAlpha > 0) {
+      const baseGap = window.particleStep || 2;
+      const explosionGap = baseGap * (clamp(W*.086, 40, 84) / 180);
+      const finalGap = explosionGap * navScale;
+      
+      const currentGap = explosionGap + (finalGap - explosionGap) * easeSt;
+      const size = Math.max(0.6, currentGap * 1.5); 
+
       for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
           let pt = clamp((prog - p.delay) / 0.5, 0, 1);
@@ -775,13 +788,9 @@ function draw(){
 
           if(pt === 0 && prog < 0.1) continue; 
 
-          // Compute exact morph status position
           let docX = p.startX + (p.targetX - p.startX) * pt;
           let docY = p.startY + (p.targetY - p.startY) * pt;
 
-          // Mathematical fix for the "stretched face": 
-          // Uniformly transform whatever shape (docX, docY) currently holds towards the top left, 
-          // instead of forcing un-morphed circle pixels to individually target text destination pixels.
           let endDocX = navStartX + (docX - textStartX) * navScale;
           let endDocY = H + navCenterY + (docY - textCenterY) * navScale;
           
@@ -797,18 +806,12 @@ function draw(){
           const cr = Math.round(p.startR + (destC.r - p.startR) * pt);
           const cg = Math.round(p.startG + (destC.g - p.startG) * pt);
           const cb = Math.round(p.startB + (destC.b - p.startB) * pt);
-
-          const size = Math.max(1.8, 1.8 * (1 - easeSt * 0.5)); 
           
           ctx.fillStyle = `rgba(${cr},${cg},${cb},${pAlpha})`;
           ctx.fillRect(screenX, screenY, size, size);
       }
   }
 
-  if(prog >= 1 && !revealDone){
-      revealDone = true;
-      scrollHint.style.opacity = '1';
-  }
   if(scrollOffset > 10){
       scrollHint.style.opacity = '0';
   }
