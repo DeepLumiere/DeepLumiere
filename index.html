@@ -4,6 +4,20 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Deep Joshi — CV</title>
+
+<meta name="description" content="Building reliable, research-informed AI systems — from GreenAI benchmarks to federated learning and computer vision."/>
+<meta property="og:title" content="Deep Joshi — CV"/>
+<meta property="og:description" content="Undergraduate Researcher at Nirma University focusing on Green AI, Computer Vision, and efficient neural architectures."/>
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/173024745?v=4"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Deep Joshi — CV"/>
+<meta name="twitter:description" content="Undergraduate Researcher at Nirma University focusing on Green AI, Computer Vision, and efficient neural architectures."/>
+<meta name="twitter:image" content="https://avatars.githubusercontent.com/u/173024745?v=4"/>
+
+<link rel="icon" href="https://avatars.githubusercontent.com/u/173024745?v=4" type="image/jpeg"/>
+<link rel="apple-touch-icon" href="https://avatars.githubusercontent.com/u/173024745?v=4"/>
+
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -55,7 +69,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   -webkit-overflow-scrolling:touch;
 }
 
-/* ── PRONOUNCED LAVA LAMP BLOBS ───────────── */
+/* ── DYNAMIC LAVA LAMP BLOBS ──────────────── */
 .bg-blobs{
   position:fixed;
   inset:0;
@@ -65,40 +79,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 }
 .blob{
   position:absolute;
-  /* Use a static, irregular shape */
-  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
   filter:blur(80px);
-  will-change:transform; /* Hardware acceleration */
+  will-change:transform, border-radius;
+  animation: morph 8s ease-in-out infinite alternate;
 }
-/* Dark theme blobs */
-[data-theme="dark"] .blob.b1 { background: rgba(126, 184, 247, 0.14); }
-[data-theme="dark"] .blob.b2 { background: rgba(74, 128, 212, 0.12); }
-[data-theme="dark"] .blob.b3 { background: rgba(138, 154, 196, 0.10); }
+/* Dark theme colors */
+[data-theme="dark"] .blob.c1 { background: rgba(126, 184, 247, 0.15); }
+[data-theme="dark"] .blob.c2 { background: rgba(74, 128, 212, 0.13); }
+[data-theme="dark"] .blob.c3 { background: rgba(138, 154, 196, 0.11); }
 
-/* Light theme blobs */
-[data-theme="light"] .blob.b1 { background: rgba(26, 59, 204, 0.09); }
-[data-theme="light"] .blob.b2 { background: rgba(42, 84, 232, 0.08); }
-[data-theme="light"] .blob.b3 { background: rgba(105, 119, 158, 0.07); }
+/* Light theme colors */
+[data-theme="light"] .blob.c1 { background: rgba(26, 59, 204, 0.10); }
+[data-theme="light"] .blob.c2 { background: rgba(42, 84, 232, 0.08); }
+[data-theme="light"] .blob.c3 { background: rgba(105, 119, 158, 0.07); }
 
-/* Sped up slightly and set to linear rotation */
-.blob.b1{width:45vw;height:45vw;top:-10vw;left:-10vw;animation: lava1 6s infinite linear;}
-.blob.b2{width:40vw;height:40vw;bottom:-10vw;right:-5vw;animation: lava2 12s infinite linear;}
-.blob.b3{width:50vw;height:50vw;top:30vh;left:20vw;animation: lava3 18s infinite linear;}
-
-@keyframes lava1 {
-  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  50% { transform: translate(8vw, 10vh) rotate(180deg) scale(1.15); }
-  100% { transform: translate(0, 0) rotate(360deg) scale(1); }
-}
-@keyframes lava2 {
-  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  50% { transform: translate(-10vw, -12vh) rotate(-180deg) scale(1.1); }
-  100% { transform: translate(0, 0) rotate(-360deg) scale(1); }
-}
-@keyframes lava3 {
-  0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-  50% { transform: translate(10vw, -10vh) rotate(180deg) scale(0.9); }
-  100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+/* This animation organically changes the shape of the blob */
+@keyframes morph {
+  0%   { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
+  34%  { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+  67%  { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
+  100% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
 }
 
 /* ── INTRO SECTION ────────────────────────── */
@@ -170,7 +170,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   align-items:center;
   gap:14px;
   padding:20px 32px;
-  /* Replaced solid background to remove clash with blobs */
   background:transparent;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -318,11 +317,8 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
 </head>
 <body>
 
-<div class="bg-blobs">
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-</div>
+<div class="bg-blobs" id="blob-container">
+  </div>
 
 <div id="scroller">
 
@@ -488,6 +484,66 @@ function applyTheme(t){
 tBtn.addEventListener('click',()=>applyTheme(theme==='dark'?'light':'dark'));
 applyTheme(theme);
 
+/* ═══ LAVA LAMP GENERATOR ══════════════════ */
+const blobContainer = document.getElementById('blob-container');
+const blobColors = ['c1', 'c2', 'c3'];
+
+function spawnBlob(isInitial = false) {
+    const blob = document.createElement('div');
+    // Assign random color class
+    blob.classList.add('blob', blobColors[Math.floor(Math.random() * blobColors.length)]);
+    
+    // Random size between 30vw and 60vw
+    const size = 30 + Math.random() * 30;
+    blob.style.width = `${size}vw`;
+    blob.style.height = `${size}vw`;
+    
+    // Random horizontal starting position
+    const startX = -10 + Math.random() * 80;
+    blob.style.left = `${startX}vw`;
+    
+    // Randomize shape morphing duration so they don't look synchronized
+    blob.style.animationDuration = `${8 + Math.random() * 6}s`;
+    
+    blobContainer.appendChild(blob);
+
+    // Randomize upward travel time between 25 and 40 seconds
+    const fullDuration = 25000 + Math.random() * 15000;
+    
+    // If it's the initial load, scatter them across the screen so we don't start with a blank background
+    const startY = isInitial ? (-20 + Math.random() * 120) : 120;
+    
+    // Calculate actual travel duration based on starting height to maintain consistent speed
+    const distanceRatio = (startY + 100) / 220; 
+    const actualDuration = fullDuration * distanceRatio;
+    
+    // Randomize end drift and slight rotation
+    const endX = startX + (-15 + Math.random() * 30);
+    const rot = Math.random() > 0.5 ? 45 : -45;
+
+    // Use Web Animations API to float them upwards
+    const anim = blob.animate([
+        { transform: `translateY(${startY}vh) translateX(0vw) rotate(0deg) scale(1)` },
+        { transform: `translateY(-100vh) translateX(${endX - startX}vw) rotate(${rot}deg) scale(${0.8 + Math.random() * 0.4})` }
+    ], {
+        duration: actualDuration,
+        easing: 'linear',
+        fill: 'forwards'
+    });
+
+    // When the blob floats off the top, destroy it and spawn a new one at the bottom
+    anim.onfinish = () => {
+        blob.remove();
+        spawnBlob(); 
+    };
+}
+
+// Spawn 5 initial scattered blobs
+for(let i=0; i<5; i++) {
+    spawnBlob(true);
+}
+
+
 /* ═══ ELEMENTS & SIZES ═════════════════════ */
 const scroller = document.getElementById('scroller');
 const intro = document.getElementById('intro');
@@ -547,11 +603,18 @@ function rebuildTargets(){
   iCanvas.width = iSize; iCanvas.height = iSize;
   const iCtx = iCanvas.getContext('2d');
   
+  // Anti-stretching image crop calculations
+  let sWidth = imgObj.width;
+  let sHeight = imgObj.height;
+  let sSize = Math.min(sWidth, sHeight);
+  let sx = (sWidth - sSize) / 2;
+  let sy = (sHeight - sSize) / 2;
+  
   iCtx.beginPath();
   iCtx.arc(iSize/2, iSize/2, iSize/2, 0, Math.PI*2);
   iCtx.clip();
   try {
-    iCtx.drawImage(imgObj, 0, 0, iSize, iSize);
+    iCtx.drawImage(imgObj, sx, sy, sSize, sSize, 0, 0, iSize, iSize);
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
   } catch(e) {
     iCtx.fillStyle = '#445566'; iCtx.fill();
@@ -644,6 +707,7 @@ function onUserInteraction(){
 }
 intro.addEventListener('mousemove', onUserInteraction);
 intro.addEventListener('touchmove', onUserInteraction, {passive:true});
+scroller.addEventListener('scroll', onUserInteraction, {passive:true}); // Trigger morph strictly on scroll
 setTimeout(onUserInteraction, 3500);
 
 /* ═══ DRAW LOOP ════════════════════════════ */
@@ -669,25 +733,33 @@ function draw(){
       ctx.save();
       const imgCenterY = CY - scrollOffset;
       ctx.beginPath(); ctx.arc(CX, imgCenterY, FR, 0, Math.PI*2); ctx.clip();
-      ctx.drawImage(imgObj, CX - FR, imgCenterY - FR, FR*2, FR*2);
+      
+      // Prevent original source image stretching here as well
+      let sSize = Math.min(imgObj.width, imgObj.height);
+      let sx = (imgObj.width - sSize) / 2;
+      let sy = (imgObj.height - sSize) / 2;
+      ctx.drawImage(imgObj, sx, sy, sSize, sSize, CX - FR, imgCenterY - FR, FR*2, FR*2);
+      
       ctx.restore();
       ctx.globalAlpha = 1;
   }
 
-  // Adjusted Crossfade logic to prevent thickness/blurriness discrepancy at end
-  let pAlpha = 1;
-  let navAlpha = 0;
-  
-  // Fade starts 90px from the top, ends sharply 10px from docking
+  // Fade bounds
   const fadeStart = H - 90;
   const fadeEnd = H - 10;
+  let pAlpha = 1;
+  let navAlpha = 0;
 
   if (scrollOffset >= fadeEnd) {
       pAlpha = 0;
       navAlpha = 1;
   } else if (scrollOffset > fadeStart) {
-      navAlpha = (scrollOffset - fadeStart) / (fadeEnd - fadeStart);
+      // mathematically clamp to prevent negative values applying broken opacity to DOM element
+      navAlpha = Math.max(0, Math.min(1, (scrollOffset - fadeStart) / (fadeEnd - fadeStart)));
       pAlpha = 1 - Math.pow(navAlpha, 1.2); 
+  } else {
+      navAlpha = 0;
+      pAlpha = 1;
   }
 
   navInner.style.opacity = navAlpha;
@@ -703,11 +775,15 @@ function draw(){
 
           if(pt === 0 && prog < 0.1) continue; 
 
+          // Compute exact morph status position
           let docX = p.startX + (p.targetX - p.startX) * pt;
           let docY = p.startY + (p.targetY - p.startY) * pt;
 
-          const endDocX = navStartX + (p.targetX - textStartX) * navScale;
-          const endDocY = H + navCenterY + (p.targetY - textCenterY) * navScale;
+          // Mathematical fix for the "stretched face": 
+          // Uniformly transform whatever shape (docX, docY) currently holds towards the top left, 
+          // instead of forcing un-morphed circle pixels to individually target text destination pixels.
+          let endDocX = navStartX + (docX - textStartX) * navScale;
+          let endDocY = H + navCenterY + (docY - textCenterY) * navScale;
           
           let finalDocX = docX + (endDocX - docX) * easeSt;
           let finalDocY = docY + (endDocY - docY) * easeSt;
@@ -722,7 +798,6 @@ function draw(){
           const cg = Math.round(p.startG + (destC.g - p.startG) * pt);
           const cb = Math.round(p.startB + (destC.b - p.startB) * pt);
 
-          // Clamped thickness size to retain font weight matching through the transition
           const size = Math.max(1.8, 1.8 * (1 - easeSt * 0.5)); 
           
           ctx.fillStyle = `rgba(${cr},${cg},${cb},${pAlpha})`;
