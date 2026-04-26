@@ -621,7 +621,7 @@ function rebuildTargets(){
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
   }
 
-  const HD_fs = 512; 
+  const HD_fs = 320; 
   const tCanvas = document.createElement('canvas');
   tCanvas.width = 1600; 
   tCanvas.height = 400;
@@ -659,7 +659,7 @@ function rebuildTargets(){
               }
           }
       }
-      if(textPixels.length <= 64000 || step >= 2) break;
+      if(textPixels.length <= 32000 || step >= 2) break;
       step++;
   }
   
@@ -799,7 +799,7 @@ function draw(){
       const finalGap = explosionGap * navScale;
       
       const currentGap = explosionGap + (finalGap - explosionGap) * easeSt;
-      const size = Math.max(0.25, currentGap * 1); 
+      const size = Math.max(0.4, currentGap * 1.25); 
 
       for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
