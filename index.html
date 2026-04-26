@@ -72,7 +72,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   -webkit-overflow-scrolling:touch;
 }
 
-/* ── DYNAMIC LAVA LAMP BLOBS ──────────────── */
+/* ── LAVA LAMP BLOBS ──────────────────────── */
 .bg-blobs{
   position:fixed;
   inset:0;
@@ -83,24 +83,56 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 .blob{
   position:absolute;
   filter:blur(80px);
-  will-change:transform, border-radius;
-  animation: morph 8s ease-in-out infinite alternate;
+  will-change:transform,border-radius;
 }
-/* Dark theme colors */
-[data-theme="dark"] .blob.c1 { background: rgba(126, 184, 247, 0.15); }
-[data-theme="dark"] .blob.c2 { background: rgba(74, 128, 212, 0.13); }
-[data-theme="dark"] .blob.c3 { background: rgba(138, 154, 196, 0.11); }
+[data-theme="dark"] .blob.c1{background:rgba(126,184,247,.15)}
+[data-theme="dark"] .blob.c2{background:rgba(74,128,212,.13)}
+[data-theme="dark"] .blob.c3{background:rgba(138,154,196,.11)}
+[data-theme="light"] .blob.c1{background:rgba(26,59,204,.10)}
+[data-theme="light"] .blob.c2{background:rgba(42,84,232,.08)}
+[data-theme="light"] .blob.c3{background:rgba(105,119,158,.07)}
 
-/* Light theme colors */
-[data-theme="light"] .blob.c1 { background: rgba(26, 59, 204, 0.10); }
-[data-theme="light"] .blob.c2 { background: rgba(42, 84, 232, 0.08); }
-[data-theme="light"] .blob.c3 { background: rgba(105, 119, 158, 0.07); }
+/* 5 fixed blobs rising infinitely — staggered so screen is always populated */
+.blob:nth-child(1){width:40vw;height:40vw;left:5vw;
+  animation:rise1 28s linear infinite,morph 9s ease-in-out infinite alternate;}
+.blob:nth-child(2){width:30vw;height:30vw;left:55vw;
+  animation:rise2 22s linear infinite,morph 11s ease-in-out infinite alternate;
+  animation-delay:-9s,-3s;}
+.blob:nth-child(3){width:35vw;height:35vw;left:22vw;
+  animation:rise3 34s linear infinite,morph 7s ease-in-out infinite alternate;
+  animation-delay:-18s,-5s;}
+.blob:nth-child(4){width:28vw;height:28vw;left:68vw;
+  animation:rise4 19s linear infinite,morph 13s ease-in-out infinite alternate;
+  animation-delay:-5s,-2s;}
+.blob:nth-child(5){width:45vw;height:45vw;left:30vw;
+  animation:rise5 38s linear infinite,morph 10s ease-in-out infinite alternate;
+  animation-delay:-25s,-7s;}
 
-@keyframes morph {
-  0%   { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
-  34%  { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
-  67%  { border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%; }
-  100% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
+@keyframes rise1{
+  0%  {transform:translateY(120vh) translateX(0)    rotate(0deg)  scale(1)}
+  100%{transform:translateY(-130vh) translateX(6vw)  rotate(40deg) scale(.85)}
+}
+@keyframes rise2{
+  0%  {transform:translateY(120vh) translateX(0)    rotate(0deg)   scale(1)}
+  100%{transform:translateY(-130vh) translateX(-9vw) rotate(-45deg) scale(.9)}
+}
+@keyframes rise3{
+  0%  {transform:translateY(120vh) translateX(0)    rotate(0deg)  scale(1)}
+  100%{transform:translateY(-130vh) translateX(12vw) rotate(30deg) scale(.8)}
+}
+@keyframes rise4{
+  0%  {transform:translateY(120vh) translateX(0)    rotate(0deg)   scale(1)}
+  100%{transform:translateY(-130vh) translateX(-5vw) rotate(-30deg) scale(.95)}
+}
+@keyframes rise5{
+  0%  {transform:translateY(120vh) translateX(0)   rotate(0deg)  scale(1)}
+  100%{transform:translateY(-130vh) translateX(8vw) rotate(20deg) scale(.88)}
+}
+@keyframes morph{
+  0%  {border-radius:40% 60% 70% 30% / 40% 40% 60% 50%}
+  34% {border-radius:70% 30% 50% 50% / 30% 30% 70% 70%}
+  67% {border-radius:100% 60% 60% 100% / 100% 100% 60% 60%}
+  100%{border-radius:40% 60% 70% 30% / 40% 40% 60% 50%}
 }
 
 /* ── INTRO SECTION ────────────────────────── */
@@ -184,7 +216,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   border-color:var(--line);
 }
 #nav-chip-ring{
-  width:36px;height:36px;
+  width:32px;height:32px;
   border-radius:50%;
   overflow:hidden;
   border:1.5px solid var(--accent-b);
@@ -194,7 +226,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 #nav-name{
   font-family:var(--serif);
   font-size:18px; /* Hardcoded pixel size to match canvas math flawlessly */
-  font-weight:386;
+  font-weight:32;
   color:var(--text);
   /* Removed letter-spacing so it perfectly mirrors canvas rendering */
   opacity: 0; /* Starts completely invisible to allow particles to render */
@@ -337,13 +369,19 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
 </head>
 <body>
 
-<div class="bg-blobs" id="blob-container"></div>
+<div class="bg-blobs" id="blob-container">
+  <div class="blob c1"></div>
+  <div class="blob c2"></div>
+  <div class="blob c3"></div>
+  <div class="blob c1"></div>
+  <div class="blob c2"></div>
+</div>
 
 <div id="scroller">
 
   <section id="intro">
     <canvas id="intro-canvas"></canvas>
-    <p id="hint">Move mouse or scroll to begin</p>
+    <p id="hint">Scroll to Begin</p>
     <div id="scroll-hint">
       <span>Scroll</span>
       <div class="arr-down"></div>
@@ -503,46 +541,7 @@ function applyTheme(t){
 tBtn.addEventListener('click',()=>applyTheme(theme==='dark'?'light':'dark'));
 applyTheme(theme);
 
-/* ═══ LAVA LAMP GENERATOR ══════════════════ */
-const blobContainer = document.getElementById('blob-container');
-const blobColors = ['c1', 'c2', 'c3'];
-
-function spawnBlob(isInitial = false) {
-    const blob = document.createElement('div');
-    blob.classList.add('blob', blobColors[Math.floor(Math.random() * blobColors.length)]);
-    
-    const size = 30 + Math.random() * 30;
-    blob.style.width = `${size}vw`;
-    blob.style.height = `${size}vw`;
-    
-    const startX = -10 + Math.random() * 80;
-    blob.style.left = `${startX}vw`;
-    blob.style.animationDuration = `${8 + Math.random() * 6}s`;
-    
-    blobContainer.appendChild(blob);
-
-    const fullDuration = 25000 + Math.random() * 15000;
-    const startY = isInitial ? (-20 + Math.random() * 120) : 120;
-    const distanceRatio = (startY + 100) / 220; 
-    const actualDuration = fullDuration * distanceRatio;
-    const endX = startX + (-15 + Math.random() * 30);
-    const rot = Math.random() > 0.5 ? 45 : -45;
-
-    const anim = blob.animate([
-        { transform: `translateY(${startY}vh) translateX(0vw) rotate(0deg) scale(1)` },
-        { transform: `translateY(-100vh) translateX(${endX - startX}vw) rotate(${rot}deg) scale(${0.8 + Math.random() * 0.4})` }
-    ], {
-        duration: actualDuration,
-        easing: 'linear',
-        fill: 'forwards'
-    });
-
-    anim.onfinish = () => {
-        blob.remove();
-        spawnBlob(); 
-    };
-}
-for(let i=0; i<5; i++) { spawnBlob(true); }
+/* ═══ LAVA LAMP — pure CSS, no JS needed ═══ */
 
 /* ═══ ELEMENTS & SIZES ═════════════════════ */
 const scroller = document.getElementById('scroller');
@@ -574,7 +573,7 @@ function resize(){
   CX = W/2; CY = H/2;
   FR = Math.min(W*.105, 115);
   updateNavTarget();
-  if(imageLoaded && fontReady) rebuildTargets();
+  if(imageLoaded && fontReady) setTimeout(rebuildTargets, 0);
 }
 window.addEventListener('resize', resize);
 
@@ -648,19 +647,18 @@ function rebuildTargets(){
   const tData = tCtx.getImageData(0,0,tCanvas.width,tCanvas.height).data;
   const textPixels = [];
   
-  let step = 1;
-  while(true) {
-      textPixels.length = 0;
-      for(let y=0; y<tCanvas.height; y+=step) {
-          for(let x=0; x<tCanvas.width; x+=step) {
-              const idx = (y*tCanvas.width + x)*4;
-              if(tData[idx+3] > 60) {
-                  textPixels.push({ x, y, isAccent: tData[idx+2] > 128 });
-              }
+  // Single-pass: pre-count filled pixels to pick step, then sample once
+  let filledCount = 0;
+  for(let i=3; i<tData.length; i+=4) if(tData[i]>60) filledCount++;
+  const step = filledCount > 32000 ? 2 : 1;
+  
+  for(let y=0; y<tCanvas.height; y+=step) {
+      for(let x=0; x<tCanvas.width; x+=step) {
+          const idx = (y*tCanvas.width + x)*4;
+          if(tData[idx+3] > 60) {
+              textPixels.push({ x, y, isAccent: tData[idx+2] > 128 });
           }
       }
-      if(textPixels.length <= 32000 || step >= 2) break;
-      step++;
   }
   
   window.particleStep = step;
@@ -734,7 +732,7 @@ function draw(){
   if(!fontReady || !imageLoaded || particles.length === 0) return;
 
   if(mouseMoved) {
-      prog = Math.min(prog + 0.015, 1); // Increment morph frame
+      prog = Math.min(prog + 0.045, 1); // Increment morph frame
   }
 
   // Once morph hits 100%, unlock the scrollbar!
@@ -799,7 +797,7 @@ function draw(){
       const finalGap = explosionGap * navScale;
       
       const currentGap = explosionGap + (finalGap - explosionGap) * easeSt;
-      const size = Math.max(0.4, currentGap * 1.25); 
+      const size = Math.max(0.2, currentGap * 1.25); 
 
       for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
