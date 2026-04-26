@@ -732,7 +732,7 @@ function draw(){
   if(!fontReady || !imageLoaded || particles.length === 0) return;
 
   if(mouseMoved) {
-      prog = Math.min(prog + 0.045, 1); // Increment morph frame
+      prog = Math.min(prog + 0.025, 1); // Increment morph frame
   }
 
   // Once morph hits 100%, unlock the scrollbar!
