@@ -85,12 +85,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   filter:blur(80px);
   will-change:transform,border-radius;
 }
-[data-theme="dark"] .blob.c1{background:rgba(126,184,247,.15)}
-[data-theme="dark"] .blob.c2{background:rgba(74,128,212,.13)}
-[data-theme="dark"] .blob.c3{background:rgba(138,154,196,.11)}
-[data-theme="light"] .blob.c1{background:rgba(26,59,204,.10)}
-[data-theme="light"] .blob.c2{background:rgba(42,84,232,.08)}
-[data-theme="light"] .blob.c3{background:rgba(105,119,158,.07)}
+/* Increased opacity for darker theme visibility */
+[data-theme="dark"] .blob.c1{background:rgba(126,184,247,.35)}
+[data-theme="dark"] .blob.c2{background:rgba(74,128,212,.30)}
+[data-theme="dark"] .blob.c3{background:rgba(138,154,196,.28)}
+[data-theme="light"] .blob.c1{background:rgba(26,59,204,.15)}
+[data-theme="light"] .blob.c2{background:rgba(42,84,232,.13)}
+[data-theme="light"] .blob.c3{background:rgba(105,119,158,.11)}
 
 /* 5 fixed blobs rising infinitely — staggered so screen is always populated */
 .blob:nth-child(1){width:40vw;height:40vw;left:5vw;
@@ -226,7 +227,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 #nav-name{
   font-family:var(--serif);
   font-size:18px; /* Hardcoded pixel size to match canvas math flawlessly */
-  font-weight:32;
+  font-weight:400; /* Fixed to properly match visual thinness */
   color:var(--text);
   /* Removed letter-spacing so it perfectly mirrors canvas rendering */
   opacity: 0; /* Starts completely invisible to allow particles to render */
@@ -314,8 +315,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 .cv-list{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:6px}
 .cv-list li{font-size:.92rem;font-weight:300;color:var(--body);padding-left:14px;position:relative;line-height:1.55;transition:color .4s}
 .cv-list li::before{content:'—';position:absolute;left:0;color:var(--muted);font-size:.72rem;top:2px}
-.pub-venue{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:.61rem;letter-spacing:.17em;text-transform:uppercase;color:var(--accent);background:var(--accent-s);padding:3px 9px;border-radius:3px;border:1px solid var(--accent-b);transition:color .4s,background .4s,border-color .4s}
-.paper-link{display:inline-flex;align-items:center;margin-top:10px;font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:6px 11px;border-radius:4px;transition:color .18s,border-color .18s}
+.pub-venue{display:inline-block;margin-bottom:8px;font-family:var(--mono);font-size:.61rem;letter-spacing:.17em;text-transform:uppercase;color:var(--accent);background:var(--accent-s);padding:3px 9px;border-radius:4px;transition:background .4s,color .4s}
+.paper-link{display:inline-flex;align-items:center;margin-top:10px;font-family:var(--mono);font-size:.67rem;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:6px 11px;border-radius:4px;transition:border-color .4s,color .4s}
 .paper-link:hover{color:var(--text);border-color:var(--muted);text-decoration:none}
 .paper-link::after{content:' ↗';font-size:.62rem}
 
@@ -472,7 +473,7 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
               <div>
                 <p class="cv-role">Technical Head</p>
                 <p class="cv-org">IEEE Computer Society · Nirma University Chapter</p>
-                <p class="cv-desc">Directing chapter technical initiatives and mentoring project teams across AI and systems domains. Coordinating external collaborations including speaker engagements with industry practitioners.</p>
+                <p class="cv-desc">Directing chapter technical initiatives and mentoring project teams across AI and systems domains. Coordinating external collaborations including speaker engagements and workshops.</p>
               </div>
             </div>
           </section>
@@ -504,7 +505,7 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
               <div>
                 <span class="pub-venue">FIDTA @ ACM MobiHoc '25</span>
                 <p class="cv-role">FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud Detection</p>
-                <p class="cv-desc" style="margin-top:8px">Research detailing a federated learning approach for financial fraud detection, incorporating quantum-enforced privacy guarantees across distributed participants.</p>
+                <p class="cv-desc" style="margin-top:8px">Research detailing a federated learning approach for financial fraud detection, incorporating quantum-enforced privacy guarantees across distributed banking nodes.</p>
                 <a class="paper-link" href="https://dl.acm.org/doi/10.1145/3704413.3765511" target="_blank" rel="noreferrer">Read Paper</a>
               </div>
             </div>
@@ -620,16 +621,18 @@ function rebuildTargets(){
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
   }
 
-  const HD_fs = 320; 
+  // Drastically reduced initial font size for much better performance (less particles)
+  const HD_fs = 160; 
   const tCanvas = document.createElement('canvas');
-  tCanvas.width = 1600; 
-  tCanvas.height = 400;
+  tCanvas.width = 800; 
+  tCanvas.height = 240;
   const tCtx = tCanvas.getContext('2d');
   tCtx.textBaseline = 'middle';
   
-  tCtx.font = `500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  // Set font to 400 weight to fix "feels bolder" issue and match visual look properly
+  tCtx.font = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   const w1 = tCtx.measureText("Deep ").width;
-  tCtx.font = `italic 500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   const w2 = tCtx.measureText("Joshi").width;
   const totalW = w1 + w2;
   
@@ -637,20 +640,18 @@ function rebuildTargets(){
   const hdCenterY = Math.floor(tCanvas.height/2);
 
   tCtx.fillStyle = '#ff0000';
-  tCtx.font = `500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   tCtx.fillText("Deep ", hdStartX, hdCenterY);
   
   tCtx.fillStyle = '#0000ff';
-  tCtx.font = `italic 500 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   tCtx.fillText("Joshi", hdStartX + w1, hdCenterY);
 
   const tData = tCtx.getImageData(0,0,tCanvas.width,tCanvas.height).data;
   const textPixels = [];
   
-  // Single-pass: pre-count filled pixels to pick step, then sample once
-  let filledCount = 0;
-  for(let i=3; i<tData.length; i+=4) if(tData[i]>60) filledCount++;
-  const step = filledCount > 32000 ? 2 : 1;
+  // Always use a step to heavily reduce generated particles and fix extreme lagging
+  const step = 2; 
   
   for(let y=0; y<tCanvas.height; y+=step) {
       for(let x=0; x<tCanvas.width; x+=step) {
@@ -797,7 +798,7 @@ function draw(){
       const finalGap = explosionGap * navScale;
       
       const currentGap = explosionGap + (finalGap - explosionGap) * easeSt;
-      const size = Math.max(0.2, currentGap * 1.25); 
+      const size = Math.max(0.5, currentGap * 1.5); 
 
       for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
