@@ -99,6 +99,7 @@ a:hover { text-decoration: underline; }
 .btn-ghost:hover { background: var(--surface-hover); color: var(--text); border-color: var(--text-muted); }
 .btn-danger { background: rgba(240, 101, 101, 0.1); color: #f06565; }
 .btn-danger:hover { background: rgba(240, 101, 101, 0.2); }
+.btn-sm { padding: 4px 8px; font-size: 12px; }
 
 .input, .select, .textarea {
   width: 100%; padding: 10px 12px; background: var(--surface);
@@ -113,18 +114,19 @@ a:hover { text-decoration: underline; }
 .form-group { margin-bottom: 16px; }
 .form-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
 
-/* ─── Layout: Login ──────────────────────────────────────────── */
-#login-screen {
+/* ─── Layout: Login / Portal ─────────────────────────────────── */
+.centered-screen {
   position: fixed; inset: 0; background: var(--bg);
   display: flex; align-items: center; justify-content: center; z-index: 9999;
+  padding: 24px;
 }
-.login-card {
+.centered-card {
   background: var(--surface); padding: 40px; border-radius: var(--radius-lg);
-  border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow-lg);
-  max-width: 400px; width: 100%;
+  border: 1px solid var(--border); box-shadow: var(--shadow-lg);
+  max-width: 480px; width: 100%;
 }
-.login-card h1 { margin-bottom: 8px; font-size: 24px; }
-.login-card p { margin-bottom: 24px; color: var(--text-muted); }
+.centered-card h1 { margin-bottom: 8px; font-size: 24px; text-align: center; }
+.centered-card p { margin-bottom: 24px; color: var(--text-muted); text-align: center; }
 
 /* ─── Layout: Shell ──────────────────────────────────────────── */
 .shell { display: grid; grid-template-columns: 240px 1fr; height: 100vh; overflow: hidden; }
@@ -165,13 +167,13 @@ a:hover { text-decoration: underline; }
 .kanban-card-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
 .kanban-card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12px; color: var(--text-muted); }
 
-/* Table View (All Tickets, Projects) */
+/* Table View */
 .data-table-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
 .data-table { width: 100%; border-collapse: collapse; text-align: left; }
 .data-table th { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 500; color: var(--text-muted); font-size: 12px; text-transform: uppercase; }
 .data-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
 .data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--surface-hover); cursor: pointer; }
+.data-table tr.interactive:hover td { background: var(--surface-hover); cursor: pointer; }
 
 /* Dashboard Cards */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
@@ -195,11 +197,8 @@ a:hover { text-decoration: underline; }
 .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
 .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
-
 .modal-close { cursor: pointer; color: var(--text-muted); background: none; border: none; font-size: 20px; }
 .modal-close:hover { color: var(--text); }
-
-/* Detail Modal (Side Panel style) */
 .modal.side-panel {
   position: absolute; right: 0; top: 0; bottom: 0; height: 100vh; max-height: 100vh;
   border-radius: 0; border-left: 1px solid var(--border); width: 100%; max-width: 600px;
@@ -211,12 +210,11 @@ a:hover { text-decoration: underline; }
 .link-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .link-item { display: flex; align-items: center; gap: 8px; background: var(--surface-hover); padding: 8px 12px; border-radius: var(--radius); font-size: 13px; border: 1px solid var(--border); justify-content: space-between; }
 .link-item-main { display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
 .comment-list { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
 .comment { background: var(--surface-hover); padding: 12px; border-radius: var(--radius); border: 1px solid var(--border); }
 .comment-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
 
-/* ─── Toasts ─────────────────────────────────────────────────── */
+/* ─── Toasts & Notifications ─────────────────────────────────── */
 #toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
 .toast {
   background: var(--surface); border: 1px solid var(--border); padding: 12px 16px;
@@ -224,28 +222,58 @@ a:hover { text-decoration: underline; }
   display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease-out forwards;
 }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-/* Notification Center */
 .notification-bell { position: relative; cursor: pointer; padding: 8px; color: var(--text-muted); }
 .notification-bell:hover { color: var(--text); }
 .notification-badge { position: absolute; top: 0; right: 0; background: var(--priority-crit); color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-/* ─── Project detail specific ────────────────────────────────── */
 .project-header-card { background: var(--surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 24px; }
 .project-progress-bar { height: 8px; background: var(--surface-hover); border-radius: 4px; margin-top: 12px; overflow: hidden; }
 .project-progress-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.3s; }
-
 </style>
 </head>
 <body>
 
   <!-- Login Screen -->
-  <div id="login-screen">
-    <div class="login-card">
+  <div id="login-screen" class="centered-screen" style="display: none;">
+    <div class="centered-card">
       <h1>TaskFlow Pro</h1>
       <p>Sign in to manage your tickets and projects</p>
-      <button id="btn-login" class="btn btn-primary" style="width: 100%;">Sign in with Google</button>
+      <button id="btn-login" class="btn btn-primary" style="width: 100%; font-size: 15px; padding: 12px;">Sign in with Google</button>
       <div id="login-error" style="color: #f06565; margin-top: 12px; font-size: 13px; display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Client Portal Screen -->
+  <div id="portal-screen" class="centered-screen" style="display: none;">
+    <div class="centered-card" id="portal-form-container">
+      <h1>Submit a Request</h1>
+      <p id="portal-welcome">Please describe your issue or request below.</p>
+      <div class="form-group" style="margin-top: 24px;">
+        <label class="form-label">Your Name</label>
+        <input type="text" class="input" id="portal-name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contact Email</label>
+        <input type="email" class="input" id="portal-email" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Request Title</label>
+        <input type="text" class="input" id="portal-title" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Details</label>
+        <textarea class="textarea" id="portal-desc" rows="5"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width: 100%; font-size: 15px; padding: 12px; margin-top: 16px;" onclick="submitPortalTicket()">Submit Request</button>
+    </div>
+    
+    <div class="centered-card" id="portal-success-container" style="display: none; text-align: center;">
+      <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+      <h1>Request Submitted</h1>
+      <p>Thank you! Your request has been securely submitted to the team.</p>
+      <div style="background: var(--surface-hover); padding: 12px; border-radius: var(--radius); margin-top: 24px;">
+        <span class="text-muted">Reference ID:</span>
+        <div style="font-family: var(--font-mono); font-size: 18px; margin-top: 4px; font-weight: 600;" id="portal-ref-id"></div>
+      </div>
     </div>
   </div>
 
@@ -262,16 +290,16 @@ a:hover { text-decoration: underline; }
           <div class="nav-item active" data-view="dashboard" onclick="nav('dashboard')">📊 Dashboard</div>
         </div>
         <div class="nav-section">
-          <div class="nav-title">Tickets</div>
+          <div class="nav-title">Tasks & Tickets</div>
           <div class="nav-item" data-view="kanban" onclick="nav('kanban')">📋 Kanban Board</div>
-          <div class="nav-item" data-view="tickets" onclick="nav('tickets')">🗄️ All Tickets</div>
+          <div class="nav-item" data-view="tickets" onclick="nav('tickets')">🗄️ All Tasks</div>
         </div>
         <div class="nav-section">
           <div class="nav-title">Projects</div>
           <div class="nav-item" data-view="projects" onclick="nav('projects')">📁 All Projects</div>
         </div>
         <div class="nav-section">
-          <div class="nav-title">People</div>
+          <div class="nav-title">Directory</div>
           <div class="nav-item" data-view="team" onclick="nav('team')">👥 Team</div>
           <div class="nav-item" data-view="clients" onclick="nav('clients')">🏢 Clients</div>
         </div>
@@ -295,7 +323,7 @@ a:hover { text-decoration: underline; }
           <div class="notification-bell" id="bell-icon" onclick="requestNotificationPermission()">
             🔔<span class="notification-badge" id="notif-badge" style="display: none;">0</span>
           </div>
-          <button class="btn btn-primary" onclick="openTicketModal()">+ New Ticket</button>
+          <button class="btn btn-primary" onclick="openTicketModal()">+ New Task</button>
         </div>
       </header>
 
@@ -305,7 +333,7 @@ a:hover { text-decoration: underline; }
         <div id="view-dashboard" class="view active">
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-label">Open Tickets</div>
+              <div class="stat-label">Open Tasks</div>
               <div class="stat-value" id="stat-open">0</div>
             </div>
             <div class="stat-card">
@@ -313,13 +341,15 @@ a:hover { text-decoration: underline; }
               <div class="stat-value" id="stat-prog">0</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Active Projects</div>
-              <div class="stat-value" id="stat-proj">0</div>
+              <div class="stat-label">Client Portal Submissions</div>
+              <div class="stat-value" style="color: var(--primary);" id="stat-portal">0</div>
             </div>
           </div>
           
-          <h3>Recent Activity</h3>
-          <p class="text-muted" style="margin-top: 8px;">(Activity feed implementation placeholder)</p>
+          <h3 style="margin-bottom: 16px;">New Client Submissions (Triage Queue)</h3>
+          <div id="triage-queue-content">
+             <!-- Triage queue rendered here -->
+          </div>
         </div>
 
         <!-- View: Kanban -->
@@ -327,6 +357,7 @@ a:hover { text-decoration: underline; }
           <div style="margin-bottom: 16px;" class="flex gap-4">
             <select class="select" id="kanban-project-filter" style="width: 200px;" onchange="renderKanban()">
               <option value="all">All Projects</option>
+              <option value="unassigned">Personal / Unassigned</option>
             </select>
           </div>
           <div class="kanban-board" id="kanban-board">
@@ -346,7 +377,7 @@ a:hover { text-decoration: underline; }
                   <th>Status</th>
                   <th>Priority</th>
                   <th>Assignee</th>
-                  <th>Due Date</th>
+                  <th>Source</th>
                 </tr>
               </thead>
               <tbody id="tickets-table-body">
@@ -405,7 +436,7 @@ a:hover { text-decoration: underline; }
           </div>
           <div class="data-table-wrapper">
             <table class="data-table">
-              <thead><tr><th>Company</th><th>Contact Email</th><th>Tier</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Company</th><th>Contact Email</th><th>Tier</th><th>Portal Link</th><th>Actions</th></tr></thead>
               <tbody id="clients-table-body"></tbody>
             </table>
           </div>
@@ -416,7 +447,7 @@ a:hover { text-decoration: underline; }
           <div class="project-header-card" style="max-width: 600px;">
             <h3>Settings</h3>
             <div class="form-group" style="margin-top: 16px;">
-              <label class="form-label">Ticket ID Prefix</label>
+              <label class="form-label">Task ID Prefix</label>
               <input type="text" class="input" id="set-prefix" placeholder="TF">
             </div>
             
@@ -440,27 +471,28 @@ a:hover { text-decoration: underline; }
   <div class="modal-overlay" id="ticket-modal-overlay" onclick="closeModal('ticket-modal-overlay', event)">
     <div class="modal side-panel" id="ticket-modal">
       <div class="modal-header">
-        <h3 id="tm-title">New Ticket</h3>
+        <h3 id="tm-title">New Task / Ticket</h3>
         <button class="modal-close" onclick="closeModal('ticket-modal-overlay')">×</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="tm-id">
+        <input type="hidden" id="tm-source">
         <div class="form-group">
           <label class="form-label">Title</label>
           <input type="text" class="input" id="tm-name" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Description</label>
+          <label class="form-label">Description / Details</label>
           <textarea class="textarea" id="tm-desc" rows="4"></textarea>
         </div>
         
         <div class="flex gap-4">
           <div class="form-group" style="flex:1;">
-            <label class="form-label">Project</label>
+            <label class="form-label">Project (Optional)</label>
             <select class="select" id="tm-project"></select>
           </div>
           <div class="form-group" style="flex:1;">
-            <label class="form-label">Assignee</label>
+            <label class="form-label">Assignee (Optional)</label>
             <select class="select" id="tm-assignee"></select>
           </div>
         </div>
@@ -478,8 +510,9 @@ a:hover { text-decoration: underline; }
             </select>
           </div>
           <div class="form-group" style="flex:1;">
-            <label class="form-label">Priority</label>
+            <label class="form-label">Priority (Optional)</label>
             <select class="select" id="tm-priority">
+              <option value="None">None</option>
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
@@ -489,16 +522,16 @@ a:hover { text-decoration: underline; }
         </div>
 
         <div class="form-group">
-          <label class="form-label">Due Date</label>
+          <label class="form-label">Due Date (Optional)</label>
           <input type="date" class="input" id="tm-due">
         </div>
 
         <hr style="border:0; border-top: 1px solid var(--border); margin: 24px 0;">
         
-        <h4>Links</h4>
+        <h4>Links & Attachments</h4>
         <div class="flex gap-2" style="margin-top: 8px;">
           <input type="text" class="input" id="tm-link-url" placeholder="Paste URL (e.g. GitHub PR, Figma)">
-          <input type="text" class="input" id="tm-link-label" placeholder="Label (optional)" style="width: 150px;">
+          <input type="text" class="input" id="tm-link-label" placeholder="Label (opt)" style="width: 120px;">
           <button class="btn btn-ghost" onclick="addTicketLink()">Add</button>
         </div>
         <div class="link-list" id="tm-link-list"></div>
@@ -516,7 +549,7 @@ a:hover { text-decoration: underline; }
       <div class="modal-footer">
         <button class="btn btn-danger" id="tm-btn-delete" style="display:none; margin-right: auto;" onclick="deleteTicket()">Delete</button>
         <button class="btn btn-ghost" onclick="closeModal('ticket-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveTicket()">Save Ticket</button>
+        <button class="btn btn-primary" onclick="saveTicket()">Save Task</button>
       </div>
     </div>
   </div>
@@ -546,12 +579,8 @@ a:hover { text-decoration: underline; }
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Client</label>
+          <label class="form-label">Client (Optional)</label>
           <select class="select" id="pm-client"></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">GitHub Repo URL</label>
-          <input type="text" class="input" id="pm-repo" placeholder="https://github.com/...">
         </div>
       </div>
       <div class="modal-footer">
@@ -574,12 +603,7 @@ a:hover { text-decoration: underline; }
         <div class="form-group"><label class="form-label">Email</label><input type="email" class="input" id="te-email"></div>
         <div class="form-group">
           <label class="form-label">Role</label>
-          <select class="select" id="te-role">
-            <option value="Developer">Developer</option>
-            <option value="Designer">Designer</option>
-            <option value="Manager">Manager</option>
-            <option value="Admin">Admin</option>
-          </select>
+          <input type="text" class="input" id="te-role" placeholder="e.g. Developer, Self, Freelancer">
         </div>
       </div>
       <div class="modal-footer">
@@ -593,14 +617,13 @@ a:hover { text-decoration: underline; }
   <div class="modal-overlay" id="client-modal-overlay" onclick="closeModal('client-modal-overlay', event)">
     <div class="modal" id="client-modal" style="max-width: 400px;">
       <div class="modal-header">
-        <h3>Client</h3>
+        <h3>Client Profile</h3>
         <button class="modal-close" onclick="closeModal('client-modal-overlay')">×</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="ce-id">
-        <div class="form-group"><label class="form-label">Company Name</label><input type="text" class="input" id="ce-company"></div>
+        <div class="form-group"><label class="form-label">Company / Client Name</label><input type="text" class="input" id="ce-company"></div>
         <div class="form-group"><label class="form-label">Contact Email</label><input type="email" class="input" id="ce-email"></div>
-        <div class="form-group"><label class="form-label">Tier</label><input type="text" class="input" id="ce-tier" placeholder="e.g. Enterprise"></div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal('client-modal-overlay')">Cancel</button>
@@ -648,38 +671,120 @@ a:hover { text-decoration: underline; }
     
     let unsubscribes = [];
 
-    // --- Auth Logic ---
-    const loginScreen = document.getElementById('login-screen');
-    const appShell = document.getElementById('app-shell');
-    const btnLogin = document.getElementById('btn-login');
+    // --- Routing (Check for Portal) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const portalToken = urlParams.get('portal');
+    
+    if (portalToken) {
+      // Client Portal Mode
+      document.getElementById('portal-screen').style.display = 'flex';
+      setupPortal(portalToken);
+    } else {
+      // Internal App Mode
+      setupInternalApp();
+    }
 
-    btnLogin.addEventListener('click', () => {
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider).catch(err => {
-        document.getElementById('login-error').innerText = err.message;
-        document.getElementById('login-error').style.display = 'block';
-      });
-    });
-
-    window.appLogout = () => {
-      signOut(auth);
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('current-user-name').innerText = user.displayName || user.email;
-        document.getElementById('current-user-avatar').innerText = (user.displayName || user.email).charAt(0).toUpperCase();
-        loginScreen.style.display = 'none';
-        appShell.style.display = 'grid';
-        initApp();
-      } else {
-        currentUser = null;
-        loginScreen.style.display = 'flex';
-        appShell.style.display = 'none';
-        cleanupApp();
+    // --- Portal Logic ---
+    async function setupPortal(token) {
+      // Unauthenticated submission logic
+      try {
+        const clientSnap = await getDoc(doc(db, "clients", token));
+        if (clientSnap.exists()) {
+          document.getElementById('portal-welcome').innerText = `Welcome, ${clientSnap.data().company}. Please describe your request below.`;
+        }
+      } catch(e) {
+        console.warn("Client not found or unauthenticated read blocked, proceeding anyway.");
       }
-    });
+
+      window.submitPortalTicket = async () => {
+        const name = document.getElementById('portal-name').value.trim();
+        const email = document.getElementById('portal-email').value.trim();
+        const title = document.getElementById('portal-title').value.trim();
+        const desc = document.getElementById('portal-desc').value.trim();
+
+        if(!name || !email || !title) return alert("Name, email, and title are required.");
+
+        const id = `t_${Date.now()}`;
+        // Since we are unauthenticated, we rely on Firebase rules allowing writes to `tickets`
+        // Or specific fields. 
+        
+        // Fetch current settings to get display ID (This read might fail if rules are strict, 
+        // fallback to timestamp ID for display if needed)
+        let displayId = `REQ-${Date.now().toString().slice(-4)}`;
+        try {
+           const setSnap = await getDoc(doc(db, "globals", "settings"));
+           if(setSnap.exists()) {
+              const s = setSnap.data();
+              displayId = `${s.ticketPrefix}-${String(s.nextNum).padStart(4, '0')}`;
+              // Note: A real app needs a cloud function here to safely increment the counter 
+              // for unauthenticated users. We will just save the ticket.
+           }
+        } catch(e) {}
+
+        const tData = {
+          title,
+          description: `Submitted by: ${name} (${email})\n\n${desc}`,
+          project: "",
+          assignee: "",
+          status: "Open",
+          priority: "None",
+          source: "portal",
+          clientToken: token,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          displayId
+        };
+
+        try {
+          await setDoc(doc(db, "tickets", id), tData);
+          document.getElementById('portal-form-container').style.display = 'none';
+          document.getElementById('portal-success-container').style.display = 'block';
+          document.getElementById('portal-ref-id').innerText = displayId;
+          
+          // Optionally trigger webhook if we could read settings
+          // This requires a cloud function in a real production environment.
+        } catch(e) {
+          alert("Error submitting ticket. Ensure your Firebase Firestore rules allow unauthenticated writes to the 'tickets' collection.\nError: " + e.message);
+        }
+      };
+    }
+
+    // --- Internal App Logic ---
+    function setupInternalApp() {
+      const loginScreen = document.getElementById('login-screen');
+      const appShell = document.getElementById('app-shell');
+      const btnLogin = document.getElementById('btn-login');
+
+      loginScreen.style.display = 'flex';
+
+      btnLogin.addEventListener('click', () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider).catch(err => {
+          document.getElementById('login-error').innerText = err.message;
+          document.getElementById('login-error').style.display = 'block';
+        });
+      });
+
+      window.appLogout = () => {
+        signOut(auth);
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+          document.getElementById('current-user-name').innerText = user.displayName || user.email;
+          document.getElementById('current-user-avatar').innerText = (user.displayName || user.email).charAt(0).toUpperCase();
+          loginScreen.style.display = 'none';
+          appShell.style.display = 'grid';
+          initApp();
+        } else {
+          currentUser = null;
+          loginScreen.style.display = 'flex';
+          appShell.style.display = 'none';
+          cleanupApp();
+        }
+      });
+    }
 
     // --- Init & Data Fetching ---
     function initApp() {
@@ -740,7 +845,7 @@ a:hover { text-decoration: underline; }
       document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
       document.getElementById(`view-${viewId === 'project-detail' ? 'project-detail' : viewId}`).classList.add('active');
       
-      const titles = { dashboard: 'Dashboard', kanban: 'Kanban Board', tickets: 'All Tickets', projects: 'Projects', team: 'Team Members', clients: 'Clients', settings: 'Settings' };
+      const titles = { dashboard: 'Dashboard', kanban: 'Kanban Board', tickets: 'All Tasks & Tickets', projects: 'Projects', team: 'Team Directory', clients: 'Clients', settings: 'Settings' };
       document.getElementById('topbar-title').innerText = titles[viewId] || 'TaskFlow Pro';
       
       refreshCurrentView();
@@ -764,7 +869,9 @@ a:hover { text-decoration: underline; }
       projSelects.forEach(select => {
         if(!select) return;
         const currentVal = select.value;
-        select.innerHTML = select.id === 'kanban-project-filter' ? '<option value="all">All Projects</option>' : '<option value="">Unassigned</option>';
+        select.innerHTML = select.id === 'kanban-project-filter' ? 
+          '<option value="all">All Projects</option><option value="unassigned">Personal / Unassigned</option>' : 
+          '<option value="">None / Personal Task</option>';
         state.projects.forEach(p => {
           select.innerHTML += `<option value="${p.id}">${escapeHtml(p.name)}</option>`;
         });
@@ -786,7 +893,7 @@ a:hover { text-decoration: underline; }
       const pmClient = document.getElementById('pm-client');
       if (pmClient) {
         const currentVal = pmClient.value;
-        pmClient.innerHTML = '<option value="">Internal (No Client)</option>';
+        pmClient.innerHTML = '<option value="">None</option>';
         state.clients.forEach(c => {
           pmClient.innerHTML += `<option value="${c.id}">${escapeHtml(c.company)}</option>`;
         });
@@ -798,10 +905,32 @@ a:hover { text-decoration: underline; }
     function renderDashboard() {
       const open = state.tickets.filter(t => t.status === 'Open').length;
       const prog = state.tickets.filter(t => t.status === 'In Progress').length;
-      const activeProj = state.projects.filter(p => p.status === 'Active').length;
+      
+      const portalSubmissions = state.tickets.filter(t => t.source === 'portal' && t.status === 'Open');
+      
       document.getElementById('stat-open').innerText = open;
       document.getElementById('stat-prog').innerText = prog;
-      document.getElementById('stat-proj').innerText = activeProj;
+      document.getElementById('stat-portal').innerText = portalSubmissions.length;
+
+      // Render Triage Queue
+      const queue = document.getElementById('triage-queue-content');
+      if (portalSubmissions.length === 0) {
+        queue.innerHTML = '<p class="text-muted">No new client submissions to triage.</p>';
+      } else {
+        queue.innerHTML = `<div class="data-table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Client Token</th><th>Title</th><th>Submitted At</th></tr></thead>
+            <tbody>
+              ${portalSubmissions.map(t => `<tr class="interactive" onclick="openTicketModal('${t.id}')">
+                <td style="font-family:var(--font-mono);">${t.displayId}</td>
+                <td><span class="badge" style="background:var(--surface-hover)">${escapeHtml(t.clientToken || 'Unknown')}</span></td>
+                <td style="font-weight:500;">${escapeHtml(t.title)}</td>
+                <td>${new Date(t.createdAt).toLocaleString()}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+      }
     }
 
     // --- Kanban Board ---
@@ -817,7 +946,8 @@ a:hover { text-decoration: underline; }
         col.className = 'kanban-column';
         
         let columnTickets = state.tickets.filter(t => t.status === status);
-        if (projFilter !== 'all') columnTickets = columnTickets.filter(t => t.project === projFilter);
+        if (projFilter === 'unassigned') columnTickets = columnTickets.filter(t => !t.project);
+        else if (projFilter !== 'all') columnTickets = columnTickets.filter(t => t.project === projFilter);
         
         col.innerHTML = `
           <div class="kanban-header">
@@ -834,15 +964,18 @@ a:hover { text-decoration: underline; }
 
     function createKanbanCardHTML(t) {
       const proj = state.projects.find(p => p.id === t.project);
-      const projName = proj ? proj.name : 'Unassigned';
+      const projName = proj ? proj.name : 'Personal/Unassigned';
       const assignee = state.team.find(tm => tm.id === t.assignee);
       const assigneeName = assignee ? assignee.name.split(' ')[0] : 'Unassigned';
       
+      let priorityBadge = t.priority && t.priority !== 'None' ? `<span class="badge badge-priority-${t.priority.toLowerCase()}">${t.priority}</span>` : '';
+      let sourceBadge = t.source === 'portal' ? `<span class="badge" style="background:var(--primary-bg); color:var(--primary);">Portal</span>` : '';
+
       return `
         <div class="kanban-card" draggable="true" ondragstart="drag(event, '${t.id}')" onclick="openTicketModal('${t.id}')">
           <div class="flex justify-between items-center" style="margin-bottom:8px">
             <span style="font-size:12px; font-family:var(--font-mono); color:var(--text-muted)">${t.displayId || t.id.substring(0,6)}</span>
-            <span class="badge badge-priority-${t.priority.toLowerCase()}">${t.priority}</span>
+            <div class="flex gap-2">${sourceBadge}${priorityBadge}</div>
           </div>
           <div class="kanban-card-title">${escapeHtml(t.title)}</div>
           <div class="kanban-card-meta">
@@ -860,7 +993,7 @@ a:hover { text-decoration: underline; }
       const id = ev.dataTransfer.getData("text");
       if(id) {
         await updateDoc(doc(db, "tickets", id), { status: newStatus });
-        fireWebhook('ticket_updated', `Ticket ${id} moved to ${newStatus}`);
+        fireWebhook('ticket_updated', `Task ${id} moved to ${newStatus}`);
       }
     };
 
@@ -870,14 +1003,14 @@ a:hover { text-decoration: underline; }
       tbody.innerHTML = state.tickets.map(t => {
         const p = state.projects.find(x => x.id === t.project);
         const a = state.team.find(x => x.id === t.assignee);
-        return `<tr onclick="openTicketModal('${t.id}')">
+        return `<tr class="interactive" onclick="openTicketModal('${t.id}')">
           <td style="font-family:var(--font-mono); font-size:12px;">${t.displayId || t.id.substring(0,6)}</td>
           <td style="font-weight:500;">${escapeHtml(t.title)}</td>
           <td>${p ? escapeHtml(p.name) : '-'}</td>
           <td><span class="badge badge-status-${t.status.toLowerCase().replace(' ','-')}">${t.status}</span></td>
-          <td><span class="badge badge-priority-${t.priority.toLowerCase()}">${t.priority}</span></td>
+          <td>${t.priority !== 'None' ? `<span class="badge badge-priority-${(t.priority||'').toLowerCase()}">${t.priority}</span>` : '-'}</td>
           <td>${a ? escapeHtml(a.name) : '-'}</td>
-          <td>${t.dueDate || '-'}</td>
+          <td>${t.source === 'portal' ? '🌎 Portal' : 'Internal'}</td>
         </tr>`;
       }).join('');
     }
@@ -890,9 +1023,9 @@ a:hover { text-decoration: underline; }
         const done = pTickets.filter(t => ['Resolved','Closed'].includes(t.status)).length;
         const pct = pTickets.length ? Math.round((done/pTickets.length)*100) : 0;
         
-        return `<tr onclick="openProjectDetail('${p.id}')">
+        return `<tr class="interactive" onclick="openProjectDetail('${p.id}')">
           <td style="font-weight:500;">${escapeHtml(p.name)}</td>
-          <td>${c ? escapeHtml(c.company) : 'Internal'}</td>
+          <td>${c ? escapeHtml(c.company) : '-'}</td>
           <td>${p.status}</td>
           <td>
             <div class="flex items-center gap-2">
@@ -907,11 +1040,11 @@ a:hover { text-decoration: underline; }
     function renderTeamTable() {
       const tbody = document.getElementById('team-table-body');
       tbody.innerHTML = state.team.map(t => `
-        <tr onclick="openTeamModal('${t.id}')">
+        <tr class="interactive" onclick="openTeamModal('${t.id}')">
           <td>${escapeHtml(t.name)}</td>
           <td>${escapeHtml(t.email)}</td>
-          <td>${t.role}</td>
-          <td><button class="btn btn-ghost" onclick="event.stopPropagation(); deleteDoc(doc(db,'team','${t.id}'))">Delete</button></td>
+          <td>${escapeHtml(t.role)}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteDoc(doc(db,'team','${t.id}'))">Delete</button></td>
         </tr>
       `).join('');
     }
@@ -919,14 +1052,24 @@ a:hover { text-decoration: underline; }
     function renderClientsTable() {
       const tbody = document.getElementById('clients-table-body');
       tbody.innerHTML = state.clients.map(c => `
-        <tr onclick="openClientModal('${c.id}')">
+        <tr class="interactive" onclick="openClientModal('${c.id}')">
           <td>${escapeHtml(c.company)}</td>
           <td>${escapeHtml(c.email)}</td>
           <td>${escapeHtml(c.tier || '-')}</td>
-          <td><button class="btn btn-ghost" onclick="event.stopPropagation(); deleteDoc(doc(db,'clients','${c.id}'))">Delete</button></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); copyPortalLink('${c.id}')">🔗 Copy Portal Link</button>
+          </td>
+          <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteDoc(doc(db,'clients','${c.id}'))">Delete</button></td>
         </tr>
       `).join('');
     }
+
+    window.copyPortalLink = (clientId) => {
+      const url = `${window.location.origin}${window.location.pathname}?portal=${clientId}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast("Portal link copied to clipboard!");
+      });
+    };
 
     // --- Project Detail View ---
     window.openProjectDetail = (id) => {
@@ -955,8 +1098,7 @@ a:hover { text-decoration: underline; }
           </div>
           <div class="flex gap-4 items-center" style="margin-top:12px; color:var(--text-muted); font-size:13px;">
             <span>Status: ${p.status}</span>
-            <span>Client: ${p.client ? escapeHtml(state.clients.find(c=>c.id===p.client)?.company || 'Unknown') : 'Internal'}</span>
-            ${p.repoUrl ? `<span>🔗 <a href="${escapeHtml(p.repoUrl)}" target="_blank">GitHub Repo</a></span>` : ''}
+            <span>Client: ${p.client ? escapeHtml(state.clients.find(c=>c.id===p.client)?.company || 'None') : 'None'}</span>
           </div>
           <div class="project-progress-bar"><div class="project-progress-fill" style="width:${pct}%"></div></div>
           <div style="font-size:12px; margin-top:4px; text-align:right;">${pct}% Complete</div>
@@ -977,8 +1119,8 @@ a:hover { text-decoration: underline; }
             <div class="flex flex-col gap-2">
               ${open.length ? open.slice(0,5).map(t => `<div class="kanban-card" onclick="openTicketModal('${t.id}')">
                 <div style="font-weight:500">${escapeHtml(t.title)}</div>
-                <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Priority: ${t.priority}</div>
-              </div>`).join('') : '<p class="text-muted">No open tickets.</p>'}
+                <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Priority: ${t.priority !== 'None' ? t.priority : '-'}</div>
+              </div>`).join('') : '<p class="text-muted">No open tasks.</p>'}
             </div>
           </div>
         </div>
@@ -999,29 +1141,31 @@ a:hover { text-decoration: underline; }
         const t = state.tickets.find(x => x.id === id);
         if(!t) return;
         document.getElementById('tm-id').value = t.id;
+        document.getElementById('tm-source').value = t.source || 'internal';
         document.getElementById('tm-name').value = t.title || '';
         document.getElementById('tm-desc').value = t.description || '';
         document.getElementById('tm-project').value = t.project || '';
         document.getElementById('tm-assignee').value = t.assignee || '';
         document.getElementById('tm-status').value = t.status || 'Open';
-        document.getElementById('tm-priority').value = t.priority || 'Medium';
+        document.getElementById('tm-priority').value = t.priority || 'None';
         document.getElementById('tm-due').value = t.dueDate || '';
         
         state.activeTicketLinks = t.links || [];
         state.activeTicketComments = t.comments || [];
         
-        title.innerText = `Edit Ticket: ${t.displayId || t.id.substring(0,6)}`;
+        title.innerText = `Edit Task: ${t.displayId || t.id.substring(0,6)}`;
         btnDel.style.display = 'block';
       } else {
         document.getElementById('tm-id').value = '';
+        document.getElementById('tm-source').value = 'internal';
         document.getElementById('tm-name').value = '';
         document.getElementById('tm-desc').value = '';
         document.getElementById('tm-project').value = '';
         document.getElementById('tm-assignee').value = '';
         document.getElementById('tm-status').value = 'Open';
-        document.getElementById('tm-priority').value = 'Medium';
+        document.getElementById('tm-priority').value = 'None';
         document.getElementById('tm-due').value = '';
-        title.innerText = 'New Ticket';
+        title.innerText = 'New Task / Ticket';
         btnDel.style.display = 'none';
       }
       
@@ -1048,6 +1192,7 @@ a:hover { text-decoration: underline; }
         status: document.getElementById('tm-status').value,
         priority: document.getElementById('tm-priority').value,
         dueDate: document.getElementById('tm-due').value,
+        source: document.getElementById('tm-source').value,
         links: state.activeTicketLinks,
         comments: state.activeTicketComments,
         updatedAt: new Date().toISOString()
@@ -1062,17 +1207,17 @@ a:hover { text-decoration: underline; }
 
       await setDoc(doc(db, "tickets", id), tData, {merge: true});
       closeModal('ticket-modal-overlay');
-      showToast(isNew ? 'Ticket created' : 'Ticket updated');
+      showToast(isNew ? 'Task created' : 'Task updated');
       
-      if(isNew) fireWebhook('ticket_created', `New ticket created: ${tData.title}`);
+      if(isNew) fireWebhook('ticket_created', `New task created: ${tData.title}`);
     };
 
     window.deleteTicket = async () => {
       const id = document.getElementById('tm-id').value;
-      if(confirm('Delete this ticket?')) {
+      if(confirm('Delete this task?')) {
         await deleteDoc(doc(db, "tickets", id));
         closeModal('ticket-modal-overlay');
-        showToast('Ticket deleted');
+        showToast('Task deleted');
       }
     };
 
@@ -1142,14 +1287,12 @@ a:hover { text-decoration: underline; }
         document.getElementById('pm-name').value = p.name;
         document.getElementById('pm-status').value = p.status;
         document.getElementById('pm-client').value = p.client || '';
-        document.getElementById('pm-repo').value = p.repoUrl || '';
         document.getElementById('pm-title').innerText = 'Edit Project';
       } else {
         document.getElementById('pm-id').value = '';
         document.getElementById('pm-name').value = '';
         document.getElementById('pm-status').value = 'Active';
         document.getElementById('pm-client').value = '';
-        document.getElementById('pm-repo').value = '';
         document.getElementById('pm-title').innerText = 'New Project';
       }
       document.getElementById('project-modal-overlay').classList.add('active');
@@ -1162,8 +1305,7 @@ a:hover { text-decoration: underline; }
       await setDoc(doc(db, "projects", id), {
         name,
         status: document.getElementById('pm-status').value,
-        client: document.getElementById('pm-client').value,
-        repoUrl: document.getElementById('pm-repo').value
+        client: document.getElementById('pm-client').value
       }, {merge: true});
       closeModal('project-modal-overlay');
       showToast('Project saved');
@@ -1175,12 +1317,12 @@ a:hover { text-decoration: underline; }
         document.getElementById('te-id').value = t.id;
         document.getElementById('te-name').value = t.name;
         document.getElementById('te-email').value = t.email;
-        document.getElementById('te-role').value = t.role;
+        document.getElementById('te-role').value = t.role || '';
       } else {
         document.getElementById('te-id').value = '';
         document.getElementById('te-name').value = '';
         document.getElementById('te-email').value = '';
-        document.getElementById('te-role').value = 'Developer';
+        document.getElementById('te-role').value = '';
       }
       document.getElementById('team-modal-overlay').classList.add('active');
     };
@@ -1192,7 +1334,7 @@ a:hover { text-decoration: underline; }
       await setDoc(doc(db, "team", id), {
         name,
         email: document.getElementById('te-email').value.trim(),
-        role: document.getElementById('te-role').value
+        role: document.getElementById('te-role').value.trim()
       }, {merge: true});
       closeModal('team-modal-overlay');
     };
@@ -1203,12 +1345,10 @@ a:hover { text-decoration: underline; }
         document.getElementById('ce-id').value = c.id;
         document.getElementById('ce-company').value = c.company;
         document.getElementById('ce-email').value = c.email;
-        document.getElementById('ce-tier').value = c.tier || '';
       } else {
         document.getElementById('ce-id').value = '';
         document.getElementById('ce-company').value = '';
         document.getElementById('ce-email').value = '';
-        document.getElementById('ce-tier').value = '';
       }
       document.getElementById('client-modal-overlay').classList.add('active');
     };
@@ -1219,8 +1359,7 @@ a:hover { text-decoration: underline; }
       if(!company) return;
       await setDoc(doc(db, "clients", id), {
         company,
-        email: document.getElementById('ce-email').value.trim(),
-        tier: document.getElementById('ce-tier').value.trim()
+        email: document.getElementById('ce-email').value.trim()
       }, {merge: true});
       closeModal('client-modal-overlay');
     };
@@ -1265,10 +1404,6 @@ a:hover { text-decoration: underline; }
       if (dueToday.length > 0) {
         badge.style.display = 'flex';
         badge.innerText = dueToday.length;
-        if (Notification.permission === "granted") {
-          // Prevent spamming - realistically needs a "notified" flag in DB, simplified for here
-          // new Notification("TaskFlow Reminder", { body: `You have ${dueToday.length} tickets due today!` });
-        }
       } else {
         badge.style.display = 'none';
       }
