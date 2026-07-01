@@ -112,6 +112,7 @@ a:hover { color: var(--primary-hover); }
 .btn-danger { background: rgba(240, 101, 101, 0.1); color: #f06565; border: 1px solid rgba(240, 101, 101, 0.2); }
 .btn-danger:hover { background: rgba(240, 101, 101, 0.2); }
 .btn-sm { padding: 6px 10px; font-size: 12px; }
+.btn svg { width: 16px; height: 16px; stroke-width: 2.5; }
 
 /* Lifecycle buttons */
 .btn-lifecycle { flex: 1; padding: 10px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; background: var(--surface-hover); color: var(--text-muted); }
@@ -123,6 +124,19 @@ a:hover { color: var(--primary-hover); }
   border: 1px solid var(--border); border-radius: var(--radius);
   color: var(--text); font-family: var(--font-sans); font-size: 14px;
   transition: all 0.2s; outline: none;
+}
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%239ba1a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+.select option {
+  background: var(--surface);
+  color: var(--text);
 }
 .input:focus, .select:focus, .textarea:focus {
   border-color: var(--primary);
@@ -377,8 +391,8 @@ a:hover { color: var(--primary-hover); }
         </div>
       </nav>
       <div class="sidebar-footer">
-        <div class="user-avatar" id="current-user-avatar">?</div>
-        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500;" id="current-user-name">Loading...</div>
+        <div class="user-avatar" id="current-user-avatar" style="cursor: pointer;" onclick="openProfileModal()">?</div>
+        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer;" id="current-user-name" onclick="openProfileModal()">Loading...</div>
         <button class="btn-ghost" style="padding: 6px; border-radius: var(--radius-full);" onclick="appLogout()" title="Sign Out"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i></button>
       </div>
     </aside>
@@ -489,11 +503,8 @@ a:hover { color: var(--primary-hover); }
           <div class="flex justify-between items-center" style="margin-bottom: 24px;">
             <button class="btn btn-primary" onclick="openTeamModal()"><i data-lucide="user-plus"></i> Add Team Member</button>
           </div>
-          <div class="data-table-wrapper">
-            <table class="data-table">
-              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Actions</th></tr></thead>
-              <tbody id="team-table-body"></tbody>
-            </table>
+          <div id="team-content">
+             <!-- Grouped by department via JS -->
           </div>
         </div>
 
@@ -519,14 +530,8 @@ a:hover { color: var(--primary-hover); }
               <input type="text" class="input" id="set-prefix" placeholder="TF">
             </div>
             
-            <h4 style="margin-top: 32px; margin-bottom: 16px; font-family: var(--font-display);">Webhooks (Global)</h4>
-            <div class="form-group">
-              <label class="form-label">Discord/Slack Webhook URL</label>
-              <input type="text" class="input" id="set-webhook" placeholder="https://...">
-            </div>
             <div class="flex gap-4" style="margin-top: 24px;">
                 <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Settings</button>
-                <button class="btn btn-ghost" onclick="testWebhook()"><i data-lucide="radio"></i> Test Webhook</button>
             </div>
           </div>
         </div>
@@ -1276,40 +1281,45 @@ a:hover { color: var(--primary-hover); }
     };
 
     window.saveTicket = async () => {
-      const id = document.getElementById('tm-id').value || `t_${Date.now()}`;
-      const isNew = !document.getElementById('tm-id').value;
-      
-      let displayId = null;
-      if (isNew) {
-        displayId = `${state.settings.ticketPrefix}-${String(state.settings.nextNum).padStart(4, '0')}`;
-        await setDoc(doc(db, "globals", "settings"), { nextNum: state.settings.nextNum + 1 }, {merge:true});
+      try {
+        const id = document.getElementById('tm-id').value || `t_${Date.now()}`;
+        const isNew = !document.getElementById('tm-id').value;
+        
+        let displayId = null;
+        if (isNew) {
+          displayId = `${state.settings.ticketPrefix}-${String(state.settings.nextNum).padStart(4, '0')}`;
+          await setDoc(doc(db, "globals", "settings"), { nextNum: state.settings.nextNum + 1 }, {merge:true});
+        }
+
+        const tData = {
+          title: document.getElementById('tm-name').value.trim(),
+          description: document.getElementById('tm-desc').value.trim(),
+          project: document.getElementById('tm-project').value,
+          assignee: document.getElementById('tm-assignee').value,
+          status: document.getElementById('tm-status').value,
+          priority: document.getElementById('tm-priority').value,
+          dueDate: document.getElementById('tm-due').value,
+          source: document.getElementById('tm-source').value,
+          clientToken: document.getElementById('tm-client-token').value,
+          links: state.activeTicketLinks,
+          comments: state.activeTicketComments,
+          updatedAt: new Date().toISOString()
+        };
+        
+        if(isNew) {
+          tData.createdAt = new Date().toISOString();
+          tData.displayId = displayId;
+        }
+
+        if(!tData.title) return showToast('Title is required');
+
+        await setDoc(doc(db, "tickets", id), tData, {merge: true});
+        closeModal('ticket-modal-overlay');
+        showToast(isNew ? 'Task created' : 'Task updated');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+        console.error('saveTicket Error:', e);
       }
-
-      const tData = {
-        title: document.getElementById('tm-name').value.trim(),
-        description: document.getElementById('tm-desc').value.trim(),
-        project: document.getElementById('tm-project').value,
-        assignee: document.getElementById('tm-assignee').value,
-        status: document.getElementById('tm-status').value,
-        priority: document.getElementById('tm-priority').value,
-        dueDate: document.getElementById('tm-due').value,
-        source: document.getElementById('tm-source').value,
-        clientToken: document.getElementById('tm-client-token').value,
-        links: state.activeTicketLinks,
-        comments: state.activeTicketComments,
-        updatedAt: new Date().toISOString()
-      };
-      
-      if(isNew) {
-        tData.createdAt = new Date().toISOString();
-        tData.displayId = displayId;
-      }
-
-      if(!tData.title) return showToast('Title is required');
-
-      await setDoc(doc(db, "tickets", id), tData, {merge: true});
-      closeModal('ticket-modal-overlay');
-      showToast(isNew ? 'Task created' : 'Task updated');
     };
 
     window.deleteTicket = async () => {
@@ -1402,16 +1412,21 @@ a:hover { color: var(--primary-hover); }
     };
 
     window.saveProject = async () => {
-      const id = document.getElementById('pm-id').value || `p_${Date.now()}`;
-      const name = document.getElementById('pm-name').value.trim();
-      if(!name) return;
-      await setDoc(doc(db, "projects", id), {
-        name,
-        status: document.getElementById('pm-status').value,
-        client: document.getElementById('pm-client').value
-      }, {merge: true});
-      closeModal('project-modal-overlay');
-      showToast('Project saved');
+      try {
+        const id = document.getElementById('pm-id').value || `p_${Date.now()}`;
+        const name = document.getElementById('pm-name').value.trim();
+        if(!name) return showToast("Project Name is required");
+        await setDoc(doc(db, "projects", id), {
+          name,
+          status: document.getElementById('pm-status').value,
+          client: document.getElementById('pm-client').value
+        }, {merge: true});
+        closeModal('project-modal-overlay');
+        showToast('Project saved');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+        console.error('saveProject Error:', e);
+      }
     };
 
     window.openTeamModal = (id = null) => {
@@ -1431,15 +1446,20 @@ a:hover { color: var(--primary-hover); }
     };
 
     window.saveTeamMember = async () => {
-      const id = document.getElementById('te-id').value || `tm_${Date.now()}`;
-      const name = document.getElementById('te-name').value.trim();
-      if(!name) return;
-      await setDoc(doc(db, "team", id), {
-        name,
-        email: document.getElementById('te-email').value.trim(),
-        role: document.getElementById('te-role').value.trim()
-      }, {merge: true});
-      closeModal('team-modal-overlay');
+      try {
+        const id = document.getElementById('te-id').value || `tm_${Date.now()}`;
+        const name = document.getElementById('te-name').value.trim();
+        if(!name) return showToast("Name is required");
+        await setDoc(doc(db, "team", id), {
+          name,
+          email: document.getElementById('te-email').value.trim(),
+          role: document.getElementById('te-role').value.trim()
+        }, {merge: true});
+        closeModal('team-modal-overlay');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+        console.error('saveTeamMember Error:', e);
+      }
     };
 
     window.openClientModal = (id = null) => {
@@ -1457,14 +1477,19 @@ a:hover { color: var(--primary-hover); }
     };
 
     window.saveClient = async () => {
-      const id = document.getElementById('ce-id').value || `c_${Date.now()}`;
-      const company = document.getElementById('ce-company').value.trim();
-      if(!company) return;
-      await setDoc(doc(db, "clients", id), {
-        company,
-        email: document.getElementById('ce-email').value.trim()
-      }, {merge: true});
-      closeModal('client-modal-overlay');
+      try {
+        const id = document.getElementById('ce-id').value || `c_${Date.now()}`;
+        const company = document.getElementById('ce-company').value.trim();
+        if(!company) return showToast("Company Name is required");
+        await setDoc(doc(db, "clients", id), {
+          company,
+          email: document.getElementById('ce-email').value.trim()
+        }, {merge: true});
+        closeModal('client-modal-overlay');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+        console.error('saveClient Error:', e);
+      }
     };
 
     // --- Settings ---
