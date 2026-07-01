@@ -796,9 +796,6 @@ a:hover { color: var(--primary-hover); }
   <!-- Toast Container -->
   <div id="toast-container"></div>
 
-  <!-- Load Firebase Credentials from external config (excluded from git) -->
-  <script src="firebase-config.js"></script>
-
   <!-- ─── Application Logic ────────────────────────────────────────── -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -806,10 +803,15 @@ a:hover { color: var(--primary-hover); }
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // --- Firebase Configuration ---
-    if (!window.firebaseConfig || window.firebaseConfig.apiKey === "YOUR_API_KEY") {
-      alert("Firebase Configuration is missing! Please copy 'firebase-config.example.js' to 'firebase-config.js' and fill in your Firebase credentials.");
-    }
-    const firebaseConfig = window.firebaseConfig;
+    const firebaseConfig = {
+      apiKey: "AIzaSyAk_YmDpbaedj-McM2K7ALUqkJyIJBKcfM",
+      authDomain: "taskflow-e7f24.firebaseapp.com",
+      projectId: "taskflow-e7f24",
+      storageBucket: "taskflow-e7f24.firebasestorage.app",
+      messagingSenderId: "431732571375",
+      appId: "1:431732571375:web:b14d105be4058b0e79af1a",
+      measurementId: "G-HHBSC5583N"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
