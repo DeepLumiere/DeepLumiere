@@ -362,9 +362,15 @@ a:hover { color: var(--primary-hover); }
   <div id="app-shell" class="shell" style="display: none;">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-header">
-        <i data-lucide="layers"></i>
-        <h2 style="font-size: 18px; color: var(--text); letter-spacing: 0;">TaskFlow<span style="color: var(--primary);">Pro</span></h2>
+      <div class="sidebar-header" style="flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 20px;">
+        <div class="flex items-center gap-2">
+          <i data-lucide="layers"></i>
+          <h2 style="font-size: 18px; color: var(--text); letter-spacing: 0; margin: 0;">TaskFlow<span style="color: var(--primary);">Pro</span></h2>
+        </div>
+        <div class="flex flex-col gap-2" style="margin-top: 8px;">
+          <select class="select" id="sidebar-org-switcher" onchange="switchOrganization(this.value)" style="background: var(--surface-hover); border-color: var(--border); font-size: 13px; font-weight: 500;"></select>
+          <button class="btn btn-ghost btn-sm" onclick="openCreateOrgModal()" style="font-size: 12px; width: 100%; justify-content: center;"><i data-lucide="plus" style="width: 14px; height: 14px;"></i> Create Workspace</button>
+        </div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">
@@ -390,8 +396,8 @@ a:hover { color: var(--primary-hover); }
         </div>
       </nav>
       <div class="sidebar-footer">
-        <div class="user-avatar" id="current-user-avatar" style="cursor: pointer;" onclick="openProfileModal()">?</div>
-        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer;" id="current-user-name" onclick="openProfileModal()">Loading...</div>
+        <div class="user-avatar" id="current-user-avatar" style="cursor: pointer;" onclick="nav('settings')">?</div>
+        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer;" id="current-user-name" onclick="nav('settings')">Loading...</div>
         <button class="btn-ghost" style="padding: 6px; border-radius: var(--radius-full);" onclick="appLogout()" title="Sign Out"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i></button>
       </div>
     </aside>
@@ -541,6 +547,14 @@ a:hover { color: var(--primary-hover); }
                   <label class="form-label">Task ID Prefix</label>
                   <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Prefix for generated tickets (e.g. TF-0001).</div>
                   <input type="text" class="input" id="set-prefix" placeholder="TF">
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                  <label class="form-label">Workspace Invite Link</label>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Share this link to invite others directly to this organization.</div>
+                  <div class="flex gap-2">
+                    <input type="text" class="input" id="set-invite-link" readonly style="background: var(--surface-hover);">
+                    <button class="btn btn-ghost" onclick="copyInviteLink()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+                  </div>
                 </div>
                 <div class="flex gap-4" style="margin-top: 24px;">
                     <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Organization</button>
@@ -692,20 +706,27 @@ a:hover { color: var(--primary-hover); }
     </div>
   </div>
 
-  <!-- Profile Modal -->
-  <div class="modal-overlay" id="profile-modal-overlay" onclick="closeModal('profile-modal-overlay', event)">
-    <div class="modal" id="profile-modal" style="max-width: 450px;">
+
+  <!-- Create Organization Modal -->
+  <div class="modal-overlay" id="create-org-modal-overlay" onclick="closeModal('create-org-modal-overlay', event)">
+    <div class="modal" id="create-org-modal" style="max-width: 400px;">
       <div class="modal-header">
-        <h3>My Profile</h3>
-        <button class="modal-close" onclick="closeModal('profile-modal-overlay')"><i data-lucide="x"></i></button>
+        <h3>Create New Workspace</h3>
+        <button class="modal-close" onclick="closeModal('create-org-modal-overlay')"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
-        <div class="form-group"><label class="form-label">Username</label><input type="text" class="input" id="profile-username" placeholder="@username"></div>
-        <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="input" id="profile-display-name"></div>
+        <div class="form-group">
+          <label class="form-label">Workspace Name</label>
+          <input type="text" class="input" id="new-org-name" placeholder="e.g. Design Team">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Task ID Prefix</label>
+          <input type="text" class="input" id="new-org-prefix" placeholder="TF" value="TF">
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('profile-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveProfile()"><i data-lucide="save"></i> Save Profile</button>
+        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="createOrganization()"><i data-lucide="plus"></i> Create</button>
       </div>
     </div>
   </div>
@@ -775,6 +796,9 @@ a:hover { color: var(--primary-hover); }
   <!-- Toast Container -->
   <div id="toast-container"></div>
 
+  <!-- Load Firebase Credentials from external config (excluded from git) -->
+  <script src="firebase-config.js"></script>
+
   <!-- ─── Application Logic ────────────────────────────────────────── -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -782,15 +806,10 @@ a:hover { color: var(--primary-hover); }
     import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // --- Firebase Configuration ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyAk_YmDpbaedj-McM2K7ALUqkJyIJBKcfM",
-      authDomain: "taskflow-e7f24.firebaseapp.com",
-      projectId: "taskflow-e7f24",
-      storageBucket: "taskflow-e7f24.firebasestorage.app",
-      messagingSenderId: "431732571375",
-      appId: "1:431732571375:web:b14d105be4058b0e79af1a",
-      measurementId: "G-HHBSC5583N"
-    };
+    if (!window.firebaseConfig || window.firebaseConfig.apiKey === "YOUR_API_KEY") {
+      alert("Firebase Configuration is missing! Please copy 'firebase-config.example.js' to 'firebase-config.js' and fill in your Firebase credentials.");
+    }
+    const firebaseConfig = window.firebaseConfig;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -970,6 +989,29 @@ a:hover { color: var(--primary-hover); }
                 department: 'Leadership'
              });
           }
+          // Check for Invite link parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const inviteOrgId = urlParams.get('invite');
+          if (inviteOrgId) {
+             const orgSnap = await getDoc(doc(db, "organizations", inviteOrgId));
+             if (orgSnap.exists()) {
+                await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                   orgId: inviteOrgId,
+                   name: user.displayName || user.email,
+                   email: user.email,
+                   role: 'Member',
+                   department: 'Engineering',
+                   title: 'Member'
+                }, {merge: true});
+                await setDoc(userRef, { activeOrgId: inviteOrgId }, {merge: true});
+                orgId = inviteOrgId;
+                showToast("Joined workspace: " + orgSnap.data().name);
+             } else {
+                showToast("Workspace invite link is invalid.");
+             }
+             window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
           state.activeOrgId = orgId;
           
           unsubscribes.push(onSnapshot(userRef, (docSnap) => {
@@ -985,6 +1027,22 @@ a:hover { color: var(--primary-hover); }
                   state.activeOrgId = myProfile.activeOrgId;
                   initApp();
                }
+             }
+          }));
+
+          // Listen to user's workspaces
+          unsubscribes.push(onSnapshot(query(collection(db, "team"), where("email", "==", user.email)), async (teamSnap) => {
+             const orgIds = [...new Set(teamSnap.docs.map(d => d.data().orgId))];
+             const orgList = [];
+             for(const oId of orgIds) {
+                const oSnap = await getDoc(doc(db, "organizations", oId));
+                if(oSnap.exists()) {
+                   orgList.push({ id: oId, ...oSnap.data() });
+                }
+             }
+             const switcher = document.getElementById('sidebar-org-switcher');
+             if(switcher) {
+                switcher.innerHTML = orgList.map(o => `<option value="${o.id}" ${o.id === state.activeOrgId ? 'selected' : ''}>${escapeHtml(o.name)}</option>`).join('');
              }
           }));
 
@@ -1089,6 +1147,7 @@ a:hover { color: var(--primary-hover); }
       if(state.activeOrg) {
         document.getElementById('set-workspace').value = state.activeOrg.name || '';
         document.getElementById('set-prefix').value = state.activeOrg.ticketPrefix || 'TF';
+        document.getElementById('set-invite-link').value = `${window.location.origin}${window.location.pathname}?invite=${state.activeOrgId}`;
       }
       
       const tbody = document.getElementById('settings-team-body');
@@ -1454,8 +1513,9 @@ a:hover { color: var(--primary-hover); }
         
         let displayId = null;
         if (isNew) {
-          const nextNum = state.activeOrg.nextNum || 1;
-          displayId = `${state.settings.ticketPrefix}-${String(nextNum).padStart(4, '0')}`;
+          const nextNum = (state.activeOrg && state.activeOrg.nextNum) || 1;
+          const prefix = (state.activeOrg && state.activeOrg.ticketPrefix) || 'TF';
+          displayId = `${prefix}-${String(nextNum).padStart(4, '0')}`;
           await setDoc(doc(db, "organizations", state.activeOrgId), { nextNum: nextNum + 1 }, {merge:true});
         }
 
@@ -1642,26 +1702,7 @@ a:hover { color: var(--primary-hover); }
       }
     };
 
-    window.openProfileModal = () => {
-      document.getElementById('profile-username').value = state.currentUserProfile?.username || '';
-      document.getElementById('profile-display-name').value = state.currentUserProfile?.displayName || currentUser.displayName || '';
-      document.getElementById('profile-modal-overlay').classList.add('active');
-    };
 
-    window.saveProfile = async () => {
-      try {
-        const username = document.getElementById('profile-username').value.trim();
-        const displayName = document.getElementById('profile-display-name').value.trim();
-        if(!username) return showToast('Username required');
-        await setDoc(doc(db, "users", currentUser.uid), {
-          username, displayName, updatedAt: new Date().toISOString()
-        }, {merge: true});
-        closeModal('profile-modal-overlay');
-        showToast('Profile updated');
-      } catch (e) {
-        showToast('Error: ' + e.message);
-      }
-    };
 
     window.openClientModal = (id = null) => {
       if(id) {
@@ -1716,8 +1757,28 @@ a:hover { color: var(--primary-hover); }
         const username = document.getElementById('set-profile-username').value.trim();
         const displayName = document.getElementById('set-profile-display-name').value.trim();
         if(!username) return showToast('Username required');
+        
+        let formattedUsername = username;
+        if (!formattedUsername.startsWith('@')) {
+          formattedUsername = '@' + formattedUsername;
+        }
+
+        // Check for duplicate username
+        const q = query(collection(db, "users"), where("username", "==", formattedUsername));
+        const snap = await getDocs(q);
+        let taken = false;
+        snap.forEach(d => {
+          if (d.id !== currentUser.uid) {
+            taken = true;
+          }
+        });
+
+        if (taken) {
+          return showToast(`Username ${formattedUsername} is already taken`);
+        }
+
         await setDoc(doc(db, "users", currentUser.uid), {
-          username, displayName, updatedAt: new Date().toISOString()
+          username: formattedUsername, displayName, updatedAt: new Date().toISOString()
         }, {merge: true});
         showToast('Profile updated');
       } catch (e) {
@@ -1778,6 +1839,67 @@ a:hover { color: var(--primary-hover); }
            .replace(/"/g, "&quot;")
            .replace(/'/g, "&#039;");
     }
+
+
+    window.switchOrganization = async (orgId) => {
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+        showToast('Switched Workspace');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    };
+
+    window.openCreateOrgModal = () => {
+      document.getElementById('new-org-name').value = '';
+      document.getElementById('new-org-prefix').value = 'TF';
+      document.getElementById('create-org-modal-overlay').classList.add('active');
+    };
+
+    window.createOrganization = async () => {
+      try {
+        const name = document.getElementById('new-org-name').value.trim();
+        const prefix = document.getElementById('new-org-prefix').value.trim() || 'TF';
+        if(!name) return showToast('Workspace Name is required');
+        
+        const orgId = `org_${Date.now()}`;
+        await setDoc(doc(db, "organizations", orgId), {
+          name,
+          ownerId: currentUser.uid,
+          ticketPrefix: prefix,
+          nextNum: 1,
+          createdAt: new Date().toISOString()
+        });
+
+        // Add creator to team
+        await setDoc(doc(db, "team", `tm_${currentUser.uid}_${Date.now()}`), {
+          orgId: orgId,
+          uid: currentUser.uid,
+          name: currentUser.displayName || currentUser.email,
+          email: currentUser.email,
+          role: 'Admin',
+          department: 'Leadership'
+        });
+
+        // Set as active org
+        const userRef = doc(db, "users", currentUser.uid);
+        await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+        
+        closeModal('create-org-modal-overlay');
+        showToast('Workspace Created!');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    };
+
+    window.copyInviteLink = () => {
+      const inviteLink = document.getElementById('set-invite-link');
+      inviteLink.select();
+      inviteLink.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(inviteLink.value);
+      showToast('Invite link copied to clipboard!');
+    };
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
