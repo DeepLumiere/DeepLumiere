@@ -1876,22 +1876,32 @@ a:hover { color: var(--primary-hover); }
     };
 
     window.deleteTeamMember = async (id) => {
+      console.log('deleteTeamMember called for ID:', id);
       if (confirm('Are you sure you want to remove this member from the organization?')) {
         try {
-          await deleteDoc(doc(db, 'team', id));
+          const ref = doc(db, 'team', id);
+          console.log('Attempting Firestore delete on path: team/' + id);
+          await deleteDoc(ref);
+          console.log('Delete successful');
           showToast('Member removed');
         } catch(e) {
+          console.error('Delete failed:', e);
           showToast('Error: ' + e.message);
         }
       }
     };
 
     window.deleteClient = async (id) => {
+      console.log('deleteClient called for ID:', id);
       if (confirm('Are you sure you want to delete this client?')) {
         try {
-          await deleteDoc(doc(db, 'clients', id));
+          const ref = doc(db, 'clients', id);
+          console.log('Attempting Firestore delete on path: clients/' + id);
+          await deleteDoc(ref);
+          console.log('Delete successful');
           showToast('Client deleted');
         } catch(e) {
+          console.error('Delete failed:', e);
           showToast('Error: ' + e.message);
         }
       }
