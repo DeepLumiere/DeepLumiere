@@ -973,23 +973,45 @@ a:hover { color: var(--primary-hover); }
           
           let orgId = userData.activeOrgId;
           if (!orgId) {
-             orgId = "org_" + user.uid;
-             await setDoc(doc(db, "organizations", orgId), {
-                name: (user.displayName || 'My') + "'s Workspace",
-                ownerId: user.uid,
-                ticketPrefix: 'TF',
-                createdAt: new Date().toISOString()
-             });
-             await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
-             
-             // Auto-add self to team
-             await setDoc(doc(db, "team", `tm_${user.uid}`), {
-                orgId: orgId,
-                name: user.displayName || user.email,
-                email: user.email,
-                role: 'Admin',
-                department: 'Leadership'
-             });
+             // Check if there is an existing organization in the database to join by default
+             const orgsSnap = await getDocs(query(collection(db, "organizations")));
+             if (!orgsSnap.empty) {
+                orgId = orgsSnap.docs[0].id;
+                await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+                
+                // Add self to the team roster
+                await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                   orgId: orgId,
+                   uid: user.uid,
+                   name: user.displayName || user.email,
+                   email: user.email,
+                   role: 'Member',
+                   department: 'Engineering',
+                   title: 'Member'
+                }, {merge: true});
+                showToast("Joined workspace: " + orgsSnap.docs[0].data().name);
+             } else {
+                // No workspaces exist yet, create the first one
+                orgId = "org_" + user.uid;
+                await setDoc(doc(db, "organizations", orgId), {
+                   name: (user.displayName || 'My') + "'s Workspace",
+                   ownerId: user.uid,
+                   ticketPrefix: 'TF',
+                   createdAt: new Date().toISOString()
+                });
+                await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+                
+                // Auto-add self to team as Admin
+                await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                   orgId: orgId,
+                   uid: user.uid,
+                   name: user.displayName || user.email,
+                   email: user.email,
+                   role: 'Admin',
+                   department: 'Leadership',
+                   title: 'Founder'
+                }, {merge: true});
+             }
           }
           // Check for Invite link parameters
           const urlParams = new URLSearchParams(window.location.search);
@@ -1160,7 +1182,7 @@ a:hover { color: var(--primary-hover); }
               <td>${escapeHtml(t.email)}</td>
               <td><span class="badge" style="background:rgba(255,255,255,0.05);">${escapeHtml(t.department || 'General')}</span></td>
               <td>${escapeHtml(t.role)}</td>
-              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteDoc(doc(db,'team','${t.id}'))"><i data-lucide="trash-2"></i></button></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteTeamMember('${t.id}')"><i data-lucide="trash-2"></i></button></td>
             </tr>
           `).join('');
       }
@@ -1364,7 +1386,7 @@ a:hover { color: var(--primary-hover); }
           <td>
             <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); copyPortalLink('${c.id}')"><i data-lucide="copy"></i> Copy Link</button>
           </td>
-          <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteDoc(doc(db,'clients','${c.id}'))"><i data-lucide="trash-2"></i></button></td>
+          <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteClient('${c.id}')"><i data-lucide="trash-2"></i></button></td>
         </tr>
       `).join('');
     }
@@ -1850,6 +1872,28 @@ a:hover { color: var(--primary-hover); }
         showToast('Switched Workspace');
       } catch (e) {
         showToast('Error: ' + e.message);
+      }
+    };
+
+    window.deleteTeamMember = async (id) => {
+      if (confirm('Are you sure you want to remove this member from the organization?')) {
+        try {
+          await deleteDoc(doc(db, 'team', id));
+          showToast('Member removed');
+        } catch(e) {
+          showToast('Error: ' + e.message);
+        }
+      }
+    };
+
+    window.deleteClient = async (id) => {
+      if (confirm('Are you sure you want to delete this client?')) {
+        try {
+          await deleteDoc(doc(db, 'clients', id));
+          showToast('Client deleted');
+        } catch(e) {
+          showToast('Error: ' + e.message);
+        }
       }
     };
 
