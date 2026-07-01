@@ -382,7 +382,6 @@ a:hover { color: var(--primary-hover); }
         </div>
         <div class="nav-section">
           <div class="nav-title">Directory</div>
-          <div class="nav-item" data-view="team" onclick="nav('team')"><i data-lucide="users"></i> Team</div>
           <div class="nav-item" data-view="clients" onclick="nav('clients')"><i data-lucide="building-2"></i> Clients</div>
         </div>
         <div class="nav-section">
@@ -498,15 +497,7 @@ a:hover { color: var(--primary-hover); }
           <div id="pd-content"></div>
         </div>
 
-        <!-- View: Team -->
-        <div id="view-team" class="view">
-          <div class="flex justify-between items-center" style="margin-bottom: 24px;">
-            <button class="btn btn-primary" onclick="openTeamModal()"><i data-lucide="user-plus"></i> Add Team Member</button>
-          </div>
-          <div id="team-content">
-             <!-- Grouped by department via JS -->
-          </div>
-        </div>
+        
 
         <!-- View: Clients -->
         <div id="view-clients" class="view">
@@ -523,33 +514,53 @@ a:hover { color: var(--primary-hover); }
 
         <!-- View: Settings -->
         <div id="view-settings" class="view">
-          <div class="project-header-card" style="max-width: 600px;">
-            <h3 style="margin-bottom: 24px;"><i data-lucide="settings-2" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Workspace Settings</h3>
-            
-            <div class="form-group">
-              <label class="form-label">Workspace Name</label>
-              <input type="text" class="input" id="set-workspace" placeholder="e.g. Acme Corp" value="TaskFlow Pro">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Task ID Prefix</label>
-              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">This prefix is used to automatically generate sequential, readable ticket IDs (e.g. TF-0001).</div>
-              <input type="text" class="input" id="set-prefix" placeholder="TF">
-            </div>
-
-            <div class="form-group" style="margin-top: 16px;">
-              <label class="form-label">Default Theme</label>
-              <select class="select" id="set-theme">
-                <option value="dark">Dark Mode (Default)</option>
-                <option value="light">Light Mode</option>
-                <option value="system">System Preference</option>
-              </select>
-            </div>
-            
-            <div class="flex gap-4" style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 24px;">
-                <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Settings</button>
-            </div>
+          
+          <div style="display: flex; gap: 32px;">
+             <div class="project-header-card" style="flex: 1; max-width: 500px;">
+                <h3 style="margin-bottom: 24px;"><i data-lucide="user" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> My Profile</h3>
+                <div class="form-group">
+                  <label class="form-label">Username</label>
+                  <input type="text" class="input" id="set-profile-username" placeholder="@john">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Display Name</label>
+                  <input type="text" class="input" id="set-profile-display-name">
+                </div>
+                <div class="flex gap-4" style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="saveProfileFromSettings()"><i data-lucide="save"></i> Save Profile</button>
+                </div>
+             </div>
+             
+             <div class="project-header-card" style="flex: 1; max-width: 500px;">
+                <h3 style="margin-bottom: 24px;"><i data-lucide="building-2" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Organization Settings</h3>
+                <div class="form-group">
+                  <label class="form-label">Organization Name</label>
+                  <input type="text" class="input" id="set-workspace" placeholder="e.g. Acme Corp">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Task ID Prefix</label>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Prefix for generated tickets (e.g. TF-0001).</div>
+                  <input type="text" class="input" id="set-prefix" placeholder="TF">
+                </div>
+                <div class="flex gap-4" style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Organization</button>
+                </div>
+             </div>
           </div>
+          
+          <div class="project-header-card" style="margin-top: 32px;">
+             <div class="flex justify-between items-center" style="margin-bottom: 24px;">
+               <h3><i data-lucide="users" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Organization Members</h3>
+               <button class="btn btn-primary" onclick="openTeamModal()"><i data-lucide="user-plus"></i> Invite Member</button>
+             </div>
+             <div class="data-table-wrapper">
+               <table class="data-table">
+                 <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Actions</th></tr></thead>
+                 <tbody id="settings-team-body"></tbody>
+               </table>
+             </div>
+          </div>
+          
         </div>
 
       </div>
@@ -797,7 +808,9 @@ a:hover { color: var(--primary-hover); }
       activeTicketLinks: [],
       activeTicketComments: [],
       users: [],
-      currentUserProfile: null
+      currentUserProfile: null,
+      activeOrgId: null,
+      activeOrg: null
     };
     
     let unsubscribes = [];
@@ -846,6 +859,7 @@ a:hover { color: var(--primary-hover); }
         } catch(e) {}
 
         const tData = {
+          orgId: state.activeOrgId,
           title,
           description: `Submitted by: ${name} (${email})\n\n${desc}`,
           project: "",
@@ -919,10 +933,10 @@ a:hover { color: var(--primary-hover); }
           document.getElementById('current-user-avatar').innerText = (user.displayName || user.email).charAt(0).toUpperCase();
           loginScreen.style.display = 'none';
           appShell.style.display = 'grid';
-          initApp();
           
           const userRef = doc(db, "users", user.uid);
-          const snap = await getDoc(userRef);
+          let snap = await getDoc(userRef);
+          
           if (!snap.exists()) {
              await setDoc(userRef, {
                 username: '@' + (user.email ? user.email.split('@')[0] : 'user'),
@@ -930,7 +944,51 @@ a:hover { color: var(--primary-hover); }
                 email: user.email,
                 createdAt: new Date().toISOString()
              });
+             snap = await getDoc(userRef);
           }
+          
+          const userData = snap.data();
+          state.currentUserProfile = { id: user.uid, ...userData };
+          
+          let orgId = userData.activeOrgId;
+          if (!orgId) {
+             orgId = "org_" + user.uid;
+             await setDoc(doc(db, "organizations", orgId), {
+                name: (user.displayName || 'My') + "'s Workspace",
+                ownerId: user.uid,
+                ticketPrefix: 'TF',
+                createdAt: new Date().toISOString()
+             });
+             await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+             
+             // Auto-add self to team
+             await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                orgId: orgId,
+                name: user.displayName || user.email,
+                email: user.email,
+                role: 'Admin',
+                department: 'Leadership'
+             });
+          }
+          state.activeOrgId = orgId;
+          
+          unsubscribes.push(onSnapshot(userRef, (docSnap) => {
+             if(docSnap.exists()) {
+               const myProfile = { id: docSnap.id, ...docSnap.data() };
+               state.currentUserProfile = myProfile;
+               const dName = myProfile.displayName || myProfile.username;
+               document.getElementById('current-user-name').innerText = dName;
+               document.getElementById('current-user-avatar').innerText = dName.charAt(0).toUpperCase();
+               
+               if(myProfile.activeOrgId && myProfile.activeOrgId !== state.activeOrgId) {
+                  cleanupApp();
+                  state.activeOrgId = myProfile.activeOrgId;
+                  initApp();
+               }
+             }
+          }));
+
+          initApp();
         } else {
           currentUser = null;
           loginScreen.style.display = 'flex';
@@ -1017,11 +1075,34 @@ a:hover { color: var(--primary-hover); }
         case 'kanban': renderKanban(); break;
         case 'tickets': renderTicketsTable(); break;
         case 'projects': renderProjectsTable(); break;
-        case 'team': renderTeamTable(); break;
         case 'clients': renderClientsTable(); break;
         case 'project-detail': renderProjectDetail(); break;
+        case 'settings': renderSettings(); break;
       }
       setTimeout(() => lucide.createIcons(), 0);
+    }
+    function renderSettings() {
+      if(state.currentUserProfile) {
+        document.getElementById('set-profile-username').value = state.currentUserProfile.username || '';
+        document.getElementById('set-profile-display-name').value = state.currentUserProfile.displayName || '';
+      }
+      if(state.activeOrg) {
+        document.getElementById('set-workspace').value = state.activeOrg.name || '';
+        document.getElementById('set-prefix').value = state.activeOrg.ticketPrefix || 'TF';
+      }
+      
+      const tbody = document.getElementById('settings-team-body');
+      if(tbody) {
+          tbody.innerHTML = state.team.map(t => `
+            <tr class="interactive" onclick="openTeamModal('${t.id}')">
+              <td style="font-weight:500;">${escapeHtml(t.name)}</td>
+              <td>${escapeHtml(t.email)}</td>
+              <td><span class="badge" style="background:rgba(255,255,255,0.05);">${escapeHtml(t.department || 'General')}</span></td>
+              <td>${escapeHtml(t.role)}</td>
+              <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteDoc(doc(db,'team','${t.id}'))"><i data-lucide="trash-2"></i></button></td>
+            </tr>
+          `).join('');
+      }
     }
 
     function populateSelects() {
@@ -1373,11 +1454,13 @@ a:hover { color: var(--primary-hover); }
         
         let displayId = null;
         if (isNew) {
-          displayId = `${state.settings.ticketPrefix}-${String(state.settings.nextNum).padStart(4, '0')}`;
-          await setDoc(doc(db, "globals", "settings"), { nextNum: state.settings.nextNum + 1 }, {merge:true});
+          const nextNum = state.activeOrg.nextNum || 1;
+          displayId = `${state.settings.ticketPrefix}-${String(nextNum).padStart(4, '0')}`;
+          await setDoc(doc(db, "organizations", state.activeOrgId), { nextNum: nextNum + 1 }, {merge:true});
         }
 
         const tData = {
+          orgId: state.activeOrgId,
           title: document.getElementById('tm-name').value.trim(),
           description: document.getElementById('tm-desc').value.trim(),
           project: document.getElementById('tm-project').value,
@@ -1503,6 +1586,7 @@ a:hover { color: var(--primary-hover); }
         const name = document.getElementById('pm-name').value.trim();
         if(!name) return showToast("Project Name is required");
         await setDoc(doc(db, "projects", id), {
+          orgId: state.activeOrgId,
           name,
           status: document.getElementById('pm-status').value,
           client: document.getElementById('pm-client').value
@@ -1543,6 +1627,7 @@ a:hover { color: var(--primary-hover); }
         const name = document.getElementById('te-name').value.trim();
         if(!name) return showToast("Name is required");
         await setDoc(doc(db, "team", id), {
+          orgId: state.activeOrgId,
           name,
           email: document.getElementById('te-email').value.trim(),
           role: document.getElementById('te-role').value.trim(),
@@ -1598,6 +1683,7 @@ a:hover { color: var(--primary-hover); }
         const company = document.getElementById('ce-company').value.trim();
         if(!company) return showToast("Company Name is required");
         await setDoc(doc(db, "clients", id), {
+          orgId: state.activeOrgId,
           company,
           email: document.getElementById('ce-email').value.trim()
         }, {merge: true});
@@ -1610,19 +1696,32 @@ a:hover { color: var(--primary-hover); }
 
     // --- Settings ---
     window.saveSettings = async () => {
+      if(!state.activeOrgId) return;
       try {
         const prefix = document.getElementById('set-prefix').value.trim() || 'TF';
-        const workspace = document.getElementById('set-workspace').value.trim() || 'TaskFlow Pro';
-        const theme = document.getElementById('set-theme').value;
-        await setDoc(doc(db, "globals", "settings"), { 
+        const workspace = document.getElementById('set-workspace').value.trim() || 'My Workspace';
+        await setDoc(doc(db, "organizations", state.activeOrgId), { 
           ticketPrefix: prefix,
-          workspaceName: workspace,
-          theme: theme
+          name: workspace
         }, {merge:true});
-        showToast('Settings saved successfully');
+        showToast('Organization saved successfully');
       } catch (e) {
         showToast('Error: ' + e.message);
         console.error('saveSettings Error:', e);
+      }
+    };
+    
+    window.saveProfileFromSettings = async () => {
+      try {
+        const username = document.getElementById('set-profile-username').value.trim();
+        const displayName = document.getElementById('set-profile-display-name').value.trim();
+        if(!username) return showToast('Username required');
+        await setDoc(doc(db, "users", currentUser.uid), {
+          username, displayName, updatedAt: new Date().toISOString()
+        }, {merge: true});
+        showToast('Profile updated');
+      } catch (e) {
+        showToast('Error: ' + e.message);
       }
     };
 
