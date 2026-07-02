@@ -7,10 +7,16 @@ export function injectLayout() {
   const sidebarHTML = `
     <aside class="sidebar">
       <div class="sidebar-header" style="flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 20px;">
-        <div class="flex items-center gap-2">
-          <i data-lucide="layers"></i>
-          <h2 style="font-size: 18px; color: var(--text); letter-spacing: 0; margin: 0;">TaskFlow<span style="color: var(--primary);">Pro</span></h2>
+        <div class="flex items-center gap-2" style="justify-content: space-between;">
+          <div class="flex items-center gap-2">
+            <i data-lucide="layers"></i>
+            <h2 style="font-size: 18px; color: var(--text); letter-spacing: 0; margin: 0;">TaskFlow<span style="color: var(--primary);">Pro</span></h2>
+          </div>
+          <button class="btn-ghost" style="padding: 4px;" onclick="openCreateOrgModal()" title="Create/Join Workspace"><i data-lucide="plus" style="width:16px;height:16px;"></i></button>
         </div>
+        <select class="select" id="sidebar-org-switcher" onchange="switchOrganization(this.value)" style="margin-top: 8px; width: 100%; font-size: 13px;">
+           <option value="">Loading workspaces...</option>
+        </select>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">

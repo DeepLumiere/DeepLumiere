@@ -392,17 +392,8 @@ import { injectLayout } from "./layout.js";
           refreshCurrentView();
         }));
       } else {
-        // Member only gets assigned or unassigned tickets
-        const myId = myTeamRecord ? myTeamRecord.id : "tm_" + state.activeOrgId + "_" + currentUser.uid;
-        const memberTicketQuery = query(
-          collection(db, "tickets"),
-          orgFilter,
-          or(
-            where("assignee", "==", myId),
-            where("assignee", "==", null),
-            where("assignee", "==", "")
-          )
-        );
+        // Member gets all tickets in workspace (per new Firestore rules)
+        const memberTicketQuery = query(collection(db, "tickets"), orgFilter);
         unsubscribes.push(onSnapshot(memberTicketQuery, (snapshot) => {
           state.tickets = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
           
@@ -980,8 +971,8 @@ import { injectLayout } from "./layout.js";
           orgId: state.activeOrgId,
           title: document.getElementById('tm-name').value.trim(),
           description: document.getElementById('tm-desc').value.trim(),
-          project: document.getElementById('tm-project').value,
-          assignee: document.getElementById('tm-assignee').value,
+          project: document.getElementById('tm-project').value || "",
+          assignee: document.getElementById('tm-assignee').value || "",
           status: document.getElementById('tm-status').value,
           priority: document.getElementById('tm-priority').value,
           dueDate: document.getElementById('tm-due').value,
@@ -1102,6 +1093,13 @@ import { injectLayout } from "./layout.js";
         const id = document.getElementById('pm-id').value || `p_${Date.now()}`;
         const name = document.getElementById('pm-name').value.trim();
         if(!name) return showToast("Project Name is required");
+        
+        const isNew = !document.getElementById('pm-id').value;
+        if (isNew) {
+           const existing = state.projects.find(p => p.name.toLowerCase() === name.toLowerCase());
+           if (existing) return showToast("A project with this name already exists");
+        }
+
         await setDoc(doc(db, "projects", id), {
           orgId: state.activeOrgId,
           name,
@@ -1175,6 +1173,13 @@ import { injectLayout } from "./layout.js";
         const id = document.getElementById('st-id').value || `st_${Date.now()}`;
         const name = document.getElementById('st-name').value.trim();
         if(!name) return showToast("Subteam Name is required");
+        
+        const isNew = !document.getElementById('st-id').value;
+        if (isNew) {
+           const existing = (state.subteams || []).find(st => st.name.toLowerCase() === name.toLowerCase());
+           if (existing) return showToast("A subteam with this name already exists");
+        }
+
         await setDoc(doc(db, "subteams", id), {
           orgId: state.activeOrgId,
           name,
@@ -1219,6 +1224,13 @@ import { injectLayout } from "./layout.js";
         const id = document.getElementById('ce-id').value || `c_${Date.now()}`;
         const company = document.getElementById('ce-company').value.trim();
         if(!company) return showToast("Company Name is required");
+        
+        const isNew = !document.getElementById('ce-id').value;
+        if (isNew) {
+           const existing = state.clients.find(c => c.company.toLowerCase() === company.toLowerCase());
+           if (existing) return showToast("A client with this company name already exists");
+        }
+
         await setDoc(doc(db, "clients", id), {
           orgId: state.activeOrgId,
           company,
