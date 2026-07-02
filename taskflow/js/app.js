@@ -69,18 +69,6 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
         portalScreen.style.display = 'flex';
         setupPortal(portalToken);
       } else {
-        injectLayout(); // Inject Sidebar first
-        
-        // Fetch Modals and append to body
-        try {
-            const resp = await fetch('modals.html');
-            const modalsHtml = await resp.text();
-            const modalsContainer = document.getElementById('modals-container');
-            if (modalsContainer) {
-                modalsContainer.innerHTML = modalsHtml;
-            }
-        } catch(e) { console.error("Failed to load modals", e); }
-        
         setupInternalApp();
       }
     }
