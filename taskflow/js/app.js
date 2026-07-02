@@ -225,68 +225,63 @@ import { injectLayout } from "./layout.js";
           state.currentUserProfile = { id: user.uid, ...userData };
           
           let orgId = userData.activeOrgId;
-          if (!orgId) {
-             // Check if there is an existing organization in the database to join by default
-             const orgsSnap = await getDocs(query(collection(db, "organizations")));
-             if (!orgsSnap.empty) {
-                orgId = orgsSnap.docs[0].id;
-                await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
-                
-                // Add self to the team roster
-                await setDoc(doc(db, "team", `tm_${orgId}_${user.uid}`), {
-                   orgId: orgId,
-                   uid: user.uid,
-                   name: user.displayName || user.email,
-                   email: user.email,
-                   role: 'Member',
-                   department: 'Engineering',
-                   title: 'Member'
-                }, {merge: true});
-                showToast("Joined workspace: " + orgsSnap.docs[0].data().name);
-             } else {
-                // No workspaces exist yet, create the first one
-                orgId = "org_" + user.uid;
-                await setDoc(doc(db, "organizations", orgId), {
-                   name: (user.displayName || 'My') + "'s Workspace",
-                   ownerId: user.uid,
-                   ticketPrefix: 'TF',
-                   createdAt: new Date().toISOString()
-                });
-                await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
-                
-                // Auto-add self to team as Admin
-                await setDoc(doc(db, "team", `tm_${orgId}_${user.uid}`), {
-                   orgId: orgId,
-                   uid: user.uid,
-                   name: user.displayName || user.email,
-                   email: user.email,
-                   role: 'Admin',
-                   department: 'Leadership',
-                   title: 'Founder'
-                }, {merge: true});
-             }
-          }
-          // Check for Invite link parameters
+          
+          // Check for Invite link parameters first
           const urlParams = new URLSearchParams(window.location.search);
           const inviteOrgId = urlParams.get('invite');
           if (inviteOrgId) {
-             const orgSnap = await getDoc(doc(db, "organizations", inviteOrgId));
-             if (orgSnap.exists()) {
-                await setDoc(doc(db, "team", `tm_${inviteOrgId}_${user.uid}`), {
-                   orgId: inviteOrgId,
-                   name: user.displayName || user.email,
-                   email: user.email,
-                   role: 'Member',
-                   department: 'Engineering',
-                   title: 'Member'
-                }, {merge: true});
-                await setDoc(userRef, { activeOrgId: inviteOrgId }, {merge: true});
-                orgId = inviteOrgId;
-                showToast("Joined workspace: " + orgSnap.data().name);
-             } else {
-                showToast("Workspace invite link is invalid.");
+             try {
+                 const orgSnap = await getDoc(doc(db, "organizations", inviteOrgId));
+                 if (orgSnap.exists()) {
+                    await setDoc(doc(db, "team", `tm_${inviteOrgId}_${user.uid}`), {
+                       orgId: inviteOrgId,
+                       uid: user.uid,
+                       name: user.displayName || user.email,
+                       email: user.email,
+                       role: 'Member',
+                       department: 'Engineering',
+                       title: 'Member'
+                    }, {merge: true});
+                    await setDoc(userRef, { activeOrgId: inviteOrgId }, {merge: true});
+                    orgId = inviteOrgId;
+                    showToast("Joined workspace: " + orgSnap.data().name);
+                 } else {
+                    showToast("Workspace invite link is invalid.");
+                 }
+             } catch(e) {
+                 showToast("Failed to join via invite.");
+                 console.error(e);
              }
              window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          if (!orgId) {
+             // No workspaces exist yet, create the first one
+             orgId = "org_" + Date.now() + "_" + user.uid.substring(0,5);
+             try {
+                 await setDoc(doc(db, "organizations", orgId), {
+                    name: (user.displayName || 'My') + "'s Workspace",
+                    ownerId: user.uid,
+                    ticketPrefix: 'TF',
+                    nextNum: 1,
+                    createdAt: new Date().toISOString()
+                 });
+                 
+                 // Auto-add self to team as Admin
+                 await setDoc(doc(db, "team", `tm_${orgId}_${user.uid}`), {
+                    orgId: orgId,
+                    uid: user.uid,
+                    name: user.displayName || user.email,
+                    email: user.email,
+                    role: 'Admin',
+                    department: 'Leadership',
+                    title: 'Founder'
+                 }, {merge: true});
+                 
+                 await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+             } catch(e) {
+                 console.error("Error creating default workspace", e);
+             }
           }
 
           state.activeOrgId = orgId;
