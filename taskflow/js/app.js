@@ -1,4 +1,4 @@
-import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSnapshot, deleteDoc, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "./firebase-config.js";
+import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSnapshot, deleteDoc, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, or } from "./firebase-config.js";
 import { injectLayout } from "./layout.js";
 
     // --- State ---
@@ -342,7 +342,7 @@ import { injectLayout } from "./layout.js";
     }
 
     // --- Init & Data Fetching ---
-    function initApp() {
+    async function initApp() {
       if (!state.activeOrgId) return;
       const orgFilter = where("orgId", "==", state.activeOrgId);
 
@@ -368,23 +368,68 @@ import { injectLayout } from "./layout.js";
         if (setPrefixEl) setPrefixEl.value = state.settings.ticketPrefix;
       }));
 
-      unsubscribes.push(onSnapshot(query(collection(db, "tickets"), orgFilter), (snapshot) => {
-        state.tickets = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        refreshCurrentView();
-        checkReminders();
-      }));
+      // Fetch team first to figure out User Role for secured Queries
+      const teamQuery = query(collection(db, "team"), orgFilter);
+      const teamSnap = await getDocs(teamQuery);
+      state.team = teamSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const myTeamRecord = state.team.find(t => t.email === currentUser.email);
+      const role = myTeamRecord ? myTeamRecord.role : 'Member';
+      const isAdmin = role === 'Admin' || role === 'Owner';
 
-      unsubscribes.push(onSnapshot(query(collection(db, "projects"), orgFilter), (snapshot) => {
-        state.projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        populateSelects();
-        refreshCurrentView();
-      }));
+      // Attach Live Listeners based strictly on permitted data to avoid Firestore missing permission errors
 
-      unsubscribes.push(onSnapshot(query(collection(db, "team"), orgFilter), (snapshot) => {
+      unsubscribes.push(onSnapshot(teamQuery, (snapshot) => {
         state.team = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         populateSelects();
         refreshCurrentView();
       }));
+
+      if (isAdmin) {
+        // Admin gets everything
+        unsubscribes.push(onSnapshot(query(collection(db, "tickets"), orgFilter), (snapshot) => {
+          state.tickets = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          refreshCurrentView();
+          checkReminders();
+        }));
+        unsubscribes.push(onSnapshot(query(collection(db, "projects"), orgFilter), (snapshot) => {
+          state.projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          populateSelects();
+          refreshCurrentView();
+        }));
+      } else {
+        // Member only gets assigned or unassigned tickets
+        const myId = myTeamRecord ? myTeamRecord.id : "tm_" + currentUser.uid;
+        const memberTicketQuery = query(
+          collection(db, "tickets"),
+          orgFilter,
+          or(
+            where("assignee", "==", myId),
+            where("assignee", "==", null),
+            where("assignee", "==", "")
+          )
+        );
+        unsubscribes.push(onSnapshot(memberTicketQuery, (snapshot) => {
+          state.tickets = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          
+          // Now fetch projects securely based on loaded tickets
+          const visibleProjIds = state.tickets.map(t => t.project).filter(Boolean);
+          if (visibleProjIds.length > 0) {
+             const projQ = query(collection(db, "projects"), orgFilter, where("__name__", "in", visibleProjIds));
+             getDocs(projQ).then(pSnap => {
+                state.projects = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                populateSelects();
+                refreshCurrentView();
+             }).catch(err => console.warn("Failed to fetch member projects", err));
+          } else {
+             state.projects = [];
+             populateSelects();
+             refreshCurrentView();
+          }
+          
+          refreshCurrentView();
+          checkReminders();
+        }));
+      }
 
       unsubscribes.push(onSnapshot(query(collection(db, "clients"), orgFilter), (snapshot) => {
         state.clients = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -457,6 +502,23 @@ import { injectLayout } from "./layout.js";
       if(orgSettingsCard) {
          orgSettingsCard.style.display = isAdmin ? 'block' : 'none';
       }
+    }
+
+    function getVisibleTickets() {
+      if(!currentUser) return [];
+      const myTeamRecord = state.team.find(t => t.email === currentUser.email);
+      const role = myTeamRecord ? myTeamRecord.role : 'Member';
+      if(role === 'Admin' || role === 'Owner') return state.tickets;
+      return state.tickets.filter(t => t.assignee === myTeamRecord.id || !t.assignee);
+    }
+
+    function getVisibleProjects() {
+      if(!currentUser) return [];
+      const myTeamRecord = state.team.find(t => t.email === currentUser.email);
+      const role = myTeamRecord ? myTeamRecord.role : 'Member';
+      if(role === 'Admin' || role === 'Owner') return state.projects;
+      const visibleTicketProjects = getVisibleTickets().map(t => t.project).filter(Boolean);
+      return state.projects.filter(p => visibleTicketProjects.includes(p.id));
     }
     function renderSettings() {
       const setProfileUsername = document.getElementById('set-profile-username');
@@ -547,9 +609,10 @@ import { injectLayout } from "./layout.js";
       const queue = document.getElementById('triage-queue-content');
       if (!statOpen || !statProg || !statPortal || !queue) return;
 
-      const open = state.tickets.filter(t => t.status === 'Open').length;
-      const prog = state.tickets.filter(t => t.status === 'In Progress').length;
-      const portalSubmissions = state.tickets.filter(t => t.source === 'portal' && t.status === 'Open');
+      const visibleT = getVisibleTickets();
+      const open = visibleT.filter(t => t.status === 'Open').length;
+      const prog = visibleT.filter(t => t.status === 'In Progress').length;
+      const portalSubmissions = visibleT.filter(t => t.source === 'portal' && t.status === 'Open');
       
       statOpen.innerText = open;
       statProg.innerText = prog;
@@ -592,7 +655,8 @@ import { injectLayout } from "./layout.js";
         const col = document.createElement('div');
         col.className = 'kanban-column';
         
-        let columnTickets = state.tickets.filter(t => t.status === status);
+        const visibleT = getVisibleTickets();
+        let columnTickets = visibleT.filter(t => t.status === status);
         if (projFilter === 'unassigned') columnTickets = columnTickets.filter(t => !t.project);
         else if (projFilter !== 'all') columnTickets = columnTickets.filter(t => t.project === projFilter);
         
@@ -649,8 +713,10 @@ import { injectLayout } from "./layout.js";
     function renderTicketsTable() {
       const tbody = document.getElementById('tickets-table-body');
       if (!tbody) return;
-      tbody.innerHTML = state.tickets.map(t => {
-        const p = state.projects.find(x => x.id === t.project);
+      const visibleT = getVisibleTickets();
+      const visibleP = getVisibleProjects();
+      tbody.innerHTML = visibleT.map(t => {
+        const p = visibleP.find(x => x.id === t.project);
         const a = state.team.find(x => x.id === t.assignee);
         return `<tr class="interactive" onclick="openTicketModal('${t.id}')">
           <td style="font-family:var(--font-mono); font-size:12px;">${t.displayId || t.id.substring(0,6)}</td>
@@ -667,9 +733,11 @@ import { injectLayout } from "./layout.js";
     function renderProjectsTable() {
       const tbody = document.getElementById('projects-table-body');
       if (!tbody) return;
-      tbody.innerHTML = state.projects.map(p => {
+      const visibleP = getVisibleProjects();
+      const visibleT = getVisibleTickets();
+      tbody.innerHTML = visibleP.map(p => {
         const c = state.clients.find(x => x.id === p.client);
-        const pTickets = state.tickets.filter(t => t.project === p.id);
+        const pTickets = visibleT.filter(t => t.project === p.id);
         const done = pTickets.filter(t => ['Resolved','Closed'].includes(t.status)).length;
         const pct = pTickets.length ? Math.round((done/pTickets.length)*100) : 0;
         
@@ -759,7 +827,8 @@ import { injectLayout } from "./layout.js";
 
     // --- Project Detail View ---
     window.openProjectDetail = (id) => {
-      const p = state.projects.find(x => x.id === id);
+      const visibleP = getVisibleProjects();
+      const p = visibleP.find(x => x.id === id);
       if(!p) return;
       state.activeProjectId = id;
       nav('project-detail');
@@ -768,11 +837,13 @@ import { injectLayout } from "./layout.js";
     function renderProjectDetail() {
       const pdContent = document.getElementById('pd-content');
       if (!pdContent) return;
+      const visibleT = getVisibleTickets();
+      const visibleP = getVisibleProjects();
       const id = state.activeProjectId;
-      const p = state.projects.find(x => x.id === id);
+      const p = visibleP.find(x => x.id === id);
       if(!p) return nav('projects');
 
-      const pTickets = state.tickets.filter(t => t.project === id);
+      const pTickets = visibleT.filter(t => t.project === id);
       const inProg = pTickets.filter(t => t.status === 'In Progress');
       const open = pTickets.filter(t => t.status === 'Open');
       const done = pTickets.filter(t => ['Resolved','Closed'].includes(t.status)).length;
@@ -903,7 +974,11 @@ import { injectLayout } from "./layout.js";
           const nextNum = (state.activeOrg && state.activeOrg.nextNum) || 1;
           const prefix = (state.activeOrg && state.activeOrg.ticketPrefix) || 'TF';
           displayId = `${prefix}-${String(nextNum).padStart(4, '0')}`;
-          await setDoc(doc(db, "organizations", state.activeOrgId), { nextNum: nextNum + 1 }, {merge:true});
+          try {
+            await setDoc(doc(db, "organizations", state.activeOrgId), { nextNum: nextNum + 1 }, {merge:true});
+          } catch(err) {
+            console.warn("Could not increment global ticket counter (permissions likely).", err);
+          }
         }
 
         const tData = {
