@@ -233,7 +233,7 @@ import { injectLayout } from "./layout.js";
                 await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
                 
                 // Add self to the team roster
-                await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                await setDoc(doc(db, "team", `tm_${orgId}_${user.uid}`), {
                    orgId: orgId,
                    uid: user.uid,
                    name: user.displayName || user.email,
@@ -255,7 +255,7 @@ import { injectLayout } from "./layout.js";
                 await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
                 
                 // Auto-add self to team as Admin
-                await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                await setDoc(doc(db, "team", `tm_${orgId}_${user.uid}`), {
                    orgId: orgId,
                    uid: user.uid,
                    name: user.displayName || user.email,
@@ -272,7 +272,7 @@ import { injectLayout } from "./layout.js";
           if (inviteOrgId) {
              const orgSnap = await getDoc(doc(db, "organizations", inviteOrgId));
              if (orgSnap.exists()) {
-                await setDoc(doc(db, "team", `tm_${user.uid}`), {
+                await setDoc(doc(db, "team", `tm_${inviteOrgId}_${user.uid}`), {
                    orgId: inviteOrgId,
                    name: user.displayName || user.email,
                    email: user.email,
@@ -398,7 +398,7 @@ import { injectLayout } from "./layout.js";
         }));
       } else {
         // Member only gets assigned or unassigned tickets
-        const myId = myTeamRecord ? myTeamRecord.id : "tm_" + currentUser.uid;
+        const myId = myTeamRecord ? myTeamRecord.id : "tm_" + state.activeOrgId + "_" + currentUser.uid;
         const memberTicketQuery = query(
           collection(db, "tickets"),
           orgFilter,
@@ -1406,7 +1406,7 @@ import { injectLayout } from "./layout.js";
         });
 
         // Add creator to team
-        await setDoc(doc(db, "team", `tm_${currentUser.uid}_${Date.now()}`), {
+        await setDoc(doc(db, "team", `tm_${orgId}_${currentUser.uid}`), {
           orgId: orgId,
           uid: currentUser.uid,
           name: currentUser.displayName || currentUser.email,
@@ -1458,7 +1458,7 @@ import { injectLayout } from "./layout.js";
         // Check if already in team
         const teamSnap = await getDocs(query(collection(db, "team"), where("orgId", "==", orgId), where("email", "==", currentUser.email)));
         if(teamSnap.empty) {
-           await setDoc(doc(db, "team", `tm_${currentUser.uid}_${Date.now()}`), {
+           await setDoc(doc(db, "team", `tm_${orgId}_${currentUser.uid}`), {
              orgId: orgId,
              uid: currentUser.uid,
              name: currentUser.displayName || currentUser.email,
