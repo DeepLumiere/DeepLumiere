@@ -388,6 +388,7 @@ a:hover { color: var(--primary-hover); }
         </div>
         <div class="nav-section">
           <div class="nav-title">Directory</div>
+          <div class="nav-item" data-view="team" onclick="nav('team')"><i data-lucide="users"></i> Team & Subteams</div>
           <div class="nav-item" data-view="clients" onclick="nav('clients')"><i data-lucide="building-2"></i> Clients</div>
         </div>
         <div class="nav-section">
@@ -488,6 +489,7 @@ a:hover { color: var(--primary-hover); }
                   <th>Client</th>
                   <th>Status</th>
                   <th>Progress</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="projects-table-body">
@@ -504,6 +506,39 @@ a:hover { color: var(--primary-hover); }
         </div>
 
         
+
+        <!-- View: Team & Subteams -->
+        <div id="view-team" class="view">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+            <!-- Subteams List -->
+            <div>
+              <div class="flex justify-between items-center" style="margin-bottom: 24px;">
+                <h3><i data-lucide="network" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Subteams</h3>
+                <button class="btn btn-primary btn-sm admin-only" onclick="openSubteamModal()" id="btn-add-subteam"><i data-lucide="plus"></i> Add Subteam</button>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead><tr><th>Subteam Name</th><th>Description</th><th>Actions</th></tr></thead>
+                  <tbody id="subteams-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Users List -->
+            <div>
+              <div class="flex justify-between items-center" style="margin-bottom: 24px;">
+                <h3><i data-lucide="users" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Organization Members</h3>
+                <button class="btn btn-primary btn-sm admin-only" onclick="openTeamModal()" id="btn-add-member"><i data-lucide="user-plus"></i> Invite Member</button>
+              </div>
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead><tr><th>Name</th><th>Role</th><th>Subteam</th><th>Actions</th></tr></thead>
+                  <tbody id="team-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- View: Clients -->
         <div id="view-clients" class="view">
@@ -537,7 +572,7 @@ a:hover { color: var(--primary-hover); }
                 </div>
              </div>
              
-             <div class="project-header-card" style="flex: 1; max-width: 500px;">
+             <div class="project-header-card" id="org-settings-card" style="flex: 1; max-width: 500px;">
                 <h3 style="margin-bottom: 24px;"><i data-lucide="building-2" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Organization Settings</h3>
                 <div class="form-group">
                   <label class="form-label">Organization Name</label>
@@ -559,19 +594,6 @@ a:hover { color: var(--primary-hover); }
                 <div class="flex gap-4" style="margin-top: 24px;">
                     <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Organization</button>
                 </div>
-             </div>
-          </div>
-          
-          <div class="project-header-card" style="margin-top: 32px;">
-             <div class="flex justify-between items-center" style="margin-bottom: 24px;">
-               <h3><i data-lucide="users" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Organization Members</h3>
-               <button class="btn btn-primary" onclick="openTeamModal()"><i data-lucide="user-plus"></i> Invite Member</button>
-             </div>
-             <div class="data-table-wrapper">
-               <table class="data-table">
-                 <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Actions</th></tr></thead>
-                 <tbody id="settings-team-body"></tbody>
-               </table>
              </div>
           </div>
           
@@ -707,26 +729,70 @@ a:hover { color: var(--primary-hover); }
   </div>
 
 
-  <!-- Create Organization Modal -->
+  <!-- Manage Organization Modal -->
   <div class="modal-overlay" id="create-org-modal-overlay" onclick="closeModal('create-org-modal-overlay', event)">
     <div class="modal" id="create-org-modal" style="max-width: 400px;">
       <div class="modal-header">
-        <h3>Create New Workspace</h3>
+        <h3>Workspace</h3>
         <button class="modal-close" onclick="closeModal('create-org-modal-overlay')"><i data-lucide="x"></i></button>
       </div>
+      <div class="modal-body" style="padding-top: 0;">
+        <div class="flex gap-4" style="border-bottom: 1px solid var(--border); margin-bottom: 20px;">
+          <button class="btn-ghost" style="border: none; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 12px 0; color: var(--text);" id="tab-create-org" onclick="switchOrgTab('create')">Create New</button>
+          <button class="btn-ghost" style="border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 12px 0; color: var(--text-muted);" id="tab-join-org" onclick="switchOrgTab('join')">Join Existing</button>
+        </div>
+        
+        <div id="org-tab-create">
+          <div class="form-group">
+            <label class="form-label">Workspace Name</label>
+            <input type="text" class="input" id="new-org-name" placeholder="e.g. Design Team">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Task ID Prefix</label>
+            <input type="text" class="input" id="new-org-prefix" placeholder="TF" value="TF">
+          </div>
+        </div>
+
+        <div id="org-tab-join" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Organization ID</label>
+            <input type="text" class="input" id="join-org-id" placeholder="e.g. org_123456789">
+          </div>
+          <p class="text-muted" style="font-size: 12px;">Ask your administrator for the Organization ID to join an existing workspace.</p>
+        </div>
+      </div>
+      <div class="modal-footer" id="org-footer-create">
+        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="createOrganization()"><i data-lucide="plus"></i> Create</button>
+      </div>
+      <div class="modal-footer" id="org-footer-join" style="display: none;">
+        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="joinOrganizationById()"><i data-lucide="arrow-right"></i> Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subteam Modal -->
+  <div class="modal-overlay" id="subteam-modal-overlay" onclick="closeModal('subteam-modal-overlay', event)">
+    <div class="modal" id="subteam-modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="st-title">Subteam</h3>
+        <button class="modal-close" onclick="closeModal('subteam-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
       <div class="modal-body">
+        <input type="hidden" id="st-id">
         <div class="form-group">
-          <label class="form-label">Workspace Name</label>
-          <input type="text" class="input" id="new-org-name" placeholder="e.g. Design Team">
+          <label class="form-label">Subteam Name</label>
+          <input type="text" class="input" id="st-name" placeholder="e.g. Frontend Developers">
         </div>
         <div class="form-group">
-          <label class="form-label">Task ID Prefix</label>
-          <input type="text" class="input" id="new-org-prefix" placeholder="TF" value="TF">
+          <label class="form-label">Description</label>
+          <input type="text" class="input" id="st-desc" placeholder="What does this team do?">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="createOrganization()"><i data-lucide="plus"></i> Create</button>
+        <button class="btn btn-ghost" onclick="closeModal('subteam-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSubteam()"><i data-lucide="save"></i> Save</button>
       </div>
     </div>
   </div>
@@ -745,25 +811,17 @@ a:hover { color: var(--primary-hover); }
           <div class="form-group" style="flex:1;"><label class="form-label">Email</label><input type="email" class="input" id="te-email"></div>
         </div>
         <div class="flex gap-4">
-          <div class="form-group" style="flex:1;"><label class="form-label">Job Title</label><input type="text" class="input" id="te-title" placeholder="e.g. Lead Developer"></div>
-          <div class="form-group" style="flex:1;"><label class="form-label">Role</label><input type="text" class="input" id="te-role" placeholder="e.g. Admin, Member"></div>
-        </div>
-        <div class="flex gap-4">
           <div class="form-group" style="flex:1;">
-            <label class="form-label">Department</label>
-            <select class="select" id="te-department">
-              <option value="Engineering">Engineering</option>
-              <option value="Product">Product</option>
-              <option value="Design">Design</option>
-              <option value="Sales">Sales</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Support">Support</option>
-              <option value="Leadership">Leadership</option>
+            <label class="form-label">Role</label>
+            <select class="select" id="te-role">
+              <option value="Owner">Owner</option>
+              <option value="Admin">Admin</option>
+              <option value="Member">Member</option>
             </select>
           </div>
           <div class="form-group" style="flex:1;">
-            <label class="form-label">Manager</label>
-            <select class="select" id="te-manager"></select>
+            <label class="form-label">Subteam</label>
+            <select class="select" id="te-subteam"></select>
           </div>
         </div>
       </div>
@@ -823,6 +881,7 @@ a:hover { color: var(--primary-hover); }
       tickets: [],
       projects: [],
       team: [],
+      subteams: [],
       clients: [],
       settings: { ticketPrefix: 'TF', nextNum: 1, webhookUrl: '' },
       currentView: 'dashboard',
@@ -1082,6 +1141,9 @@ a:hover { color: var(--primary-hover); }
 
     // --- Init & Data Fetching ---
     function initApp() {
+      if (!state.activeOrgId) return;
+      const orgFilter = where("orgId", "==", state.activeOrgId);
+
       unsubscribes.push(onSnapshot(collection(db, "users"), (snapshot) => {
         state.users = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         const myProfile = state.users.find(u => u.id === currentUser?.uid);
@@ -1093,36 +1155,40 @@ a:hover { color: var(--primary-hover); }
         }
       }));
 
-      unsubscribes.push(onSnapshot(doc(db, "globals", "settings"), (docSnap) => {
+      unsubscribes.push(onSnapshot(doc(db, "organizations", state.activeOrgId), (docSnap) => {
         if (docSnap.exists()) {
-          state.settings = { ...state.settings, ...docSnap.data() };
-        } else {
-          setDoc(doc(db, "globals", "settings"), state.settings);
+          state.activeOrg = { id: docSnap.id, ...docSnap.data() };
+          state.settings = { ticketPrefix: state.activeOrg.ticketPrefix || 'TF', nextNum: state.activeOrg.nextNum || 1 };
         }
         document.getElementById('set-prefix').value = state.settings.ticketPrefix;
-        document.getElementById('set-webhook').value = state.settings.webhookUrl || '';
       }));
 
-      unsubscribes.push(onSnapshot(collection(db, "tickets"), (snapshot) => {
+      unsubscribes.push(onSnapshot(query(collection(db, "tickets"), orgFilter), (snapshot) => {
         state.tickets = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         refreshCurrentView();
         checkReminders();
       }));
 
-      unsubscribes.push(onSnapshot(collection(db, "projects"), (snapshot) => {
+      unsubscribes.push(onSnapshot(query(collection(db, "projects"), orgFilter), (snapshot) => {
         state.projects = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         populateSelects();
         refreshCurrentView();
       }));
 
-      unsubscribes.push(onSnapshot(collection(db, "team"), (snapshot) => {
+      unsubscribes.push(onSnapshot(query(collection(db, "team"), orgFilter), (snapshot) => {
         state.team = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         populateSelects();
         refreshCurrentView();
       }));
 
-      unsubscribes.push(onSnapshot(collection(db, "clients"), (snapshot) => {
+      unsubscribes.push(onSnapshot(query(collection(db, "clients"), orgFilter), (snapshot) => {
         state.clients = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        populateSelects();
+        refreshCurrentView();
+      }));
+
+      unsubscribes.push(onSnapshot(query(collection(db, "subteams"), orgFilter), (snapshot) => {
+        state.subteams = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         populateSelects();
         refreshCurrentView();
       }));
@@ -1157,11 +1223,33 @@ a:hover { color: var(--primary-hover); }
         case 'kanban': renderKanban(); break;
         case 'tickets': renderTicketsTable(); break;
         case 'projects': renderProjectsTable(); break;
+        case 'team': renderTeamView(); break;
         case 'clients': renderClientsTable(); break;
         case 'project-detail': renderProjectDetail(); break;
         case 'settings': renderSettings(); break;
       }
+      applyRBAC();
       setTimeout(() => lucide.createIcons(), 0);
+    }
+
+    function applyRBAC() {
+      if(!currentUser) return;
+      // Get current user role
+      const myTeamRecord = state.team.find(t => t.email === currentUser.email);
+      const role = myTeamRecord ? myTeamRecord.role : 'Member';
+      const isAdmin = role === 'Admin' || role === 'Owner';
+      
+      // Select all admin-only elements
+      const adminElements = document.querySelectorAll('.admin-only');
+      adminElements.forEach(el => {
+        el.style.display = isAdmin ? '' : 'none';
+      });
+      
+      // If we are in settings and not admin, hide the org settings card
+      const orgSettingsCard = document.getElementById('org-settings-card');
+      if(orgSettingsCard) {
+         orgSettingsCard.style.display = isAdmin ? 'block' : 'none';
+      }
     }
     function renderSettings() {
       if(state.currentUserProfile) {
@@ -1204,16 +1292,25 @@ a:hover { color: var(--primary-hover); }
       if (tmAssignee) {
         const currentVal = tmAssignee.value;
         tmAssignee.innerHTML = '<option value="">Unassigned</option>';
-        state.team.forEach(t => { tmAssignee.innerHTML += `<option value="${t.id}">${escapeHtml(t.name)} (${t.title || 'Member'})</option>`; });
+        if(state.subteams && state.subteams.length > 0) {
+            tmAssignee.innerHTML += '<optgroup label="Subteams">';
+            state.subteams.forEach(st => { tmAssignee.innerHTML += `<option value="${st.id}">Team: ${escapeHtml(st.name)}</option>`; });
+            tmAssignee.innerHTML += '</optgroup>';
+        }
+        if(state.team && state.team.length > 0) {
+            tmAssignee.innerHTML += '<optgroup label="Members">';
+            state.team.forEach(t => { tmAssignee.innerHTML += `<option value="${t.id}">${escapeHtml(t.name)}</option>`; });
+            tmAssignee.innerHTML += '</optgroup>';
+        }
         tmAssignee.value = currentVal;
       }
 
-      const teManager = document.getElementById('te-manager');
-      if (teManager) {
-        const currentVal = teManager.value;
-        teManager.innerHTML = '<option value="">None (Top Level)</option>';
-        state.team.forEach(t => { teManager.innerHTML += `<option value="${t.id}">${escapeHtml(t.name)}</option>`; });
-        teManager.value = currentVal;
+      const teSubteam = document.getElementById('te-subteam');
+      if (teSubteam) {
+        const currentVal = teSubteam.value;
+        teSubteam.innerHTML = '<option value="">None</option>';
+        (state.subteams || []).forEach(st => { teSubteam.innerHTML += `<option value="${st.id}">${escapeHtml(st.name)}</option>`; });
+        teSubteam.value = currentVal;
       }
 
       const pmClient = document.getElementById('pm-client');
@@ -1360,20 +1457,55 @@ a:hover { color: var(--primary-hover); }
               <span style="font-size:12px; font-weight:600; width: 30px; text-align:right;">${pct}%</span>
             </div>
           </td>
+          <td><button class="btn btn-ghost btn-sm admin-only" onclick="event.stopPropagation(); deleteProject('${p.id}')"><i data-lucide="trash-2"></i></button></td>
         </tr>`;
       }).join('');
     }
 
+    window.deleteProject = async (id) => {
+      if (confirm('Are you sure you want to delete this project?')) {
+        try {
+          await deleteDoc(doc(db, 'projects', id));
+          showToast('Project deleted');
+        } catch(e) {
+          showToast('Error: ' + e.message);
+        }
+      }
+    };
+
+    function renderTeamView() {
+      renderTeamTable();
+      renderSubteamsTable();
+    }
+
     function renderTeamTable() {
       const tbody = document.getElementById('team-table-body');
-      tbody.innerHTML = state.team.map(t => `
-        <tr class="interactive" onclick="openTeamModal('${t.id}')">
-          <td style="font-weight:500;">${escapeHtml(t.name)}</td>
-          <td>${escapeHtml(t.email)}</td>
-          <td><span class="badge" style="background:rgba(255,255,255,0.05);">${escapeHtml(t.role)}</span></td>
-          <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteDoc(doc(db,'team','${t.id}'))"><i data-lucide="trash-2"></i></button></td>
-        </tr>
-      `).join('');
+      if(tbody) {
+        tbody.innerHTML = state.team.map(t => {
+          const subteam = t.subteamId ? state.subteams.find(st => st.id === t.subteamId) : null;
+          return `
+            <tr class="interactive" onclick="openTeamModal('${t.id}')">
+              <td style="font-weight:500;">${escapeHtml(t.name)}</td>
+              <td><span class="badge" style="background:rgba(255,255,255,0.05);">${escapeHtml(t.role)}</span></td>
+              <td>${subteam ? escapeHtml(subteam.name) : '-'}</td>
+              <td><button class="btn btn-ghost btn-sm admin-only" onclick="event.stopPropagation(); deleteTeamMember('${t.id}')"><i data-lucide="trash-2"></i></button></td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderSubteamsTable() {
+      const tbody = document.getElementById('subteams-table-body');
+      if(tbody) {
+        tbody.innerHTML = (state.subteams || []).map(st => `
+          <tr class="interactive" onclick="openSubteamModal('${st.id}')">
+            <td style="font-weight:500;">${escapeHtml(st.name)}</td>
+            <td>${escapeHtml(st.description || '-')}</td>
+            <td><button class="btn btn-ghost btn-sm admin-only" onclick="event.stopPropagation(); deleteSubteam('${st.id}')"><i data-lucide="trash-2"></i></button></td>
+          </tr>
+        `).join('');
+      }
     }
 
     function renderClientsTable() {
@@ -1386,7 +1518,7 @@ a:hover { color: var(--primary-hover); }
           <td>
             <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); copyPortalLink('${c.id}')"><i data-lucide="copy"></i> Copy Link</button>
           </td>
-          <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteClient('${c.id}')"><i data-lucide="trash-2"></i></button></td>
+          <td><button class="btn btn-ghost btn-sm admin-only" onclick="event.stopPropagation(); deleteClient('${c.id}')"><i data-lucide="trash-2"></i></button></td>
         </tr>
       `).join('');
     }
@@ -1689,18 +1821,14 @@ a:hover { color: var(--primary-hover); }
         document.getElementById('te-id').value = t.id;
         document.getElementById('te-name').value = t.name;
         document.getElementById('te-email').value = t.email;
-        document.getElementById('te-role').value = t.role || '';
-        document.getElementById('te-title').value = t.title || '';
-        document.getElementById('te-department').value = t.department || 'Engineering';
-        document.getElementById('te-manager').value = t.managerId || '';
+        document.getElementById('te-role').value = t.role || 'Member';
+        document.getElementById('te-subteam').value = t.subteamId || '';
       } else {
         document.getElementById('te-id').value = '';
         document.getElementById('te-name').value = '';
         document.getElementById('te-email').value = '';
         document.getElementById('te-role').value = 'Member';
-        document.getElementById('te-title').value = '';
-        document.getElementById('te-department').value = 'Engineering';
-        document.getElementById('te-manager').value = '';
+        document.getElementById('te-subteam').value = '';
       }
       document.getElementById('team-modal-overlay').classList.add('active');
     };
@@ -1715,14 +1843,57 @@ a:hover { color: var(--primary-hover); }
           name,
           email: document.getElementById('te-email').value.trim(),
           role: document.getElementById('te-role').value.trim(),
-          title: document.getElementById('te-title').value.trim(),
-          department: document.getElementById('te-department').value,
-          managerId: document.getElementById('te-manager').value
+          subteamId: document.getElementById('te-subteam').value
         }, {merge: true});
         closeModal('team-modal-overlay');
       } catch (e) {
         showToast('Error: ' + e.message);
         console.error('saveTeamMember Error:', e);
+      }
+    };
+
+    window.openSubteamModal = (id = null) => {
+      if(id) {
+        const st = state.subteams.find(x => x.id === id);
+        document.getElementById('st-id').value = st.id;
+        document.getElementById('st-name').value = st.name;
+        document.getElementById('st-desc').value = st.description || '';
+        document.getElementById('st-title').innerHTML = '<i data-lucide="network" style="margin-right:8px;"></i> Edit Subteam';
+      } else {
+        document.getElementById('st-id').value = '';
+        document.getElementById('st-name').value = '';
+        document.getElementById('st-desc').value = '';
+        document.getElementById('st-title').innerHTML = '<i data-lucide="network" style="margin-right:8px;"></i> New Subteam';
+      }
+      document.getElementById('subteam-modal-overlay').classList.add('active');
+      setTimeout(() => lucide.createIcons(), 0);
+    };
+
+    window.saveSubteam = async () => {
+      try {
+        const id = document.getElementById('st-id').value || `st_${Date.now()}`;
+        const name = document.getElementById('st-name').value.trim();
+        if(!name) return showToast("Subteam Name is required");
+        await setDoc(doc(db, "subteams", id), {
+          orgId: state.activeOrgId,
+          name,
+          description: document.getElementById('st-desc').value.trim()
+        }, {merge: true});
+        closeModal('subteam-modal-overlay');
+        showToast('Subteam saved');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    };
+
+    window.deleteSubteam = async (id) => {
+      if (confirm('Are you sure you want to delete this subteam?')) {
+        try {
+          await deleteDoc(doc(db, 'subteams', id));
+          showToast('Subteam deleted');
+        } catch(e) {
+          showToast('Error: ' + e.message);
+        }
       }
     };
 
@@ -1944,6 +2115,58 @@ a:hover { color: var(--primary-hover); }
         
         closeModal('create-org-modal-overlay');
         showToast('Workspace Created!');
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    };
+
+    window.switchOrgTab = (tab) => {
+      document.getElementById('org-tab-create').style.display = tab === 'create' ? 'block' : 'none';
+      document.getElementById('org-tab-join').style.display = tab === 'join' ? 'block' : 'none';
+      document.getElementById('org-footer-create').style.display = tab === 'create' ? 'flex' : 'none';
+      document.getElementById('org-footer-join').style.display = tab === 'join' ? 'flex' : 'none';
+      
+      const btnCreate = document.getElementById('tab-create-org');
+      const btnJoin = document.getElementById('tab-join-org');
+      if(tab === 'create') {
+         btnCreate.style.borderColor = 'var(--primary)';
+         btnCreate.style.color = 'var(--text)';
+         btnJoin.style.borderColor = 'transparent';
+         btnJoin.style.color = 'var(--text-muted)';
+      } else {
+         btnJoin.style.borderColor = 'var(--primary)';
+         btnJoin.style.color = 'var(--text)';
+         btnCreate.style.borderColor = 'transparent';
+         btnCreate.style.color = 'var(--text-muted)';
+      }
+    };
+
+    window.joinOrganizationById = async () => {
+      try {
+        const orgId = document.getElementById('join-org-id').value.trim();
+        if(!orgId) return showToast('Organization ID is required');
+        
+        const orgSnap = await getDoc(doc(db, "organizations", orgId));
+        if(!orgSnap.exists()) return showToast('Organization not found');
+
+        // Check if already in team
+        const teamSnap = await getDocs(query(collection(db, "team"), where("orgId", "==", orgId), where("email", "==", currentUser.email)));
+        if(teamSnap.empty) {
+           await setDoc(doc(db, "team", `tm_${currentUser.uid}_${Date.now()}`), {
+             orgId: orgId,
+             uid: currentUser.uid,
+             name: currentUser.displayName || currentUser.email,
+             email: currentUser.email,
+             role: 'Member',
+             department: 'Engineering'
+           });
+        }
+        
+        const userRef = doc(db, "users", currentUser.uid);
+        await setDoc(userRef, { activeOrgId: orgId }, {merge: true});
+        
+        closeModal('create-org-modal-overlay');
+        showToast('Successfully joined workspace!');
       } catch (e) {
         showToast('Error: ' + e.message);
       }
