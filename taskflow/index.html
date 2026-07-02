@@ -23,7 +23,49 @@
   </div>
 
   <div id="app-shell" class="shell" style="display: none;">
-    <!-- Sidebar injected via layout.js -->
+        <aside class="sidebar">
+      <div class="sidebar-header" style="flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 20px;">
+        <div class="flex items-center gap-2" style="justify-content: space-between;">
+          <div class="flex items-center gap-2">
+            <i data-lucide="layers"></i>
+            <h2 style="font-size: 18px; color: var(--text); letter-spacing: 0; margin: 0;">TaskFlow<span style="color: var(--primary);">Pro</span></h2>
+          </div>
+          <button class="btn-ghost" style="padding: 4px;" onclick="openCreateOrgModal()" title="Create/Join Workspace"><i data-lucide="plus" style="width:16px;height:16px;"></i></button>
+        </div>
+        <select class="select" id="sidebar-org-switcher" onchange="switchWorkspace(this.value)" style="margin-top: 8px; width: 100%; font-size: 13px;">
+           <option value="">Loading workspaces...</option>
+        </select>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-title">Overview</div>
+          <a href="#" onclick="nav('dashboard')" id="nav-dashboard" class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-title">Tasks & Tickets</div>
+          <a href="#" onclick="nav('kanban')" id="nav-kanban" class="nav-item"><i data-lucide="kanban-square"></i> Kanban Board</a>
+          <a href="#" onclick="nav('tickets')" id="nav-tickets" class="nav-item"><i data-lucide="list-todo"></i> All Tasks</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-title">Projects</div>
+          <a href="#" onclick="nav('projects')" id="nav-projects" class="nav-item"><i data-lucide="folder-kanban"></i> All Projects</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-title">Directory</div>
+          <a href="#" onclick="nav('team')" id="nav-team" class="nav-item"><i data-lucide="users"></i> Team & Subteams</a>
+          <a href="#" onclick="nav('clients')" id="nav-clients" class="nav-item"><i data-lucide="building-2"></i> Clients</a>
+        </div>
+        <div class="nav-section">
+          <div class="nav-title">System</div>
+          <a href="#" onclick="nav('settings')" id="nav-settings" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="current-user-avatar" style="cursor: pointer;" onclick="nav('settings')">?</div>
+        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer;" id="current-user-name" onclick="nav('settings')">Loading...</div>
+        <button class="btn-ghost" style="padding: 6px; border-radius: var(--radius-full);" onclick="window.appLogout()" title="Sign Out"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i></button>
+      </div>
+    </aside>
     <main class="main-content">
       <header class="topbar">
         <h2 id="topbar-title">Dashboard</h2>
