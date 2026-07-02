@@ -1,5 +1,4 @@
 import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSnapshot, deleteDoc, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, or } from "./firebase-config.js";
-import { injectLayout } from "./layout.js";
 
     // --- State ---
     let currentUser = null;
