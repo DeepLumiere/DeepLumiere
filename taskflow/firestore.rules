@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserTeamDoc(orgId) {
+      return get(/databases/$(database)/documents/team/$("tm_" + orgId + "_" + request.auth.uid));
+    }
+    
+    function getUserRole(orgId) {
+      let teamDoc = getUserTeamDoc(orgId);
+      return teamDoc != null ? teamDoc.data.role : 'None';
+    }
+    
+    function isAdminOrOwner(orgId) {
+      let role = getUserRole(orgId);
+      return role == 'Admin' || role == 'Owner';
+    }
+    
+    function isInOrg(orgId) {
+      let teamDoc = getUserTeamDoc(orgId);
+      return teamDoc != null && teamDoc.data.orgId == orgId;
+    }
+
+    // Rules
+    
+    // Users profile
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if request.auth.uid == userId;
+    }
+    
+    // Organizations
+    match /organizations/{orgId} {
+      allow read: if isAuthenticated() && isInOrg(orgId);
+      allow write: if isAdminOrOwner(orgId) || (isAuthenticated() && !exists(/databases/$(database)/documents/organizations/$(orgId))); 
+    }
+    
+    // Team Members
+    match /team/{teamId} {
+      allow read: if isAuthenticated() && (isInOrg(resource.data.orgId) || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email);
+      allow write: if isAuthenticated() && (isAdminOrOwner(request.resource.data.orgId) || request.auth.uid == request.resource.data.uid);
+    }
+    
+    // Clients
+    match /clients/{clientId} {
+      allow read: if isAuthenticated() && isInOrg(resource.data.orgId);
+      allow write: if isAuthenticated() && isAdminOrOwner(request.resource.data.orgId);
+    }
+    
+    // Subteams
+    match /subteams/{subteamId} {
+      allow read: if isAuthenticated() && isInOrg(resource.data.orgId);
+      allow write: if isAuthenticated() && isAdminOrOwner(request.resource.data.orgId);
+    }
+    
+    // Tickets
+    match /tickets/{ticketId} {
+      allow create: if (isAuthenticated() && isInOrg(request.resource.data.orgId)) || 
+                       (request.resource.data.source == 'portal' && get(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)).data.orgId == request.resource.data.orgId);
+      
+      // All workspace members can read tasks, and portal clients can read theirs
+      allow read: if (isAuthenticated() && isInOrg(resource.data.orgId)) || 
+                     (resource.data.source == 'portal' && resource.data.clientToken != null);
+      
+      // Only admins or assignees can edit
+      allow update: if isAuthenticated() && isInOrg(resource.data.orgId) && (
+        isAdminOrOwner(resource.data.orgId) || 
+        resource.data.assignee == "tm_" + resource.data.orgId + "_" + request.auth.uid || 
+        resource.data.assignee == ""
+      );
+      
+      allow delete: if isAuthenticated() && isAdminOrOwner(resource.data.orgId);
+    }
+    
+    // Projects
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() && isInOrg(resource.data.orgId);
+      allow write: if isAuthenticated() && isAdminOrOwner(request.resource.data.orgId);
+    }
+  }
+}
