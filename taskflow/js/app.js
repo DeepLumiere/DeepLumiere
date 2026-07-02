@@ -30,7 +30,44 @@ import { injectLayout } from "./layout.js";
     
     async function boot() {
       if (portalToken) {
-        document.getElementById('portal-screen').style.display = 'flex';
+        let portalScreen = document.getElementById('portal-screen');
+        if (!portalScreen) {
+           portalScreen = document.createElement('div');
+           portalScreen.id = 'portal-screen';
+           portalScreen.className = 'centered-screen';
+           portalScreen.style.backgroundColor = 'var(--bg)';
+           portalScreen.innerHTML = `
+             <div class="centered-card" style="max-width: 600px; width: 100%;">
+               <h2 id="portal-welcome" style="margin-bottom: 24px; text-align: center;">Welcome!</h2>
+               <div id="portal-form-container">
+                 <div class="form-group"><label class="form-label">Name</label><input type="text" class="input" id="portal-name"></div>
+                 <div class="form-group"><label class="form-label">Email</label><input type="email" class="input" id="portal-email"></div>
+                 <div class="form-group"><label class="form-label">Request Title</label><input type="text" class="input" id="portal-title"></div>
+                 <div class="form-group"><label class="form-label">Description</label><textarea class="input" id="portal-desc" rows="4"></textarea></div>
+                 <button class="btn btn-primary" style="width: 100%; margin-top: 16px;" onclick="submitPortalTicket()">Submit Request</button>
+                 
+                 <hr style="margin: 24px 0; border: none; border-top: 1px solid var(--border);">
+                 <div class="form-group">
+                   <label class="form-label">Check Request Status (Reference ID)</label>
+                   <div class="flex gap-2">
+                     <input type="text" class="input" id="portal-lookup-id" placeholder="REQ-0001">
+                     <button class="btn btn-ghost" onclick="checkPortalStatus()">Check Status</button>
+                   </div>
+                 </div>
+                 <div id="portal-status-result" style="margin-top: 16px;"></div>
+               </div>
+               <div id="portal-success-container" style="display:none; text-align:center;">
+                 <i data-lucide="check-circle" style="width:48px;height:48px;color:var(--status-res);margin-bottom:16px;"></i>
+                 <h3>Request Submitted Successfully!</h3>
+                 <p style="color:var(--text-muted); margin-top:8px;">Your reference ID is <strong id="portal-ref-id" style="color:var(--text-light);"></strong></p>
+                 <button class="btn btn-primary" style="margin-top:24px;" onclick="location.reload()">Submit Another</button>
+               </div>
+             </div>
+           `;
+           document.body.appendChild(portalScreen);
+           if (window.lucide) window.lucide.createIcons();
+        }
+        portalScreen.style.display = 'flex';
         setupPortal(portalToken);
       } else {
         injectLayout(); // Inject Sidebar first
@@ -432,10 +469,14 @@ import { injectLayout } from "./layout.js";
       const setWorkspace = document.getElementById('set-workspace');
       const setPrefix = document.getElementById('set-prefix');
       const setInviteLink = document.getElementById('set-invite-link');
+      const setOrgId = document.getElementById('set-org-id');
       if(state.activeOrg && setWorkspace && setPrefix && setInviteLink) {
         setWorkspace.value = state.activeOrg.name || '';
         setPrefix.value = state.activeOrg.ticketPrefix || 'TF';
-        setInviteLink.value = `${window.location.origin}${window.location.pathname}?invite=${state.activeOrgId}`;
+        let path = window.location.pathname;
+        if (!path.endsWith('index.html')) path = path.replace(/\/[^/]*$/, '/index.html');
+        setInviteLink.value = `${window.location.origin}${path}?invite=${state.activeOrgId}`;
+        if (setOrgId) setOrgId.value = state.activeOrg.id || state.activeOrgId;
       }
       
       const tbody = document.getElementById('settings-team-body');
@@ -710,7 +751,9 @@ import { injectLayout } from "./layout.js";
     }
 
     window.copyPortalLink = (clientId) => {
-      const url = `${window.location.origin}${window.location.pathname}?portal=${clientId}`;
+      let path = window.location.pathname;
+      if (!path.endsWith('index.html')) path = path.replace(/\/[^/]*$/, '/index.html');
+      const url = `${window.location.origin}${path}?portal=${clientId}`;
       navigator.clipboard.writeText(url).then(() => showToast("Portal link copied!"));
     };
 
