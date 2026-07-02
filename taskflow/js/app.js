@@ -184,7 +184,7 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
           currentUser = user;
 
           document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('app-shell').style.display = 'flex';
+          document.getElementById('app-shell').style.display = 'grid';
           // Initialize SPA to dashboard
           nav('dashboard');
           
@@ -472,6 +472,13 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
     }
 
     function applyRBAC() {
+      if(state.activeOrgId) {
+        document.getElementById('topbar-org-id').style.display = 'inline-flex';
+        document.getElementById('topbar-org-id-text').innerText = state.activeOrgId;
+      } else {
+        document.getElementById('topbar-org-id').style.display = 'none';
+      }
+
       if(!currentUser) return;
       // Get current user role
       const myTeamRecord = state.team.find(t => t.email === currentUser.email);
@@ -541,6 +548,53 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
           `).join('');
       }
     }
+
+    
+    function renderCustomRoles() {
+      const list = document.getElementById('set-roles-list');
+      if (!list) return;
+      const roles = (state.activeOrg && state.activeOrg.roles) || ['Owner', 'Admin', 'Member'];
+      let html = '';
+      roles.forEach(role => {
+        html += `<div class="link-item flex justify-between">
+           <span>${escapeHtml(role)}</span>
+           ${['Owner', 'Admin', 'Member'].includes(role) ? '' : `<button class="btn btn-ghost" onclick="removeCustomRole('${role}')"><i data-lucide="x"></i></button>`}
+        </div>`;
+      });
+      list.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    window.addCustomRole = async () => {
+      if (!state.activeOrgId) return;
+      const input = document.getElementById('set-new-role');
+      const role = input.value.trim();
+      if (!role) return;
+      
+      const currentRoles = state.activeOrg.roles || ['Owner', 'Admin', 'Member'];
+      if(currentRoles.includes(role)) return showToast("Role already exists");
+      
+      const newRoles = [...currentRoles, role];
+      try {
+        await setDoc(doc(db, "organizations", state.activeOrgId), { roles: newRoles }, {merge:true});
+        input.value = '';
+        showToast("Role added");
+      } catch(e) {
+        showToast("Error adding role");
+      }
+    };
+    
+    window.removeCustomRole = async (role) => {
+      if (!state.activeOrgId) return;
+      const currentRoles = state.activeOrg.roles || ['Owner', 'Admin', 'Member'];
+      const newRoles = currentRoles.filter(r => r !== role);
+      try {
+        await setDoc(doc(db, "organizations", state.activeOrgId), { roles: newRoles }, {merge:true});
+        showToast("Role removed");
+      } catch(e) {
+        showToast("Error removing role");
+      }
+    };
 
     function populateSelects() {
       const projSelects = [document.getElementById('tm-project'), document.getElementById('kanban-project-filter')];
@@ -953,8 +1007,10 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
 
     window.saveTicket = async () => {
       try {
-        const id = document.getElementById('tm-id').value || `t_${Date.now()}`;
-        const isNew = !document.getElementById('tm-id').value;
+        let id = document.getElementById('tm-id').value;
+        const isNew = !id;
+        if (isNew) id = await generateUniqueId('tickets', 't_');
+        if(!validateRequired(['tm-name'])) return showToast('Title is required');
         
         let displayId = null;
         if (isNew) {
@@ -1135,9 +1191,11 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
 
     window.saveTeamMember = async () => {
       try {
-        const id = document.getElementById('te-id').value || `tm_${Date.now()}`;
+        let id = document.getElementById('te-id').value;
+        const isNew = !id;
+        if (isNew) id = await generateUniqueId('team', 'tm_');
         const name = document.getElementById('te-name').value.trim();
-        if(!name) return showToast("Name is required");
+        if(!validateRequired(['te-name', 'te-email'])) return showToast("Name and Email are required");
         await setDoc(doc(db, "team", id), {
           orgId: state.activeOrgId,
           name,
@@ -1339,6 +1397,33 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
       }, 3000);
     };
 
+    async function generateUniqueId(collectionName, prefix = '') {
+      let id;
+      let isUnique = false;
+      while(!isUnique) {
+         id = `${prefix}${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+         const ref = doc(db, collectionName, id);
+         const snap = await getDoc(ref);
+         if (!snap.exists()) isUnique = true;
+      }
+      return id;
+    }
+
+    function validateRequired(ids) {
+      let isValid = true;
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        if(!el.value || !el.value.trim()) {
+          el.style.border = '1px solid var(--priority-crit)';
+          isValid = false;
+        } else {
+          el.style.border = '1px solid var(--border)';
+        }
+      });
+      return isValid;
+    }
+
     function escapeHtml(unsafe) {
       if(!unsafe) return '';
       return unsafe.toString()
@@ -1402,9 +1487,9 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
       try {
         const name = document.getElementById('new-org-name').value.trim();
         const prefix = document.getElementById('new-org-prefix').value.trim() || 'TF';
-        if(!name) return showToast('Workspace Name is required');
+        if(!validateRequired(['new-org-name'])) return showToast('Workspace Name is required');
         
-        const orgId = `org_${Date.now()}`;
+        const orgId = await generateUniqueId('organizations', 'org_');
         await setDoc(doc(db, "organizations", orgId), {
           name,
           ownerId: currentUser.uid,
