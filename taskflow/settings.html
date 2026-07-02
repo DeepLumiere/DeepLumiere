@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow Pro - Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app-shell" class="shell" style="display: none;">
+    <!-- Sidebar injected via layout.js -->
+    <main class="main-content">
+      <header class="topbar">
+        <h2 id="topbar-title">Settings</h2>
+        <div class="flex items-center gap-4">
+          <button class="btn btn-primary" onclick="openTicketModal()"><i data-lucide="plus"></i> New Task</button>
+        </div>
+      </header>
+      <div class="view-container">
+        <div id="view-settings" class="view active">
+<div style="display: flex; gap: 32px;">
+             <div class="project-header-card" style="flex: 1; max-width: 500px;">
+                <h3 style="margin-bottom: 24px;"><i data-lucide="user" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> My Profile</h3>
+                <div class="form-group">
+                  <label class="form-label">Username</label>
+                  <input type="text" class="input" id="set-profile-username" placeholder="@john">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Display Name</label>
+                  <input type="text" class="input" id="set-profile-display-name">
+                </div>
+                <div class="flex gap-4" style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="saveProfileFromSettings()"><i data-lucide="save"></i> Save Profile</button>
+                </div>
+             </div>
+             
+             
+             <div class="project-header-card" id="org-settings-card" style="flex: 1; max-width: 500px;">
+                <h3 style="margin-bottom: 24px;"><i data-lucide="building-2" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Organization Settings</h3>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                  <label class="form-label">Workspace ID</label>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Unique identifier for this organization.</div>
+                  <div class="flex gap-2">
+                    <input type="text" class="input" id="set-org-id" readonly style="background: var(--surface-hover); font-family: var(--font-mono); color: var(--primary); font-weight: 600;">
+                    <button class="btn btn-ghost" onclick="copyOrgId()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Organization Name</label>
+                  <input type="text" class="input" id="set-workspace" placeholder="e.g. Acme Corp">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Task ID Prefix</label>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Prefix for generated tickets (e.g. TF-0001).</div>
+                  <input type="text" class="input" id="set-prefix" placeholder="TF">
+                </div>
+                <div class="form-group" style="margin-top: 16px;">
+                  <label class="form-label">Workspace Invite Link</label>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Share this link to invite others directly to this organization.</div>
+                  <div class="flex gap-2">
+                    <input type="text" class="input" id="set-invite-link" readonly style="background: var(--surface-hover);">
+                    <button class="btn btn-ghost" onclick="copyInviteLink()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+                  </div>
+                </div>
+                <div class="flex gap-4 justify-between items-center" style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Organization</button>
+                    <div class="flex gap-2">
+                        <button class="btn btn-ghost admin-only" style="color: var(--status-res);" onclick="clearWorkspaceData()" title="Clear all tickets, projects, and clients in this org"><i data-lucide="refresh-cw"></i> Clear Data</button>
+                        <button class="btn btn-danger admin-only" onclick="deleteWorkspace()"><i data-lucide="trash-2"></i> Delete Org</button>
+                    </div>
+                </div>
+             </div>
+
+          </div>
+                <div class="flex gap-4" style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Organization</button>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="modals-container"></div>
+  <div id="toast-container"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

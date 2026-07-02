@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow Pro - Clients</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app-shell" class="shell" style="display: none;">
+    <!-- Sidebar injected via layout.js -->
+    <main class="main-content">
+      <header class="topbar">
+        <h2 id="topbar-title">Clients</h2>
+        <div class="flex items-center gap-4">
+          <button class="btn btn-primary" onclick="openTicketModal()"><i data-lucide="plus"></i> New Task</button>
+        </div>
+      </header>
+      <div class="view-container">
+        <div id="view-clients" class="view active">
+<div class="flex justify-between items-center" style="margin-bottom: 24px;">
+            <button class="btn btn-primary" onclick="openClientModal()"><i data-lucide="building"></i> Add Client</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>Company</th><th>Contact Email</th><th>Tier</th><th>Portal Link</th><th>Actions</th></tr></thead>
+              <tbody id="clients-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="modals-container"></div>
+  <div id="toast-container"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

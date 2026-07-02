@@ -1,0 +1,245 @@
+<!-- Ticket Modal (Side Panel) -->
+  <div class="modal-overlay" id="ticket-modal-overlay" onclick="closeModal('ticket-modal-overlay', event)">
+    <div class="modal side-panel" id="ticket-modal">
+      <div class="modal-header">
+        <h3 id="tm-title">New Task</h3>
+        <button class="modal-close" onclick="closeModal('ticket-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="tm-id">
+        <input type="hidden" id="tm-source">
+        <input type="hidden" id="tm-client-token">
+        
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" class="input" id="tm-name" required style="font-size: 16px; font-weight: 500;">
+        </div>
+        
+        <!-- Lifecycle Workflow Actions -->
+        <div class="form-group" id="tm-lifecycle-container" style="background: var(--surface-hover); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border);">
+           <label class="form-label" style="margin-bottom: 12px;">Task Lifecycle</label>
+           <div id="tm-lifecycle-actions" class="flex gap-2">
+              <!-- Rendered via JS -->
+           </div>
+           <input type="hidden" id="tm-status" value="Open">
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label class="form-label">Description / Details</label>
+          <textarea class="textarea" id="tm-desc" rows="5"></textarea>
+        </div>
+        
+        <div class="flex gap-4">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Project</label>
+            <select class="select" id="tm-project"></select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Assignee</label>
+            <select class="select" id="tm-assignee"></select>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Priority</label>
+            <select class="select" id="tm-priority">
+              <option value="None">None</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="input" id="tm-due">
+          </div>
+        </div>
+
+        <hr style="border:0; border-top: 1px solid var(--border); margin: 32px 0;">
+        
+        <h4 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="link" style="width: 18px;"></i> Links & Attachments</h4>
+        <div class="flex gap-2">
+          <input type="text" class="input" id="tm-link-url" placeholder="Paste URL (e.g. GitHub PR, Figma)">
+          <input type="text" class="input" id="tm-link-label" placeholder="Label (opt)" style="width: 140px;">
+          <button class="btn btn-ghost" onclick="addTicketLink()"><i data-lucide="plus"></i> Add</button>
+        </div>
+        <div class="link-list" id="tm-link-list"></div>
+
+        <hr style="border:0; border-top: 1px solid var(--border); margin: 32px 0;">
+        
+        <h4 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="message-square" style="width: 18px;"></i> Comments</h4>
+        <div class="flex flex-col gap-2">
+          <textarea class="textarea" id="tm-new-comment" rows="3" placeholder="Add a comment..."></textarea>
+          <button class="btn btn-ghost" style="align-self: flex-end;" onclick="addTicketComment()"><i data-lucide="send"></i> Post</button>
+        </div>
+        <div class="comment-list" id="tm-comment-list"></div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" id="tm-btn-delete" style="display:none; margin-right: auto;" onclick="deleteTicket()"><i data-lucide="trash-2"></i> Delete</button>
+        <button class="btn btn-ghost" onclick="closeModal('ticket-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTicket()"><i data-lucide="save"></i> Save Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Modal -->
+  <div class="modal-overlay" id="project-modal-overlay" onclick="closeModal('project-modal-overlay', event)">
+    <div class="modal" id="project-modal">
+      <div class="modal-header">
+        <h3 id="pm-title">New Project</h3>
+        <button class="modal-close" onclick="closeModal('project-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="pm-id">
+        <div class="form-group">
+          <label class="form-label">Project Name</label>
+          <input type="text" class="input" id="pm-name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="select" id="pm-status">
+            <option value="Active">Active</option>
+            <option value="Planning">Planning</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Shelved">Shelved</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client (Optional)</label>
+          <select class="select" id="pm-client"></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('project-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProject()"><i data-lucide="save"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Manage Organization Modal -->
+  <div class="modal-overlay" id="create-org-modal-overlay" onclick="closeModal('create-org-modal-overlay', event)">
+    <div class="modal" id="create-org-modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3>Workspace</h3>
+        <button class="modal-close" onclick="closeModal('create-org-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" style="padding-top: 0;">
+        <div class="flex gap-4" style="border-bottom: 1px solid var(--border); margin-bottom: 20px;">
+          <button class="btn-ghost" style="border: none; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 12px 0; color: var(--text);" id="tab-create-org" onclick="switchOrgTab('create')">Create New</button>
+          <button class="btn-ghost" style="border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 12px 0; color: var(--text-muted);" id="tab-join-org" onclick="switchOrgTab('join')">Join Existing</button>
+        </div>
+        
+        <div id="org-tab-create">
+          <div class="form-group">
+            <label class="form-label">Workspace Name</label>
+            <input type="text" class="input" id="new-org-name" placeholder="e.g. Design Team">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Task ID Prefix</label>
+            <input type="text" class="input" id="new-org-prefix" placeholder="TF" value="TF">
+          </div>
+        </div>
+
+        <div id="org-tab-join" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Organization ID</label>
+            <input type="text" class="input" id="join-org-id" placeholder="e.g. org_123456789">
+          </div>
+          <p class="text-muted" style="font-size: 12px;">Ask your administrator for the Organization ID to join an existing workspace.</p>
+        </div>
+      </div>
+      <div class="modal-footer" id="org-footer-create">
+        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="createOrganization()"><i data-lucide="plus"></i> Create</button>
+      </div>
+      <div class="modal-footer" id="org-footer-join" style="display: none;">
+        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="joinOrganizationById()"><i data-lucide="arrow-right"></i> Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subteam Modal -->
+  <div class="modal-overlay" id="subteam-modal-overlay" onclick="closeModal('subteam-modal-overlay', event)">
+    <div class="modal" id="subteam-modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="st-title">Subteam</h3>
+        <button class="modal-close" onclick="closeModal('subteam-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="st-id">
+        <div class="form-group">
+          <label class="form-label">Subteam Name</label>
+          <input type="text" class="input" id="st-name" placeholder="e.g. Frontend Developers">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" class="input" id="st-desc" placeholder="What does this team do?">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('subteam-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSubteam()"><i data-lucide="save"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Modal -->
+  <div class="modal-overlay" id="team-modal-overlay" onclick="closeModal('team-modal-overlay', event)">
+    <div class="modal" id="team-modal" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3>Team Member</h3>
+        <button class="modal-close" onclick="closeModal('team-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="te-id">
+        <div class="flex gap-4">
+          <div class="form-group" style="flex:1;"><label class="form-label">Name</label><input type="text" class="input" id="te-name"></div>
+          <div class="form-group" style="flex:1;"><label class="form-label">Email</label><input type="email" class="input" id="te-email"></div>
+        </div>
+        <div class="flex gap-4">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Role</label>
+            <select class="select" id="te-role">
+              <option value="Owner">Owner</option>
+              <option value="Admin">Admin</option>
+              <option value="Member">Member</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">Subteam</label>
+            <select class="select" id="te-subteam"></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('team-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTeamMember()"><i data-lucide="save"></i> Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Modal -->
+  <div class="modal-overlay" id="client-modal-overlay" onclick="closeModal('client-modal-overlay', event)">
+    <div class="modal" id="client-modal" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3>Client Profile</h3>
+        <button class="modal-close" onclick="closeModal('client-modal-overlay')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="ce-id">
+        <div class="form-group"><label class="form-label">Company / Client Name</label><input type="text" class="input" id="ce-company"></div>
+        <div class="form-group"><label class="form-label">Contact Email</label><input type="email" class="input" id="ce-email"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('client-modal-overlay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveClient()"><i data-lucide="save"></i> Save</button>
+      </div>
+    </div>
+  </div>
