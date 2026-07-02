@@ -39,7 +39,10 @@ import { injectLayout } from "./layout.js";
         try {
             const resp = await fetch('modals.html');
             const modalsHtml = await resp.text();
-            document.getElementById('modals-container').innerHTML = modalsHtml;
+            const modalsContainer = document.getElementById('modals-container');
+            if (modalsContainer) {
+                modalsContainer.innerHTML = modalsHtml;
+            }
         } catch(e) { console.error("Failed to load modals", e); }
         
         setupInternalApp();
@@ -132,25 +135,41 @@ import { injectLayout } from "./layout.js";
       const appShell = document.getElementById('app-shell');
       const btnLogin = document.getElementById('btn-login');
 
-      loginScreen.style.display = 'flex';
+      if (loginScreen) loginScreen.style.display = 'flex';
 
-      btnLogin.addEventListener('click', () => {
-        const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider).catch(err => {
-          document.getElementById('login-error').innerText = err.message;
-          document.getElementById('login-error').style.display = 'block';
+      if (btnLogin) {
+        btnLogin.addEventListener('click', () => {
+          const provider = new GoogleAuthProvider();
+          signInWithPopup(auth, provider).catch(err => {
+            const errEl = document.getElementById('login-error');
+            if (errEl) {
+              errEl.innerText = err.message;
+              errEl.style.display = 'block';
+            }
+          });
         });
-      });
+      }
 
       window.appLogout = () => { signOut(auth); };
 
       onAuthStateChanged(auth, async (user) => {
+        const path = window.location.pathname;
+        const page = path.split('/').pop().replace('.html', '') || 'dashboard';
+
         if (user) {
           currentUser = user;
-          document.getElementById('current-user-name').innerText = user.displayName || user.email;
-          document.getElementById('current-user-avatar').innerText = (user.displayName || user.email).charAt(0).toUpperCase();
-          loginScreen.style.display = 'none';
-          appShell.style.display = 'grid';
+
+          if (page === 'index' || page === '') {
+             window.location.href = 'dashboard.html';
+             return;
+          }
+
+          const userNameEl = document.getElementById('current-user-name');
+          const userAvatarEl = document.getElementById('current-user-avatar');
+          if (userNameEl) userNameEl.innerText = user.displayName || user.email;
+          if (userAvatarEl) userAvatarEl.innerText = (user.displayName || user.email).charAt(0).toUpperCase();
+          if (loginScreen) loginScreen.style.display = 'none';
+          if (appShell) appShell.style.display = 'grid';
           
           const userRef = doc(db, "users", user.uid);
           let snap = await getDoc(userRef);
@@ -240,8 +259,10 @@ import { injectLayout } from "./layout.js";
                const myProfile = { id: docSnap.id, ...docSnap.data() };
                state.currentUserProfile = myProfile;
                const dName = myProfile.displayName || myProfile.username;
-               document.getElementById('current-user-name').innerText = dName;
-               document.getElementById('current-user-avatar').innerText = dName.charAt(0).toUpperCase();
+               const userNameEl = document.getElementById('current-user-name');
+               const userAvatarEl = document.getElementById('current-user-avatar');
+               if (userNameEl) userNameEl.innerText = dName;
+               if (userAvatarEl) userAvatarEl.innerText = dName.charAt(0).toUpperCase();
                
                if(myProfile.activeOrgId && myProfile.activeOrgId !== state.activeOrgId) {
                   cleanupApp();
@@ -270,8 +291,14 @@ import { injectLayout } from "./layout.js";
           initApp();
         } else {
           currentUser = null;
-          loginScreen.style.display = 'flex';
-          appShell.style.display = 'none';
+
+          if (page !== 'index' && page !== '') {
+             window.location.href = 'index.html';
+             return;
+          }
+
+          if (loginScreen) loginScreen.style.display = 'flex';
+          if (appShell) appShell.style.display = 'none';
           cleanupApp();
         }
       });
@@ -288,8 +315,10 @@ import { injectLayout } from "./layout.js";
         if (myProfile) {
            state.currentUserProfile = myProfile;
            const dName = myProfile.displayName || myProfile.username;
-           document.getElementById('current-user-name').innerText = dName;
-           document.getElementById('current-user-avatar').innerText = dName.charAt(0).toUpperCase();
+           const userNameEl = document.getElementById('current-user-name');
+           const userAvatarEl = document.getElementById('current-user-avatar');
+           if (userNameEl) userNameEl.innerText = dName;
+           if (userAvatarEl) userAvatarEl.innerText = dName.charAt(0).toUpperCase();
         }
       }));
 
@@ -298,7 +327,8 @@ import { injectLayout } from "./layout.js";
           state.activeOrg = { id: docSnap.id, ...docSnap.data() };
           state.settings = { ticketPrefix: state.activeOrg.ticketPrefix || 'TF', nextNum: state.activeOrg.nextNum || 1 };
         }
-        document.getElementById('set-prefix').value = state.settings.ticketPrefix;
+        const setPrefixEl = document.getElementById('set-prefix');
+        if (setPrefixEl) setPrefixEl.value = state.settings.ticketPrefix;
       }));
 
       unsubscribes.push(onSnapshot(query(collection(db, "tickets"), orgFilter), (snapshot) => {
@@ -350,7 +380,7 @@ import { injectLayout } from "./layout.js";
 
     function refreshCurrentView() {
       const page = window.location.pathname.split('/').pop().replace('.html', '') || 'dashboard';
-      if (page === 'dashboard' || page === 'index') {
+      if (page === 'dashboard') {
           if (typeof renderDashboard === 'function') renderDashboard();
       } else if (page === 'kanban') {
           if (typeof renderKanban === 'function') renderKanban();
@@ -392,14 +422,20 @@ import { injectLayout } from "./layout.js";
       }
     }
     function renderSettings() {
-      if(state.currentUserProfile) {
-        document.getElementById('set-profile-username').value = state.currentUserProfile.username || '';
-        document.getElementById('set-profile-display-name').value = state.currentUserProfile.displayName || '';
+      const setProfileUsername = document.getElementById('set-profile-username');
+      const setProfileDisplayName = document.getElementById('set-profile-display-name');
+      if(state.currentUserProfile && setProfileUsername && setProfileDisplayName) {
+        setProfileUsername.value = state.currentUserProfile.username || '';
+        setProfileDisplayName.value = state.currentUserProfile.displayName || '';
       }
-      if(state.activeOrg) {
-        document.getElementById('set-workspace').value = state.activeOrg.name || '';
-        document.getElementById('set-prefix').value = state.activeOrg.ticketPrefix || 'TF';
-        document.getElementById('set-invite-link').value = `${window.location.origin}${window.location.pathname}?invite=${state.activeOrgId}`;
+      
+      const setWorkspace = document.getElementById('set-workspace');
+      const setPrefix = document.getElementById('set-prefix');
+      const setInviteLink = document.getElementById('set-invite-link');
+      if(state.activeOrg && setWorkspace && setPrefix && setInviteLink) {
+        setWorkspace.value = state.activeOrg.name || '';
+        setPrefix.value = state.activeOrg.ticketPrefix || 'TF';
+        setInviteLink.value = `${window.location.origin}${window.location.pathname}?invite=${state.activeOrgId}`;
       }
       
       const tbody = document.getElementById('settings-team-body');
@@ -464,15 +500,20 @@ import { injectLayout } from "./layout.js";
 
     // --- Dashboard ---
     function renderDashboard() {
+      const statOpen = document.getElementById('stat-open');
+      const statProg = document.getElementById('stat-prog');
+      const statPortal = document.getElementById('stat-portal');
+      const queue = document.getElementById('triage-queue-content');
+      if (!statOpen || !statProg || !statPortal || !queue) return;
+
       const open = state.tickets.filter(t => t.status === 'Open').length;
       const prog = state.tickets.filter(t => t.status === 'In Progress').length;
       const portalSubmissions = state.tickets.filter(t => t.source === 'portal' && t.status === 'Open');
       
-      document.getElementById('stat-open').innerText = open;
-      document.getElementById('stat-prog').innerText = prog;
-      document.getElementById('stat-portal').innerText = portalSubmissions.length;
+      statOpen.innerText = open;
+      statProg.innerText = prog;
+      statPortal.innerText = portalSubmissions.length;
 
-      const queue = document.getElementById('triage-queue-content');
       if (portalSubmissions.length === 0) {
         queue.innerHTML = '<div style="padding: 32px; text-align: center; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-lg); color: var(--text-muted);"><i data-lucide="check-circle" style="width: 32px; height: 32px; margin-bottom: 12px; opacity: 0.5;"></i><p>Inbox zero! No new client submissions to triage.</p></div>';
       } else {
@@ -499,7 +540,9 @@ import { injectLayout } from "./layout.js";
     // --- Kanban Board ---
     window.renderKanban = () => {
       const board = document.getElementById('kanban-board');
-      const projFilter = document.getElementById('kanban-project-filter').value;
+      const projFilterEl = document.getElementById('kanban-project-filter');
+      if (!board || !projFilterEl) return;
+      const projFilter = projFilterEl.value;
       
       const statuses = ['Open', 'In Progress', 'In Review', 'Resolved', 'Closed'];
       board.innerHTML = '';
@@ -564,6 +607,7 @@ import { injectLayout } from "./layout.js";
     // --- Tables ---
     function renderTicketsTable() {
       const tbody = document.getElementById('tickets-table-body');
+      if (!tbody) return;
       tbody.innerHTML = state.tickets.map(t => {
         const p = state.projects.find(x => x.id === t.project);
         const a = state.team.find(x => x.id === t.assignee);
@@ -581,6 +625,7 @@ import { injectLayout } from "./layout.js";
 
     function renderProjectsTable() {
       const tbody = document.getElementById('projects-table-body');
+      if (!tbody) return;
       tbody.innerHTML = state.projects.map(p => {
         const c = state.clients.find(x => x.id === p.client);
         const pTickets = state.tickets.filter(t => t.project === p.id);
@@ -650,6 +695,7 @@ import { injectLayout } from "./layout.js";
 
     function renderClientsTable() {
       const tbody = document.getElementById('clients-table-body');
+      if (!tbody) return;
       tbody.innerHTML = state.clients.map(c => `
         <tr class="interactive" onclick="openClientModal('${c.id}')">
           <td style="font-weight:500;">${escapeHtml(c.company)}</td>
@@ -677,6 +723,8 @@ import { injectLayout } from "./layout.js";
     };
 
     function renderProjectDetail() {
+      const pdContent = document.getElementById('pd-content');
+      if (!pdContent) return;
       const id = state.activeProjectId;
       const p = state.projects.find(x => x.id === id);
       if(!p) return nav('projects');
@@ -725,7 +773,7 @@ import { injectLayout } from "./layout.js";
           </div>
         </div>
       `;
-      document.getElementById('pd-content').innerHTML = html;
+      pdContent.innerHTML = html;
     }
 
     // --- Ticket Modal (Lifecycle Flow) ---
