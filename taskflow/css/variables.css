@@ -1,0 +1,115 @@
+/* ═══════════════════════════════════════════════════
+   TaskFlow v2 — Design System: CSS Variables
+   Single source of truth for all design tokens.
+═══════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Brand Colors ───────────────────────────────── */
+  --color-primary:          hsl(221, 83%, 53%);
+  --color-primary-hover:    hsl(221, 83%, 45%);
+  --color-primary-light:    hsl(221, 83%, 65%);
+  --color-primary-alpha:    hsla(221, 83%, 53%, 0.15);
+  --color-primary-alpha-sm: hsla(221, 83%, 53%, 0.08);
+  --color-accent:           hsl(262, 80%, 62%);
+  --color-accent-hover:     hsl(262, 80%, 54%);
+  --color-accent-alpha:     hsla(262, 80%, 62%, 0.15);
+
+  /* ── Semantic Colors ────────────────────────────── */
+  --color-success:          hsl(145, 63%, 42%);
+  --color-success-light:    hsl(145, 63%, 52%);
+  --color-success-alpha:    hsla(145, 63%, 42%, 0.15);
+  --color-warning:          hsl(38, 92%, 50%);
+  --color-warning-light:    hsl(38, 92%, 60%);
+  --color-warning-alpha:    hsla(38, 92%, 50%, 0.15);
+  --color-danger:           hsl(0, 78%, 55%);
+  --color-danger-hover:     hsl(0, 78%, 47%);
+  --color-danger-alpha:     hsla(0, 78%, 55%, 0.15);
+  --color-info:             hsl(200, 80%, 52%);
+  --color-info-alpha:       hsla(200, 80%, 52%, 0.15);
+
+  /* ── Neutrals: Dark Mode Base ───────────────────── */
+  --color-bg:               hsl(222, 22%, 8%);
+  --color-surface:          hsl(222, 20%, 12%);
+  --color-surface-2:        hsl(222, 18%, 16%);
+  --color-surface-3:        hsl(222, 16%, 21%);
+  --color-surface-4:        hsl(222, 14%, 26%);
+  --color-border:           hsl(222, 14%, 24%);
+  --color-border-subtle:    hsl(222, 12%, 19%);
+  --color-text:             hsl(220, 20%, 92%);
+  --color-text-muted:       hsl(220, 10%, 58%);
+  --color-text-subtle:      hsl(220, 8%, 40%);
+
+  /* ── Priority Colors ────────────────────────────── */
+  --priority-critical:      hsl(0, 78%, 55%);
+  --priority-critical-alpha:hsla(0, 78%, 55%, 0.15);
+  --priority-high:          hsl(25, 90%, 55%);
+  --priority-high-alpha:    hsla(25, 90%, 55%, 0.15);
+  --priority-medium:        hsl(38, 90%, 50%);
+  --priority-medium-alpha:  hsla(38, 90%, 50%, 0.15);
+  --priority-low:           hsl(200, 70%, 52%);
+  --priority-low-alpha:     hsla(200, 70%, 52%, 0.15);
+
+  /* ── Status Colors ──────────────────────────────── */
+  --status-todo:            hsl(220, 10%, 50%);
+  --status-todo-alpha:      hsla(220, 10%, 50%, 0.15);
+  --status-in-progress:     hsl(221, 83%, 53%);
+  --status-in-progress-alpha:hsla(221, 83%, 53%, 0.15);
+  --status-review:          hsl(262, 80%, 62%);
+  --status-review-alpha:    hsla(262, 80%, 62%, 0.15);
+  --status-done:            hsl(145, 63%, 42%);
+  --status-done-alpha:      hsla(145, 63%, 42%, 0.15);
+  --status-blocked:         hsl(0, 78%, 55%);
+  --status-blocked-alpha:   hsla(0, 78%, 55%, 0.15);
+
+  /* ── Spacing Scale (4px base unit) ─────────────── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* ── Border Radius ──────────────────────────────── */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ────────────────────────────────────── */
+  --shadow-xs:   0 1px 2px  hsla(0, 0%, 0%, 0.35);
+  --shadow-sm:   0 1px 4px  hsla(0, 0%, 0%, 0.40);
+  --shadow-md:   0 4px 16px hsla(0, 0%, 0%, 0.44);
+  --shadow-lg:   0 12px 40px hsla(0, 0%, 0%, 0.52);
+  --shadow-xl:   0 24px 64px hsla(0, 0%, 0%, 0.60);
+  --shadow-glow: 0 0 28px   hsla(221, 83%, 53%, 0.28);
+
+  /* ── Transitions ────────────────────────────────── */
+  --t-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-bounce: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Layout Dimensions ──────────────────────────── */
+  --sidebar-width:       260px;
+  --sidebar-collapsed:   64px;
+  --topbar-height:       56px;
+  --drawer-width:        800px;
+
+  /* ── Z-index Scale ──────────────────────────────── */
+  --z-base:     1;
+  --z-sticky:   10;
+  --z-topbar:   100;
+  --z-sidebar:  200;
+  --z-dropdown: 300;
+  --z-drawer:   400;
+  --z-modal:    500;
+  --z-toast:    600;
+  --z-tooltip:  700;
+}
