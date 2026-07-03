@@ -3,10 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Client Portal — TaskFlow</title>
-  <meta name="description" content="View task progress" />
+  <title>Client Support Portal — TaskFlow</title>
+  <meta name="description" content="Submit tickets and view ticket history" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="css/portal.css" />
+  <style>
+    /* Additional custom inline styles for support portal layout */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-6);
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .portal-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .ticket-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-5);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-4);
+    }
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-2) var(--sp-3);
+      color: var(--color-text);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color var(--t-fast);
+    }
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--color-primary);
+    }
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: 0 var(--sp-4);
+      height: 36px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: var(--radius-md);
+      border: 1px solid transparent;
+      cursor: pointer;
+      background: var(--color-primary);
+      color: #fff;
+      transition: background var(--t-fast);
+    }
+    .btn:hover {
+      background: var(--color-primary-hover);
+    }
+    .ticket-item {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      padding: var(--sp-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-3);
+      transition: border-color var(--t-fast);
+    }
+    .ticket-item:hover {
+      border-color: var(--color-border);
+    }
+    .ticket-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-3);
+    }
+    .ticket-title-text {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--color-text);
+    }
+    .ticket-desc {
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      line-height: 1.4;
+    }
+    .ticket-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--sp-1);
+    }
+    .ticket-date {
+      font-size: 11px;
+      color: var(--color-text-subtle);
+    }
+    .badge-status {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+    .badge-status.pending { background: rgba(156, 163, 175, 0.15); color: #9ca3af; }
+    .badge-status.dropped { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .badge-status.inprogress { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .badge-status.done { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+  </style>
 </head>
 <body>
 
@@ -22,46 +143,30 @@
   </header>
 
   <main class="portal-content hidden" id="portal-content">
-    <div class="portal-board" id="portal-board">
+    <div class="portal-grid">
       
-      <!-- Todo Column -->
-      <div class="portal-column">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 8px;">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-muted);"></div>
-          <span style="font-size: 13px; font-weight: 600;">To Do</span>
-          <span style="font-size: 11px; color: var(--color-text-muted); background: var(--color-surface-3); padding: 2px 8px; border-radius: 12px;" id="count-todo">0</span>
-        </div>
-        <div id="col-todo" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      <!-- Ticket Generation Form -->
+      <div class="ticket-card">
+        <h2 style="font-size: 1.125rem; font-weight: 700; margin-bottom: var(--sp-4);">Submit a Support Ticket</h2>
+        <form id="ticket-form" style="display: flex; flex-direction: column;">
+          <div class="form-group">
+            <label class="form-label" for="ticket-title">Title / Issue Summary</label>
+            <input type="text" id="ticket-title" class="form-input" placeholder="e.g. Bug with login page" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ticket-desc">Detailed Description</label>
+            <textarea id="ticket-desc" class="form-textarea" placeholder="Provide details, steps to reproduce, or requirements..." required></textarea>
+          </div>
+          <button type="submit" class="btn" style="margin-top: var(--sp-2);" id="btn-submit-ticket">Submit Ticket</button>
+        </form>
       </div>
 
-      <!-- In Progress Column -->
-      <div class="portal-column">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 8px;">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: hsl(221, 83%, 53%);"></div>
-          <span style="font-size: 13px; font-weight: 600;">In Progress</span>
-          <span style="font-size: 11px; color: var(--color-text-muted); background: var(--color-surface-3); padding: 2px 8px; border-radius: 12px;" id="count-in-progress">0</span>
+      <!-- Ticket History -->
+      <div class="ticket-card">
+        <h2 style="font-size: 1.125rem; font-weight: 700; margin-bottom: var(--sp-4);">Your Tickets</h2>
+        <div id="ticket-list" style="max-height: 500px; overflow-y: auto;">
+          <div style="padding: var(--sp-8); text-align: center; color: var(--color-text-muted);">No tickets submitted yet.</div>
         </div>
-        <div id="col-in-progress" style="display: flex; flex-direction: column; gap: 8px;"></div>
-      </div>
-
-      <!-- Review Column -->
-      <div class="portal-column">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 8px;">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: hsl(262, 80%, 62%);"></div>
-          <span style="font-size: 13px; font-weight: 600;">In Review</span>
-          <span style="font-size: 11px; color: var(--color-text-muted); background: var(--color-surface-3); padding: 2px 8px; border-radius: 12px;" id="count-review">0</span>
-        </div>
-        <div id="col-review" style="display: flex; flex-direction: column; gap: 8px;"></div>
-      </div>
-
-      <!-- Done Column -->
-      <div class="portal-column">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border-subtle); padding-bottom: 8px;">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background: hsl(145, 63%, 42%);"></div>
-          <span style="font-size: 13px; font-weight: 600;">Done</span>
-          <span style="font-size: 11px; color: var(--color-text-muted); background: var(--color-surface-3); padding: 2px 8px; border-radius: 12px;" id="count-done">0</span>
-        </div>
-        <div id="col-done" style="display: flex; flex-direction: column; gap: 8px;"></div>
       </div>
 
     </div>
