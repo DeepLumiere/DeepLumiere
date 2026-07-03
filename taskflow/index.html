@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,7 +13,15 @@
 </head>
 <body>
 
-  <div id="login-screen" class="centered-screen" style="display: none;">
+  <!-- Global Loader -->
+  <div id="global-loader" class="global-loader">
+    <div class="spinner"></div>
+    <h2 style="font-size: 24px; color: var(--primary); letter-spacing: 0;">TaskFlow<span style="color: var(--text);">Pro</span></h2>
+    <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px; font-weight: 500;">Initializing Workspace...</p>
+  </div>
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="centered-screen hidden">
     <div class="centered-card">
       <div style="text-align:center; margin-bottom: 24px;"><i data-lucide="layers" style="width:48px; height:48px; color:var(--primary);"></i></div>
       <h1>TaskFlow Pro</h1>
@@ -23,20 +31,24 @@
     </div>
   </div>
 
-  <div id="app-shell" class="shell" style="display: none;">
-        <aside class="sidebar">
-      <div class="sidebar-header" style="flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 20px;">
+  <!-- App Shell -->
+  <div id="app-shell" class="shell hidden">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header" style="flex-direction: column; align-items: stretch; gap: 12px; height: auto; padding: 24px;">
         <div class="flex items-center gap-2" style="justify-content: space-between;">
           <div class="flex items-center gap-2">
             <i data-lucide="layers"></i>
             <h2 style="font-size: 18px; color: var(--text); letter-spacing: 0; margin: 0;">TaskFlow<span style="color: var(--primary);">Pro</span></h2>
           </div>
-          <button class="btn-ghost" style="padding: 4px;" onclick="openCreateOrgModal()" title="Create/Join Workspace"><i data-lucide="plus" style="width:16px;height:16px;"></i></button>
+          <button class="btn-ghost" style="padding: 6px; border-radius: var(--radius-full);" onclick="openCreateOrgModal()" title="Create/Join Workspace"><i data-lucide="plus" style="width:16px;height:16px;"></i></button>
         </div>
-        <select class="select" id="sidebar-org-switcher" onchange="switchWorkspace(this.value)" style="margin-top: 8px; width: 100%; font-size: 13px;">
+        <select class="select" id="sidebar-org-switcher" onchange="switchWorkspace(this.value)" style="margin-top: 12px; width: 100%; font-size: 13px; background: rgba(0,0,0,0.4); border-color: transparent;">
            <option value="">Loading workspaces...</option>
         </select>
       </div>
+      
       <nav class="sidebar-nav">
         <div class="nav-section">
           <div class="nav-title">Overview</div>
@@ -61,27 +73,31 @@
           <a href="#" onclick="nav('settings')" id="nav-settings" class="nav-item"><i data-lucide="settings"></i> Settings</a>
         </div>
       </nav>
+      
       <div class="sidebar-footer">
         <div class="user-avatar" id="current-user-avatar" style="cursor: pointer;" onclick="nav('settings')">?</div>
-        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer;" id="current-user-name" onclick="nav('settings')">Loading...</div>
-        <button class="btn-ghost" style="padding: 6px; border-radius: var(--radius-full);" onclick="window.appLogout()" title="Sign Out"><i data-lucide="log-out" style="width: 16px; height: 16px;"></i></button>
+        <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text);" id="current-user-name" onclick="nav('settings')">Loading...</div>
+        <button class="btn-ghost" style="padding: 8px; border-radius: var(--radius-full); border: none; background: transparent; color: var(--text-muted);" onclick="window.appLogout()" title="Sign Out"><i data-lucide="log-out" style="width: 18px; height: 18px;"></i></button>
       </div>
     </aside>
+
+    <!-- Main Content -->
     <main class="main-content">
       <header class="topbar">
         <div class="flex items-center gap-4">
-          <h2 id="topbar-title">Dashboard</h2>
+          <h2 id="topbar-title" style="margin: 0; font-size: 20px;">Dashboard</h2>
           <span id="topbar-org-id" class="badge" style="background: var(--surface-hover); cursor: pointer; border: 1px solid var(--border); font-family: var(--font-mono); text-transform: none; display: none;" onclick="copyOrgId()" title="Copy Workspace ID"><i data-lucide="copy" style="width:12px; height:12px; margin-right: 4px;"></i><span id="topbar-org-id-text"></span></span>
         </div>
         <div class="flex items-center gap-4">
           <button class="btn btn-primary" onclick="openTicketModal()"><i data-lucide="plus"></i> New Task</button>
         </div>
       </header>
+      
       <div class="view-container">
 
-<!-- ====== DASHBOARD.HTML ====== -->
-<div id="view-dashboard" class="view" style="display:none;">
-<div class="stats-grid">
+        <!-- ====== DASHBOARD VIEW ====== -->
+        <div id="view-dashboard" class="view hidden">
+          <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-label">Open Tasks</div>
               <div class="stat-value" id="stat-open">0</div>
@@ -95,16 +111,15 @@
               <div class="stat-value" style="color: var(--primary);" id="stat-portal">0</div>
             </div>
           </div>
-          
-          <h3 style="margin-bottom: 20px;">Client Triage Queue</h3>
+          <h3 style="margin-bottom: 24px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Client Triage Queue</h3>
           <div id="triage-queue-content">
              <!-- Triage queue rendered here -->
           </div>
         </div>
 
-<!-- ====== KANBAN.HTML ====== -->
-<div id="view-kanban" class="view" style="display:none;">
-<div style="margin-bottom: 24px;" class="flex gap-4">
+        <!-- ====== KANBAN VIEW ====== -->
+        <div id="view-kanban" class="view hidden">
+          <div style="margin-bottom: 24px;" class="flex gap-4">
             <select class="select" id="kanban-project-filter" style="width: 240px; background: var(--surface);" onchange="renderKanban()">
               <option value="all">All Projects & Tasks</option>
               <option value="unassigned">Personal / Unassigned</option>
@@ -115,9 +130,9 @@
           </div>
         </div>
 
-<!-- ====== PROJECTS.HTML ====== -->
-<div id="view-projects" class="view" style="display:none;">
-<div class="flex justify-between items-center" style="margin-bottom: 24px;">
+        <!-- ====== PROJECTS VIEW ====== -->
+        <div id="view-projects" class="view hidden">
+          <div class="flex justify-between items-center" style="margin-bottom: 24px;">
             <h3 style="display:none;">Projects</h3>
             <button class="btn btn-primary" onclick="openProjectModal()"><i data-lucide="folder-plus"></i> New Project</button>
           </div>
@@ -139,15 +154,15 @@
           </div>
         </div>
 
-<!-- ====== PROJECT-DETAIL.HTML ====== -->
-<div id="view-project-detail" class="view" style="display:none;">
-<button class="btn btn-ghost" onclick="nav('projects')" style="margin-bottom: 24px;"><i data-lucide="arrow-left"></i> Back to Projects</button>
+        <!-- ====== PROJECT-DETAIL VIEW ====== -->
+        <div id="view-project-detail" class="view hidden">
+          <button class="btn btn-ghost" onclick="nav('projects')" style="margin-bottom: 24px;"><i data-lucide="arrow-left"></i> Back to Projects</button>
           <div id="pd-content"></div>
         </div>
 
-<!-- ====== TICKETS.HTML ====== -->
-<div id="view-tickets" class="view" style="display:none;">
-<div class="data-table-wrapper">
+        <!-- ====== TICKETS VIEW ====== -->
+        <div id="view-tickets" class="view hidden">
+          <div class="data-table-wrapper">
             <table class="data-table">
               <thead>
                 <tr>
@@ -167,17 +182,17 @@
           </div>
         </div>
 
-<!-- ====== TEAM.HTML ====== -->
-<div id="view-team" class="view" style="display:none;">
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+        <!-- ====== TEAM VIEW ====== -->
+        <div id="view-team" class="view hidden">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
             <!-- Subteams List -->
-            <div>
+            <div class="data-table-wrapper" style="padding: 24px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border);">
               <div class="flex justify-between items-center" style="margin-bottom: 24px;">
-                <h3><i data-lucide="network" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Subteams</h3>
+                <h3><i data-lucide="network" style="display:inline-block; vertical-align: middle; margin-right:8px; color: var(--primary);"></i> Subteams</h3>
                 <button class="btn btn-primary btn-sm admin-only" onclick="openSubteamModal()" id="btn-add-subteam"><i data-lucide="plus"></i> Add Subteam</button>
               </div>
-              <div class="data-table-wrapper">
-                <table class="data-table">
+              <div style="border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border);">
+                <table class="data-table" style="box-shadow: none;">
                   <thead><tr><th>Subteam Name</th><th>Description</th><th>Actions</th></tr></thead>
                   <tbody id="subteams-table-body"></tbody>
                 </table>
@@ -185,13 +200,13 @@
             </div>
             
             <!-- Users List -->
-            <div>
+            <div class="data-table-wrapper" style="padding: 24px; background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border);">
               <div class="flex justify-between items-center" style="margin-bottom: 24px;">
-                <h3><i data-lucide="users" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Workspace Members</h3>
+                <h3><i data-lucide="users" style="display:inline-block; vertical-align: middle; margin-right:8px; color: var(--primary);"></i> Workspace Members</h3>
                 <button class="btn btn-primary btn-sm admin-only" onclick="openTeamModal()" id="btn-add-member"><i data-lucide="user-plus"></i> Invite Member</button>
               </div>
-              <div class="data-table-wrapper">
-                <table class="data-table">
+              <div style="border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border);">
+                <table class="data-table" style="box-shadow: none;">
                   <thead><tr><th>Name</th><th>Role</th><th>Subteam</th><th>Actions</th></tr></thead>
                   <tbody id="team-table-body"></tbody>
                 </table>
@@ -200,9 +215,9 @@
           </div>
         </div>
 
-<!-- ====== CLIENTS.HTML ====== -->
-<div id="view-clients" class="view" style="display:none;">
-<div class="flex justify-between items-center" style="margin-bottom: 24px;">
+        <!-- ====== CLIENTS VIEW ====== -->
+        <div id="view-clients" class="view hidden">
+          <div class="flex justify-between items-center" style="margin-bottom: 24px;">
             <button class="btn btn-primary" onclick="openClientModal()"><i data-lucide="building"></i> Add Client</button>
           </div>
           <div class="data-table-wrapper">
@@ -213,11 +228,12 @@
           </div>
         </div>
 
-<!-- ====== SETTINGS.HTML ====== -->
-<div id="view-settings" class="view" style="display:none;">
-<div style="display: flex; gap: 32px;">
-             <div class="project-header-card" style="flex: 1; max-width: 500px;">
-                <h3 style="margin-bottom: 24px;"><i data-lucide="user" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> My Profile</h3>
+        <!-- ====== SETTINGS VIEW ====== -->
+        <div id="view-settings" class="view hidden">
+          <div style="display: flex; gap: 32px; align-items: flex-start;">
+             <!-- Profile Settings -->
+             <div class="project-header-card" style="flex: 1; max-width: 500px; margin-bottom: 0;">
+                <h3 style="margin-bottom: 24px; display: flex; align-items: center;"><i data-lucide="user" style="margin-right:8px; color: var(--primary);"></i> My Profile</h3>
                 <div class="form-group">
                   <label class="form-label">Username</label>
                   <input type="text" class="input" id="set-profile-username" placeholder="@john">
@@ -226,21 +242,21 @@
                   <label class="form-label">Display Name</label>
                   <input type="text" class="input" id="set-profile-display-name">
                 </div>
-                <div class="flex gap-4" style="margin-top: 24px;">
+                <div class="flex gap-4" style="margin-top: 32px;">
                     <button class="btn btn-primary" onclick="saveProfileFromSettings()"><i data-lucide="save"></i> Save Profile</button>
                 </div>
              </div>
              
-             
-             <div class="project-header-card" id="org-settings-card" style="flex: 1; max-width: 500px;">
-                <h3 style="margin-bottom: 24px;"><i data-lucide="building-2" style="display:inline-block; vertical-align: middle; margin-right:8px;"></i> Workspace Settings</h3>
+             <!-- Workspace Settings -->
+             <div class="project-header-card" id="org-settings-card" style="flex: 1; max-width: 500px; margin-bottom: 0;">
+                <h3 style="margin-bottom: 24px; display: flex; align-items: center;"><i data-lucide="building-2" style="margin-right:8px; color: var(--primary);"></i> Workspace Settings</h3>
                 
-                <div class="form-group" style="margin-bottom: 20px;">
+                <div class="form-group" style="margin-bottom: 24px;">
                   <label class="form-label">Workspace ID</label>
-                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Unique identifier for this workspace.</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Unique identifier for this workspace.</div>
                   <div class="flex gap-2">
-                    <input type="text" class="input" id="set-org-id" readonly style="background: var(--surface-hover); font-family: var(--font-mono); color: var(--primary); font-weight: 600;">
-                    <button class="btn btn-ghost" onclick="copyOrgId()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+                    <input type="text" class="input" id="set-org-id" readonly style="background: rgba(0,0,0,0.3); font-family: var(--font-mono); color: var(--primary); font-weight: 600;">
+                    <button class="btn btn-ghost" onclick="copyOrgId()"><i data-lucide="copy" style="width:16px;height:16px;"></i> Copy</button>
                   </div>
                 </div>
 
@@ -250,290 +266,287 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label">Task ID Prefix</label>
-                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Prefix for generated tickets (e.g. TF-0001).</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Prefix for generated tickets (e.g. TF-0001).</div>
                   <input type="text" class="input" id="set-prefix" placeholder="TF">
                 </div>
-                <div class="form-group" style="margin-top: 16px;">
+                <div class="form-group" style="margin-top: 24px;">
                   <label class="form-label">Workspace Invite Link</label>
-                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">Share this link to invite others directly to this workspace.</div>
-
+                  <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Share this link to invite others directly to this workspace.</div>
                   <div class="flex gap-2">
-                    <input type="text" class="input" id="set-invite-link" readonly style="background: var(--surface-hover);">
-                    <button class="btn btn-ghost" onclick="copyInviteLink()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+                    <input type="text" class="input" id="set-invite-link" readonly style="background: rgba(0,0,0,0.3);">
+                    <button class="btn btn-ghost" onclick="copyInviteLink()"><i data-lucide="copy" style="width:16px;height:16px;"></i> Copy</button>
                   </div>
                 </div>
-                <div class="flex gap-4 justify-between items-center" style="margin-top: 24px;">
+                
+                <div class="flex gap-4 justify-between items-center" style="margin-top: 32px;">
                     <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save"></i> Save Workspace</button>
                     <div class="flex gap-2">
-                        <button class="btn btn-ghost admin-only" style="color: var(--status-res);" onclick="clearWorkspaceData()" title="Clear all tickets, projects, and clients in this org"><i data-lucide="refresh-cw"></i> Clear Data</button>
+                        <button class="btn btn-ghost admin-only" style="color: var(--status-res); border-color: rgba(16, 185, 129, 0.2);" onclick="clearWorkspaceData()" title="Clear all tickets, projects, and clients in this org"><i data-lucide="refresh-cw"></i> Clear Data</button>
                         <button class="btn btn-danger admin-only" onclick="deleteWorkspace()"><i data-lucide="trash-2"></i> Delete Org</button>
                     </div>
                 </div>
                 
                 <hr style="border: 0; border-top: 1px solid var(--border); margin: 32px 0;">
                 
-                <h4 style="margin-bottom: 16px;"><i data-lucide="shield" style="display:inline-block; vertical-align: middle; margin-right:8px; width: 18px;"></i> Custom Roles</h4>
+                <h4 style="margin-bottom: 16px; display: flex; align-items: center;"><i data-lucide="shield" style="margin-right:8px; width: 18px; color: var(--primary);"></i> Custom Roles</h4>
                 <div class="flex gap-2">
                   <input type="text" class="input" id="set-new-role" placeholder="e.g. Developer">
                   <button class="btn btn-ghost" onclick="addCustomRole()"><i data-lucide="plus"></i> Add</button>
                 </div>
                 <div class="link-list" id="set-roles-list"></div>
-
              </div>
-
           </div>
         </div>
-
       </div>
     </main>
   </div>
 
+  <!-- ==================== MODALS ==================== -->
   <div id="modals-container">
+    
     <!-- Ticket Modal (Side Panel) -->
-  <div class="modal-overlay" id="ticket-modal-overlay" onclick="closeModal('ticket-modal-overlay', event)">
-    <div class="modal side-panel" id="ticket-modal">
-      <div class="modal-header">
-        <h3 id="tm-title">New Task</h3>
-        <button class="modal-close" onclick="closeModal('ticket-modal-overlay')"><i data-lucide="x"></i></button>
+    <div class="modal-overlay" id="ticket-modal-overlay" onclick="closeModal('ticket-modal-overlay', event)">
+      <div class="modal side-panel" id="ticket-modal">
+        <div class="modal-header">
+          <h3 id="tm-title" style="margin: 0; font-size: 20px;">New Task</h3>
+          <button class="modal-close" onclick="closeModal('ticket-modal-overlay')"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="tm-id">
+          <input type="hidden" id="tm-source">
+          <input type="hidden" id="tm-client-token">
+          
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="input" id="tm-name" required style="font-size: 16px; font-weight: 500;">
+          </div>
+          
+          <!-- Lifecycle Workflow Actions -->
+          <div class="form-group" id="tm-lifecycle-container" style="background: var(--surface-hover); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-top: 24px;">
+             <label class="form-label" style="margin-bottom: 16px;">Task Lifecycle</label>
+             <div id="tm-lifecycle-actions" class="flex gap-2">
+                <!-- Rendered via JS -->
+             </div>
+             <input type="hidden" id="tm-status" value="Open">
+          </div>
+
+          <div class="form-group" style="margin-top: 24px;">
+            <label class="form-label">Description / Details</label>
+            <textarea class="textarea" id="tm-desc" rows="5"></textarea>
+          </div>
+          
+          <div class="flex gap-4">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Project</label>
+              <select class="select" id="tm-project"></select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Assignee</label>
+              <select class="select" id="tm-assignee"></select>
+            </div>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Priority</label>
+              <select class="select" id="tm-priority">
+                <option value="None">None</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Due Date</label>
+              <input type="date" class="input" id="tm-due">
+            </div>
+          </div>
+
+          <hr style="border:0; border-top: 1px solid var(--border); margin: 32px 0;">
+          
+          <h4 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="link" style="width: 18px; color: var(--primary);"></i> Links & Attachments</h4>
+          <div class="flex gap-2">
+            <input type="text" class="input" id="tm-link-url" placeholder="Paste URL (e.g. GitHub PR, Figma)">
+            <input type="text" class="input" id="tm-link-label" placeholder="Label (opt)" style="width: 140px;">
+            <button class="btn btn-ghost" onclick="addTicketLink()"><i data-lucide="plus"></i> Add</button>
+          </div>
+          <div class="link-list" id="tm-link-list"></div>
+
+          <hr style="border:0; border-top: 1px solid var(--border); margin: 32px 0;">
+          
+          <h4 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="message-square" style="width: 18px; color: var(--primary);"></i> Comments</h4>
+          <div class="flex flex-col gap-2">
+            <textarea class="textarea" id="tm-new-comment" rows="3" placeholder="Add a comment..."></textarea>
+            <button class="btn btn-ghost" style="align-self: flex-end;" onclick="addTicketComment()"><i data-lucide="send"></i> Post</button>
+          </div>
+          <div class="comment-list" id="tm-comment-list"></div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-danger" id="tm-btn-delete" style="display:none; margin-right: auto;" onclick="deleteTicket()"><i data-lucide="trash-2"></i> Delete</button>
+          <button class="btn btn-ghost" onclick="closeModal('ticket-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveTicket()"><i data-lucide="save"></i> Save Task</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="tm-id">
-        <input type="hidden" id="tm-source">
-        <input type="hidden" id="tm-client-token">
-        
-        <div class="form-group">
-          <label class="form-label">Title</label>
-          <input type="text" class="input" id="tm-name" required style="font-size: 16px; font-weight: 500;">
-        </div>
-        
-        <!-- Lifecycle Workflow Actions -->
-        <div class="form-group" id="tm-lifecycle-container" style="background: var(--surface-hover); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border);">
-           <label class="form-label" style="margin-bottom: 12px;">Task Lifecycle</label>
-           <div id="tm-lifecycle-actions" class="flex gap-2">
-              <!-- Rendered via JS -->
-           </div>
-           <input type="hidden" id="tm-status" value="Open">
-        </div>
+    </div>
 
-        <div class="form-group" style="margin-top: 20px;">
-          <label class="form-label">Description / Details</label>
-          <textarea class="textarea" id="tm-desc" rows="5"></textarea>
+    <!-- Project Modal -->
+    <div class="modal-overlay" id="project-modal-overlay" onclick="closeModal('project-modal-overlay', event)">
+      <div class="modal" id="project-modal">
+        <div class="modal-header">
+          <h3 id="pm-title" style="margin: 0;">New Project</h3>
+          <button class="modal-close" onclick="closeModal('project-modal-overlay')"><i data-lucide="x"></i></button>
         </div>
-        
-        <div class="flex gap-4">
-          <div class="form-group" style="flex:1;">
-            <label class="form-label">Project</label>
-            <select class="select" id="tm-project"></select>
+        <div class="modal-body">
+          <input type="hidden" id="pm-id">
+          <div class="form-group">
+            <label class="form-label">Project Name</label>
+            <input type="text" class="input" id="pm-name" required>
           </div>
-          <div class="form-group" style="flex:1;">
-            <label class="form-label">Assignee</label>
-            <select class="select" id="tm-assignee"></select>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="form-group" style="flex:1;">
-            <label class="form-label">Priority</label>
-            <select class="select" id="tm-priority">
-              <option value="None">None</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="select" id="pm-status">
+              <option value="Active">Active</option>
+              <option value="Planning">Planning</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Shelved">Shelved</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </div>
-          <div class="form-group" style="flex:1;">
-            <label class="form-label">Due Date</label>
-            <input type="date" class="input" id="tm-due">
+          <div class="form-group">
+            <label class="form-label">Client (Optional)</label>
+            <select class="select" id="pm-client"></select>
           </div>
         </div>
-
-        <hr style="border:0; border-top: 1px solid var(--border); margin: 32px 0;">
-        
-        <h4 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="link" style="width: 18px;"></i> Links & Attachments</h4>
-        <div class="flex gap-2">
-          <input type="text" class="input" id="tm-link-url" placeholder="Paste URL (e.g. GitHub PR, Figma)">
-          <input type="text" class="input" id="tm-link-label" placeholder="Label (opt)" style="width: 140px;">
-          <button class="btn btn-ghost" onclick="addTicketLink()"><i data-lucide="plus"></i> Add</button>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('project-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveProject()"><i data-lucide="save"></i> Save</button>
         </div>
-        <div class="link-list" id="tm-link-list"></div>
-
-        <hr style="border:0; border-top: 1px solid var(--border); margin: 32px 0;">
-        
-        <h4 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"><i data-lucide="message-square" style="width: 18px;"></i> Comments</h4>
-        <div class="flex flex-col gap-2">
-          <textarea class="textarea" id="tm-new-comment" rows="3" placeholder="Add a comment..."></textarea>
-          <button class="btn btn-ghost" style="align-self: flex-end;" onclick="addTicketComment()"><i data-lucide="send"></i> Post</button>
-        </div>
-        <div class="comment-list" id="tm-comment-list"></div>
-
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-danger" id="tm-btn-delete" style="display:none; margin-right: auto;" onclick="deleteTicket()"><i data-lucide="trash-2"></i> Delete</button>
-        <button class="btn btn-ghost" onclick="closeModal('ticket-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveTicket()"><i data-lucide="save"></i> Save Task</button>
       </div>
     </div>
-  </div>
 
-  <!-- Project Modal -->
-  <div class="modal-overlay" id="project-modal-overlay" onclick="closeModal('project-modal-overlay', event)">
-    <div class="modal" id="project-modal">
-      <div class="modal-header">
-        <h3 id="pm-title">New Project</h3>
-        <button class="modal-close" onclick="closeModal('project-modal-overlay')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="pm-id">
-        <div class="form-group">
-          <label class="form-label">Project Name</label>
-          <input type="text" class="input" id="pm-name" required>
+    <!-- Manage Workspace Modal -->
+    <div class="modal-overlay" id="create-org-modal-overlay" onclick="closeModal('create-org-modal-overlay', event)">
+      <div class="modal" id="create-org-modal" style="max-width: 440px;">
+        <div class="modal-header">
+          <h3 style="margin: 0;">Workspace</h3>
+          <button class="modal-close" onclick="closeModal('create-org-modal-overlay')"><i data-lucide="x"></i></button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Status</label>
-          <select class="select" id="pm-status">
-            <option value="Active">Active</option>
-            <option value="Planning">Planning</option>
-            <option value="On Hold">On Hold</option>
-            <option value="Shelved">Shelved</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        <div class="modal-body" style="padding-top: 0;">
+          <div class="flex gap-4" style="border-bottom: 1px solid var(--border); margin-bottom: 24px;">
+            <button class="btn-ghost" style="border: none; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 16px 0; color: var(--text); flex: 1;" id="tab-create-org" onclick="switchOrgTab('create')">Create New</button>
+            <button class="btn-ghost" style="border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 16px 0; color: var(--text-muted); flex: 1;" id="tab-join-org" onclick="switchOrgTab('join')">Join Existing</button>
+          </div>
+          
+          <div id="org-tab-create">
+            <div class="form-group">
+              <label class="form-label">Workspace Name</label>
+              <input type="text" class="input" id="new-org-name" placeholder="e.g. Design Team">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Task ID Prefix</label>
+              <input type="text" class="input" id="new-org-prefix" placeholder="TF" value="TF">
+            </div>
+          </div>
+
+          <div id="org-tab-join" class="hidden">
+            <div class="form-group">
+              <label class="form-label">Workspace ID</label>
+              <input type="text" class="input" id="join-org-id" placeholder="e.g. org_123456789">
+            </div>
+            <p class="text-muted" style="font-size: 13px; line-height: 1.5; background: rgba(255,255,255,0.03); padding: 12px; border-radius: var(--radius); border: 1px solid var(--border);">Ask your administrator for the Workspace ID to join an existing workspace.</p>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Client (Optional)</label>
-          <select class="select" id="pm-client"></select>
+        <div class="modal-footer" id="org-footer-create">
+          <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="createWorkspace()"><i data-lucide="plus"></i> Create</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('project-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveProject()"><i data-lucide="save"></i> Save</button>
+        <div class="modal-footer hidden" id="org-footer-join">
+          <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="joinWorkspaceById()"><i data-lucide="arrow-right"></i> Join</button>
+        </div>
       </div>
     </div>
-  </div>
 
-
-  <!-- Manage Workspace Modal -->
-  <div class="modal-overlay" id="create-org-modal-overlay" onclick="closeModal('create-org-modal-overlay', event)">
-    <div class="modal" id="create-org-modal" style="max-width: 400px;">
-      <div class="modal-header">
-        <h3>Workspace</h3>
-        <button class="modal-close" onclick="closeModal('create-org-modal-overlay')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body" style="padding-top: 0;">
-        <div class="flex gap-4" style="border-bottom: 1px solid var(--border); margin-bottom: 20px;">
-          <button class="btn-ghost" style="border: none; border-bottom: 2px solid var(--primary); border-radius: 0; padding: 12px 0; color: var(--text);" id="tab-create-org" onclick="switchOrgTab('create')">Create New</button>
-          <button class="btn-ghost" style="border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 12px 0; color: var(--text-muted);" id="tab-join-org" onclick="switchOrgTab('join')">Join Existing</button>
+    <!-- Subteam Modal -->
+    <div class="modal-overlay" id="subteam-modal-overlay" onclick="closeModal('subteam-modal-overlay', event)">
+      <div class="modal" id="subteam-modal" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3 id="st-title" style="margin: 0;">Subteam</h3>
+          <button class="modal-close" onclick="closeModal('subteam-modal-overlay')"><i data-lucide="x"></i></button>
         </div>
-        
-        <div id="org-tab-create">
+        <div class="modal-body">
+          <input type="hidden" id="st-id">
           <div class="form-group">
-            <label class="form-label">Workspace Name</label>
-            <input type="text" class="input" id="new-org-name" placeholder="e.g. Design Team">
+            <label class="form-label">Subteam Name</label>
+            <input type="text" class="input" id="st-name" placeholder="e.g. Frontend Developers">
           </div>
           <div class="form-group">
-            <label class="form-label">Task ID Prefix</label>
-            <input type="text" class="input" id="new-org-prefix" placeholder="TF" value="TF">
+            <label class="form-label">Description</label>
+            <input type="text" class="input" id="st-desc" placeholder="What does this team do?">
           </div>
         </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('subteam-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveSubteam()"><i data-lucide="save"></i> Save</button>
+        </div>
+      </div>
+    </div>
 
-        <div id="org-tab-join" style="display: none;">
-          <div class="form-group">
-            <label class="form-label">Workspace ID</label>
-            <input type="text" class="input" id="join-org-id" placeholder="e.g. org_123456789">
+    <!-- Team Modal -->
+    <div class="modal-overlay" id="team-modal-overlay" onclick="closeModal('team-modal-overlay', event)">
+      <div class="modal" id="team-modal" style="max-width: 550px;">
+        <div class="modal-header">
+          <h3 style="margin: 0;">Team Member</h3>
+          <button class="modal-close" onclick="closeModal('team-modal-overlay')"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="te-id">
+          <div class="flex gap-4">
+            <div class="form-group" style="flex:1;"><label class="form-label">Name</label><input type="text" class="input" id="te-name"></div>
+            <div class="form-group" style="flex:1;"><label class="form-label">Email</label><input type="email" class="input" id="te-email"></div>
           </div>
-          <p class="text-muted" style="font-size: 12px;">Ask your administrator for the Workspace ID to join an existing workspace.</p>
+          <div class="flex gap-4">
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Role</label>
+              <select class="select" id="te-role"></select>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label class="form-label">Subteam</label>
+              <select class="select" id="te-subteam"></select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('team-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveTeamMember()"><i data-lucide="save"></i> Save</button>
         </div>
       </div>
-      <div class="modal-footer" id="org-footer-create">
-        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="createWorkspace()"><i data-lucide="plus"></i> Create</button>
-      </div>
-      <div class="modal-footer" id="org-footer-join" style="display: none;">
-        <button class="btn btn-ghost" onclick="closeModal('create-org-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="joinWorkspaceById()"><i data-lucide="arrow-right"></i> Join</button>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal-overlay" id="client-modal-overlay" onclick="closeModal('client-modal-overlay', event)">
+      <div class="modal" id="client-modal" style="max-width: 450px;">
+        <div class="modal-header">
+          <h3 style="margin: 0;">Client Profile</h3>
+          <button class="modal-close" onclick="closeModal('client-modal-overlay')"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="ce-id">
+          <div class="form-group"><label class="form-label">Company / Client Name</label><input type="text" class="input" id="ce-company"></div>
+          <div class="form-group"><label class="form-label">Contact Email</label><input type="email" class="input" id="ce-email"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal('client-modal-overlay')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveClient()"><i data-lucide="save"></i> Save</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Subteam Modal -->
-  <div class="modal-overlay" id="subteam-modal-overlay" onclick="closeModal('subteam-modal-overlay', event)">
-    <div class="modal" id="subteam-modal" style="max-width: 500px;">
-      <div class="modal-header">
-        <h3 id="st-title">Subteam</h3>
-        <button class="modal-close" onclick="closeModal('subteam-modal-overlay')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="st-id">
-        <div class="form-group">
-          <label class="form-label">Subteam Name</label>
-          <input type="text" class="input" id="st-name" placeholder="e.g. Frontend Developers">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Description</label>
-          <input type="text" class="input" id="st-desc" placeholder="What does this team do?">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('subteam-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveSubteam()"><i data-lucide="save"></i> Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Team Modal -->
-  <div class="modal-overlay" id="team-modal-overlay" onclick="closeModal('team-modal-overlay', event)">
-    <div class="modal" id="team-modal" style="max-width: 550px;">
-      <div class="modal-header">
-        <h3>Team Member</h3>
-        <button class="modal-close" onclick="closeModal('team-modal-overlay')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="te-id">
-        <div class="flex gap-4">
-          <div class="form-group" style="flex:1;"><label class="form-label">Name</label><input type="text" class="input" id="te-name"></div>
-          <div class="form-group" style="flex:1;"><label class="form-label">Email</label><input type="email" class="input" id="te-email"></div>
-        </div>
-        <div class="flex gap-4">
-          <div class="form-group" style="flex:1;">
-            <label class="form-label">Role</label>
-            <select class="select" id="te-role">
-            </select>
-          </div>
-          <div class="form-group" style="flex:1;">
-            <label class="form-label">Subteam</label>
-            <select class="select" id="te-subteam"></select>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('team-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveTeamMember()"><i data-lucide="save"></i> Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Client Modal -->
-  <div class="modal-overlay" id="client-modal-overlay" onclick="closeModal('client-modal-overlay', event)">
-    <div class="modal" id="client-modal" style="max-width: 450px;">
-      <div class="modal-header">
-        <h3>Client Profile</h3>
-        <button class="modal-close" onclick="closeModal('client-modal-overlay')"><i data-lucide="x"></i></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="ce-id">
-        <div class="form-group"><label class="form-label">Company / Client Name</label><input type="text" class="input" id="ce-company"></div>
-        <div class="form-group"><label class="form-label">Contact Email</label><input type="email" class="input" id="ce-email"></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('client-modal-overlay')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveClient()"><i data-lucide="save"></i> Save</button>
-      </div>
-    </div>
-  </div>
-  </div>
   <div id="toast-container"></div>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
-
