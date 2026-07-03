@@ -7,19 +7,79 @@ import { formatShortDate, isOverdue } from '../../utils/helpers.js';
 import { StatusBadge, PriorityBadge } from '../components/badges.js';
 import { getInitials, stringToColor } from '../../utils/helpers.js';
 import { Router } from '../router.js';
+import { createTask } from '../../db/tasks.js';
+import { Toast } from '../toast.js';
 
 let _unsubTasks = null;
 
 export async function render(container) {
+  const projects = State.get('projects') || [];
+  const members = State.get('members') || [];
+
+  const projOptions = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  const memOptions = members.map(m => `<option value="${m.userId}">${m.name}</option>`).join('');
+
   container.innerHTML = `
     <div class="view-header" style="padding: 0 var(--sp-6);">
-      <div>
-        <h1 class="view-title">List</h1>
-        <p class="text-sm text-muted mt-1">All tasks in a dense view.</p>
+      <div class="flex justify-between w-full items-center">
+        <div>
+          <h1 class="view-title">List</h1>
+          <p class="text-sm text-muted mt-1">All tasks in a dense view.</p>
+        </div>
+        <button class="btn btn-primary" id="btn-toggle-new-task">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Task
+        </button>
       </div>
     </div>
     
     <div class="view-container" style="max-width: 1400px; padding: var(--sp-4) var(--sp-6);">
+      <!-- Inline Task Form -->
+      <div id="inline-task-form" class="card mb-6 hidden" style="background: var(--color-surface-2);">
+        <div class="flex-col gap-4">
+          <div class="form-group mb-0">
+            <input type="text" class="form-input text-lg font-semibold" id="itask-title" placeholder="Task title..." style="border-color:transparent; background:var(--color-surface-3);" autofocus>
+          </div>
+          <div class="two-col-grid" style="gap:var(--sp-4); margin-top: var(--sp-3);">
+            <div class="form-group">
+              <label class="form-label">Project</label>
+              <select class="form-select" id="itask-project">
+                <option value="">No Project</option>
+                ${projOptions}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assignee</label>
+              <select class="form-select" id="itask-assignee">
+                <option value="">Unassigned</option>
+                ${memOptions}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Priority</label>
+              <select class="form-select" id="itask-priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Due Date</label>
+              <input type="date" class="form-input" id="itask-due">
+            </div>
+          </div>
+          <div class="form-group mt-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="itask-desc" placeholder="Add details..." rows="2"></textarea>
+          </div>
+          <div class="flex justify-end gap-3 mt-4">
+            <button class="btn btn-ghost" id="btn-cancel-task">Cancel</button>
+            <button class="btn btn-primary" id="btn-save-task">Create Task</button>
+          </div>
+        </div>
+      </div>
+
       <div class="card p-0" style="overflow:hidden;">
         <table style="width:100%; border-collapse:collapse; text-align:left;">
           <thead>
@@ -38,6 +98,68 @@ export async function render(container) {
       </div>
     </div>
   `;
+
+  // Bind Inline Form Events
+  const btnToggle = document.getElementById('btn-toggle-new-task');
+  const formPanel = document.getElementById('inline-task-form');
+  const btnCancel = document.getElementById('btn-cancel-task');
+  const btnSave = document.getElementById('btn-save-task');
+
+  if (btnToggle && formPanel) {
+    btnToggle.addEventListener('click', () => {
+      formPanel.classList.toggle('hidden');
+      if (!formPanel.classList.contains('hidden')) {
+        document.getElementById('itask-title').focus();
+      }
+    });
+
+    btnCancel.addEventListener('click', () => {
+      formPanel.classList.add('hidden');
+      document.getElementById('itask-title').value = '';
+      document.getElementById('itask-desc').value = '';
+      document.getElementById('itask-due').value = '';
+    });
+
+    btnSave.addEventListener('click', async () => {
+      const title = document.getElementById('itask-title').value.trim();
+      if (!title) { Toast.show('Title is required', 'error'); return; }
+      
+      btnSave.disabled = true;
+      btnSave.textContent = 'Saving...';
+      
+      const ws = State.get('currentWorkspace');
+      const data = {
+        title,
+        projectId: document.getElementById('itask-project').value || null,
+        assigneeId: document.getElementById('itask-assignee').value || null,
+        priority: document.getElementById('itask-priority').value,
+        dueDate: document.getElementById('itask-due').value ? new Date(document.getElementById('itask-due').value) : null,
+        description: document.getElementById('itask-desc').value.trim()
+      };
+
+      try {
+        await createTask(ws.id, data);
+        Toast.show('Task created', 'success');
+        formPanel.classList.add('hidden');
+        document.getElementById('itask-title').value = '';
+        document.getElementById('itask-desc').value = '';
+      } catch (err) {
+        console.error(err);
+        Toast.show('Failed to create task', 'error');
+      } finally {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Create Task';
+      }
+    });
+  }
+
+  // If hash has ?new=true, open it automatically
+  if (window.location.hash.includes('?new=true') && formPanel) {
+    formPanel.classList.remove('hidden');
+    setTimeout(() => document.getElementById('itask-title').focus(), 100);
+    // clean up hash
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash.replace('?new=true', ''));
+  }
 
   _unsubTasks = State.subscribe('tasks', () => updateList());
 

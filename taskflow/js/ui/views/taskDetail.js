@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════
 
 import { State } from '../../store/state.js';
-import { updateTask, getTask } from '../../db/tasks.js';
+import { updateTask, getTask, deleteTask } from '../../db/tasks.js';
 import { Permissions } from '../../auth/permissions.js';
 import { formatShortDate, formatDate } from '../../utils/helpers.js';
 import { StatusBadge, PriorityBadge } from '../components/badges.js';
@@ -70,7 +70,6 @@ export function closeDrawer(updateHash = true) {
   if (updateHash) {
     // Return to the parent view
     const currentView = State.get('currentView') || 'dashboard';
-    // If the hash was /task/123, go back to previous. For simplicity, go back to board if not known
     if (currentView.startsWith('task/')) {
       Router.go('#/board');
     } else {
@@ -86,12 +85,8 @@ function renderSkeleton() {
       <div class="skeleton" style="width:32px; height:32px; border-radius:4px;"></div>
     </div>
     <div class="drawer-body">
-      <div class="drawer-meta-grid">
-        <div class="skeleton" style="height:50px;"></div>
-        <div class="skeleton" style="height:50px;"></div>
-      </div>
-      <div class="skeleton" style="height:100px;"></div>
-      <div class="skeleton" style="height:100px;"></div>
+      <div class="skeleton" style="height:50px;"></div>
+      <div class="skeleton" style="height:50px;"></div>
     </div>
   `;
 }
@@ -101,14 +96,21 @@ function renderContent(task) {
   const canEdit = Permissions.canEditTask(task);
   const projects = State.get('projects') || [];
   const project = projects.find(p => p.id === task.projectId);
+  const members = State.get('members') || [];
 
   _drawerEl.innerHTML = `
     <div class="drawer-header">
-      <div style="flex:1; min-width:0;">
+      <div style="flex:1; min-width:0; margin-top: 8px;">
         ${project ? `<div class="text-xs font-semibold text-muted mb-1 uppercase tracking-wide">${project.name}</div>` : ''}
         <textarea id="drawer-title" class="drawer-title-input" rows="1" ${!canEdit ? 'readonly' : ''}>${task.title}</textarea>
       </div>
       <div class="drawer-header-actions">
+        <!-- Delete Button -->
+        ${canEdit ? `
+        <button class="btn-icon text-danger" id="btn-delete-task" title="Delete Task">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+        ` : ''}
         <!-- Close Button -->
         <button class="btn-icon" id="btn-close-drawer" aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -121,19 +123,21 @@ function renderContent(task) {
       <div class="drawer-meta-grid">
         <div class="drawer-meta-row">
           <span class="meta-label">Status</span>
-          <div class="dropdown">
-            <button class="btn btn-ghost btn-sm" id="btn-status" ${!canEdit ? 'disabled' : ''}>
-              ${StatusBadge(task.status)}
-            </button>
-          </div>
+          <select class="form-select btn-sm" id="select-status" ${!canEdit ? 'disabled' : ''} style="width:auto; min-width:130px; font-weight: 500;">
+            <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>Todo</option>
+            <option value="inprogress" ${task.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
+            <option value="inreview" ${task.status === 'inreview' ? 'selected' : ''}>In Review</option>
+            <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
+          </select>
         </div>
         <div class="drawer-meta-row">
           <span class="meta-label">Assignee</span>
-          <div class="dropdown">
-            <button class="btn btn-ghost btn-sm" id="btn-assignee" ${!canEdit ? 'disabled' : ''}>
-              ${task.assigneeId ? getAssigneeHtml(task.assigneeId) : 'Unassigned'}
-            </button>
-          </div>
+          <select class="form-select btn-sm" id="select-assignee" ${!canEdit ? 'disabled' : ''} style="width:auto; min-width:130px; font-weight: 500;">
+            <option value="">Unassigned</option>
+            ${members.map(m => `
+              <option value="${m.userId}" ${task.assigneeId === m.userId ? 'selected' : ''}>${m.name}</option>
+            `).join('')}
+          </select>
         </div>
         <div class="drawer-meta-row">
           <span class="meta-label">Due Date</span>
@@ -141,11 +145,12 @@ function renderContent(task) {
         </div>
         <div class="drawer-meta-row">
           <span class="meta-label">Priority</span>
-          <div class="dropdown">
-            <button class="btn btn-ghost btn-sm" id="btn-priority" ${!canEdit ? 'disabled' : ''}>
-              ${PriorityBadge(task.priority)}
-            </button>
-          </div>
+          <select class="form-select btn-sm" id="select-priority" ${!canEdit ? 'disabled' : ''} style="width:auto; min-width:130px; font-weight: 500;">
+            <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+            <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+            <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+            <option value="critical" ${task.priority === 'critical' ? 'selected' : ''}>Critical</option>
+          </select>
         </div>
       </div>
 
@@ -224,6 +229,48 @@ function renderContent(task) {
     dueEl.addEventListener('change', () => {
       const d = dueEl.value ? new Date(dueEl.value) : null;
       updateTask(task.id, { dueDate: d });
+    });
+  }
+
+  // Save Status change
+  const statusSelect = document.getElementById('select-status');
+  if (statusSelect && canEdit) {
+    statusSelect.addEventListener('change', () => {
+      updateTask(task.id, { status: statusSelect.value });
+    });
+  }
+
+  // Save Assignee change
+  const assigneeSelect = document.getElementById('select-assignee');
+  if (assigneeSelect && canEdit) {
+    assigneeSelect.addEventListener('change', () => {
+      updateTask(task.id, { assigneeId: assigneeSelect.value || null });
+    });
+  }
+
+  // Save Priority change
+  const prioritySelect = document.getElementById('select-priority');
+  if (prioritySelect && canEdit) {
+    prioritySelect.addEventListener('change', () => {
+      updateTask(task.id, { priority: prioritySelect.value });
+    });
+  }
+
+  // Delete Task
+  const deleteBtn = document.getElementById('btn-delete-task');
+  if (deleteBtn && canEdit) {
+    deleteBtn.addEventListener('click', async () => {
+      const modals = await import('../modals.js');
+      const confirm = await modals.Modals.confirm('Delete Task?', 'Are you sure you want to permanently delete this task?', true);
+      if (confirm) {
+        try {
+          await deleteTask(task.id);
+          Toast.show('Task deleted', 'success');
+          closeDrawer();
+        } catch (e) {
+          Toast.show('Failed to delete task', 'error');
+        }
+      }
     });
   }
 

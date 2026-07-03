@@ -87,9 +87,8 @@ export const Topbar = {
     // New Task Button (Global)
     const newTaskBtn = document.getElementById('btn-new-task');
     if (newTaskBtn) {
-      newTaskBtn.addEventListener('click', async () => {
-        const modals = await import('./modals.js');
-        modals.Modals.openTaskForm(); // We'll build this in Phase 6
+      newTaskBtn.addEventListener('click', () => {
+        Router.go('#/list?new=true');
       });
     }
 

@@ -31,6 +31,14 @@ export async function renderSettings(container) {
           <input type="text" class="form-input" id="set-ws-name" value="${ws.name}">
         </div>
         
+        <div class="form-group">
+          <label class="form-label">Workspace ID (Share with your team to join)</label>
+          <div class="flex gap-2">
+            <input type="text" class="form-input flex-1" id="set-ws-id" value="${ws.id}" readonly style="background: var(--color-surface-2); font-family: monospace;">
+            <button class="btn btn-ghost" id="btn-copy-ws-id">Copy</button>
+          </div>
+        </div>
+
         <button class="btn btn-primary" id="btn-save-settings">Save Changes</button>
       </div>
 
@@ -41,6 +49,13 @@ export async function renderSettings(container) {
       </div>
     </div>
   `;
+
+  document.getElementById('btn-copy-ws-id').addEventListener('click', () => {
+    const wsIdInput = document.getElementById('set-ws-id');
+    wsIdInput.select();
+    navigator.clipboard.writeText(wsIdInput.value);
+    Toast.show('Workspace ID copied to clipboard!', 'success');
+  });
 
   document.getElementById('btn-save-settings').addEventListener('click', async () => {
     const name = document.getElementById('set-ws-name').value.trim();

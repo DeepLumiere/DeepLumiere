@@ -46,12 +46,32 @@ export async function render(container) {
     </div>
   `;
 
-  document.getElementById('btn-invite').addEventListener('click', () => {
-    // Basic prompt for invitation
-    // Production app would trigger email invite flow
+  document.getElementById('btn-invite').addEventListener('click', async () => {
     const email = prompt('Enter email address to invite:');
     if (email) {
-      Toast.show('Invites are disabled in this demo.', 'warning');
+      try {
+        const wsName = State.get('currentWorkspace').name;
+        Toast.show('Sending invite...', 'info');
+        
+        const message = await window.Email.send({
+          Host : "smtp.gmail.com",
+          Username : "dudecomputerscience@gmail.com",
+          Password : "hqxv gmmr drsh auof",
+          To : email,
+          From : "dudecomputerscience@gmail.com",
+          Subject : `You have been invited to join ${wsName} on TaskFlow`,
+          Body : `Hello!<br><br>You have been invited to join the workspace <b>${wsName}</b> on TaskFlow.<br>Click here to join: <a href="${window.location.origin}${window.location.pathname}">TaskFlow App</a><br><br>Regards,<br>TaskFlow Team`
+        });
+        
+        if (message === 'OK') {
+          Toast.show('Invitation sent successfully!', 'success');
+        } else {
+          Toast.show(`Failed to send: ${message}`, 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        Toast.show('Error sending invitation', 'error');
+      }
     }
   });
 

@@ -43,11 +43,20 @@ export async function updateProfile(uid, data) {
   await updateDoc(userRef, data);
 }
 
+const userCache = new Map();
+
 /**
  * Get a single user by ID
  */
 export async function getUser(uid) {
   if (!uid) return null;
+  if (userCache.has(uid)) {
+    return userCache.get(uid);
+  }
   const snap = await getDoc(doc(db, COLLECTION, uid));
-  return snap.exists() ? { uid: snap.id, ...snap.data() } : null;
+  const data = snap.exists() ? { uid: snap.id, ...snap.data() } : null;
+  if (data) {
+    userCache.set(uid, data);
+  }
+  return data;
 }

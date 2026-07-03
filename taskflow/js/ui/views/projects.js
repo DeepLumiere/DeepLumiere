@@ -24,6 +24,14 @@ export async function render(container) {
       ` : ''}
     </div>
     <div class="view-container">
+      <div id="new-project-form" class="card mb-6 hidden" style="background: var(--color-surface-2);">
+        <h3 class="text-md font-semibold mb-3">Create New Project</h3>
+        <div class="flex gap-3">
+          <input type="text" id="project-name-input" class="form-input flex-1" placeholder="Enter project name..." />
+          <button class="btn btn-primary" id="btn-save-project">Save Project</button>
+          <button class="btn btn-ghost" id="btn-cancel-project">Cancel</button>
+        </div>
+      </div>
       <div class="card-grid" id="projects-grid">
         <div class="p-6 text-center text-muted">Loading projects...</div>
       </div>
@@ -31,19 +39,40 @@ export async function render(container) {
   `;
 
   if (Permissions.canManageProjects()) {
-    const btn = document.getElementById('btn-new-project');
-    if (btn) {
-      btn.addEventListener('click', async () => {
-        const modals = await import('../modals.js');
-        // We can reuse the confirm prompt with inputs, or build a specific one.
-        // For brevity, prompt:
-        const name = prompt('Enter Project Name:');
+    const btnNew = document.getElementById('btn-new-project');
+    const formPanel = document.getElementById('new-project-form');
+    const inputName = document.getElementById('project-name-input');
+    const btnSave = document.getElementById('btn-save-project');
+    const btnCancel = document.getElementById('btn-cancel-project');
+
+    if (btnNew && formPanel) {
+      btnNew.addEventListener('click', () => {
+        formPanel.classList.toggle('hidden');
+        if (!formPanel.classList.contains('hidden')) {
+          inputName.focus();
+        }
+      });
+
+      btnCancel.addEventListener('click', () => {
+        formPanel.classList.add('hidden');
+        inputName.value = '';
+      });
+
+      btnSave.addEventListener('click', async () => {
+        const name = inputName.value.trim();
         if (name) {
+          btnSave.disabled = true;
+          btnSave.textContent = 'Saving...';
           try {
             await createProject(State.get('currentWorkspace').id, { name, color: 'hsl(221, 83%, 53%)' });
             Toast.show('Project created', 'success');
+            formPanel.classList.add('hidden');
+            inputName.value = '';
           } catch (e) {
             Toast.show('Error creating project', 'error');
+          } finally {
+            btnSave.disabled = false;
+            btnSave.textContent = 'Save Project';
           }
         }
       });

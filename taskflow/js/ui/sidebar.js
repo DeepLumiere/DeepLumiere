@@ -172,6 +172,10 @@ export const Sidebar = {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Create Workspace
       </div>
+      <div class="dropdown-item" id="btn-join-ws">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Join Workspace
+      </div>
     `;
 
     dropdown.innerHTML = html;
@@ -191,6 +195,50 @@ export const Sidebar = {
         dropdown.classList.remove('open');
         const modals = await import('./modals.js');
         modals.Modals.openCreateWorkspace(); // Built in Phase 6
+      });
+    }
+
+    // Bind join button
+    const joinBtn = document.getElementById('btn-join-ws');
+    if (joinBtn) {
+      joinBtn.addEventListener('click', async () => {
+        dropdown.classList.remove('open');
+        const wsId = prompt('Enter Workspace ID to Join:');
+        if (wsId) {
+          const toastModule = await import('./toast.js');
+          const Toast = toastModule.Toast;
+          try {
+            Toast.show('Verifying workspace...', 'info');
+            const wsModule = await import('../db/workspaces.js');
+            const targetWs = await wsModule.getWorkspace(wsId);
+            if (!targetWs) {
+              Toast.show('Workspace not found. Check the ID.', 'error');
+              return;
+            }
+            
+            // Check if already member
+            const currentWorkspaces = State.get('workspaces') || [];
+            if (currentWorkspaces.some(w => w.id === wsId)) {
+              Toast.show('You are already a member of this workspace.', 'warning');
+              this.switchWorkspace(wsId);
+              return;
+            }
+
+            const memberModule = await import('../db/members.js');
+            const currentUser = State.get('user');
+            await memberModule.addMember(wsId, currentUser.uid, 'Member', currentUser.email);
+            
+            Toast.show(`Successfully joined ${targetWs.name}!`, 'success');
+            
+            // Refresh workspace list in State and switch
+            const updatedList = [...currentWorkspaces, targetWs];
+            State.set('workspaces', updatedList);
+            this.switchWorkspace(wsId);
+          } catch (e) {
+            console.error(e);
+            Toast.show('Failed to join workspace.', 'error');
+          }
+        }
       });
     }
   },

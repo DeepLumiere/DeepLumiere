@@ -43,7 +43,7 @@
   flex-direction: column;
   z-index: var(--z-sidebar);
   transition: width var(--t-normal);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .sidebar--collapsed {
@@ -331,6 +331,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: var(--sp-6);
   margin-bottom: var(--sp-6);
   gap: var(--sp-4);
 }
