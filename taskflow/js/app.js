@@ -159,7 +159,8 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
       const appShell = document.getElementById('app-shell');
       const btnLogin = document.getElementById('btn-login');
 
-      if (loginScreen) loginScreen.style.display = 'flex';
+      // Wait for auth state before showing login
+      // if (loginScreen) loginScreen.style.display = 'flex';
 
       if (btnLogin) {
         btnLogin.addEventListener('click', () => {
@@ -183,8 +184,9 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
         if (user) {
           currentUser = user;
 
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('app-shell').style.display = 'grid';
+          document.getElementById('global-loader').classList.add('hidden');
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('app-shell').classList.remove('hidden');
           // Initialize SPA to dashboard
           nav('dashboard');
           
@@ -308,8 +310,9 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
           initApp();
         } else {
           currentUser = null;
-          document.getElementById('app-shell').style.display = 'none';
-          document.getElementById('login-screen').style.display = 'flex';
+          document.getElementById('global-loader').classList.add('hidden');
+          document.getElementById('app-shell').classList.add('hidden');
+          document.getElementById('login-screen').classList.remove('hidden');
 
           if (page !== 'index' && page !== '') {
              window.location.href = 'index.html';
@@ -428,13 +431,13 @@ import { auth, db, setDoc, doc, getDoc, collection, query, where, getDocs, onSna
       // Hide all views
       document.querySelectorAll('.view').forEach(v => {
           v.classList.remove('active');
-          v.style.display = 'none';
+          v.classList.add('hidden');
       });
       // Show target view
       const target = document.getElementById('view-' + viewId);
       if (target) {
           target.classList.add('active');
-          target.style.display = 'block';
+          target.classList.remove('hidden');
       }
       
       // Update sidebar nav active states
