@@ -13,6 +13,7 @@ import { subscribeToProjects }       from './db/projects.js';
 import { subscribeToTasks }          from './db/tasks.js';
 import { subscribeToNotifications }  from './db/notifications.js';
 import { subscribeToClients }        from './db/clients.js';
+import { subscribeToTickets }        from './db/tickets.js';
 import { Sidebar }                   from './ui/sidebar.js';
 import { Topbar }                    from './ui/topbar.js';
 import { Router }                    from './ui/router.js';
@@ -118,13 +119,13 @@ async function bootWorkspace(workspaceId, workspaceData, user) {
 
   State.set('myRole', role);
 
-  // ── Start Real-time Subscriptions ──
   _activeListeners.push(
     subscribeToMembers(workspaceId),
     subscribeToProjects(workspaceId),
     subscribeToTasks(workspaceId),
     subscribeToNotifications(workspaceId),
-    subscribeToClients(workspaceId)
+    subscribeToClients(workspaceId),
+    subscribeToTickets(workspaceId)
   );
 }
 

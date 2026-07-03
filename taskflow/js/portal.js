@@ -1,13 +1,13 @@
 // ═══════════════════════════════════════════════════
-// TaskFlow v2 — Client Portal JavaScript
-// Standalone module: no auth, read-only Firestore access.
+// TaskFlow v2 — Support Portal JavaScript
+// Standalone module: no auth, read-write Firestore tickets access.
 // ═══════════════════════════════════════════════════
 
 import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, doc, getDoc, collection, query, where, orderBy, getDocs }
+import { getFirestore, doc, getDoc, collection, query, where, orderBy, onSnapshot, addDoc }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ── Firebase Config (Same as main app) ──
+// ── Firebase Config (Production) ──
 const firebaseConfig = {
   apiKey: "AIzaSyAk_YmDpbaedj-McM2K7ALUqkJyIJBKcfM",
   authDomain: "taskflow-e7f24.firebaseapp.com",
@@ -25,6 +25,8 @@ const loaderEl   = document.getElementById('portal-loader');
 const headerEl   = document.getElementById('portal-header');
 const contentEl  = document.getElementById('portal-content');
 const errorEl    = document.getElementById('portal-error');
+const formEl     = document.getElementById('ticket-form');
+const listEl     = document.getElementById('ticket-list');
 
 // ── Parse URL Params ──
 const params = new URLSearchParams(window.location.search);
@@ -33,9 +35,9 @@ const workspaceId = params.get('w');
 
 async function boot() {
   try {
-    // 1. Validate client record exists
     if (!clientId || !workspaceId) throw new Error('Missing parameters');
 
+    // 1. Validate client record
     const clientDoc = await getDoc(doc(db, 'clients', clientId));
     if (!clientDoc.exists()) throw new Error('Client not found');
 
@@ -48,46 +50,70 @@ async function boot() {
 
     const ws = wsDoc.data();
 
-    // 3. Render header
+    // 3. Render header branding
     const logoEl = document.getElementById('portal-logo');
     if (ws.logoURL) {
       logoEl.src = ws.logoURL;
     } else {
       logoEl.style.display = 'none';
     }
-    document.getElementById('portal-title').textContent = `${ws.name} — Tasks`;
-    document.getElementById('portal-subtitle').textContent = `Portal for ${client.name}`;
-    document.title = `${ws.name} — Client Portal`;
+    document.getElementById('portal-title').textContent = `${ws.name} — Support Portal`;
+    document.getElementById('portal-subtitle').textContent = `Client: ${client.name}`;
+    document.title = `${ws.name} — Client Support Portal`;
 
-    // 4. Fetch tasks that belong to this workspace (filtered to client's projects)
-    const projectIds = client.projectIds || [];
-    
-    let tasks = [];
-    if (projectIds.length > 0) {
-      // Fetch tasks per project (Firestore 'in' supports up to 10 items)
-      const batch = [];
-      for (let i = 0; i < projectIds.length; i += 10) {
-        const slice = projectIds.slice(i, i + 10);
-        const q = query(
-          collection(db, 'tasks'),
-          where('workspaceId', '==', workspaceId),
-          where('projectId', 'in', slice)
-        );
-        const snap = await getDocs(q);
-        snap.forEach(d => tasks.push({ id: d.id, ...d.data() }));
+    // 4. Set up realtime listener for tickets
+    const q = query(
+      collection(db, 'tickets'),
+      where('workspaceId', '==', workspaceId),
+      where('clientId', '==', clientId),
+      orderBy('createdAt', 'desc')
+    );
+
+    onSnapshot(q, (snapshot) => {
+      const tickets = [];
+      snapshot.forEach(doc => tickets.push({ id: doc.id, ...doc.data() }));
+      renderTickets(tickets);
+    }, (err) => {
+      console.error("Subscription error: ", err);
+    });
+
+    // 5. Wire up ticket form submission
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const titleInput = document.getElementById('ticket-title');
+      const descInput = document.getElementById('ticket-desc');
+      const btn = document.getElementById('btn-submit-ticket');
+
+      const title = titleInput.value.trim();
+      const description = descInput.value.trim();
+
+      if (!title || !description) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        await addDoc(collection(db, 'tickets'), {
+          title,
+          description,
+          workspaceId,
+          clientId,
+          status: 'pending',
+          createdAt: new Date(),
+          convertedTaskId: null,
+        });
+
+        titleInput.value = '';
+        descInput.value = '';
+        alert('Ticket submitted successfully!');
+      } catch (err) {
+        console.error('Error submitting ticket:', err);
+        alert('Failed to submit ticket. Please try again.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Ticket';
       }
-    } else {
-      // No projects linked → show all tasks in this workspace
-      const q = query(
-        collection(db, 'tasks'),
-        where('workspaceId', '==', workspaceId)
-      );
-      const snap = await getDocs(q);
-      snap.forEach(d => tasks.push({ id: d.id, ...d.data() }));
-    }
-
-    // 5. Render board columns
-    renderBoard(tasks);
+    });
 
     // 6. Show content
     loaderEl.style.display = 'none';
@@ -95,66 +121,58 @@ async function boot() {
     contentEl.classList.remove('hidden');
 
   } catch (err) {
-    console.error('Portal error:', err);
+    console.error('Portal boot error:', err);
     loaderEl.style.display = 'none';
     errorEl.classList.remove('hidden');
   }
 }
 
-function renderBoard(tasks) {
-  const statusMap = {
-    'todo': 'col-todo',
-    'in-progress': 'col-in-progress',
-    'review': 'col-review',
-    'done': 'col-done',
-    'blocked': 'col-todo', // fallback blocked tasks to todo column
+function renderTickets(tickets) {
+  if (tickets.length === 0) {
+    listEl.innerHTML = `<div style="padding: var(--sp-8); text-align: center; color: var(--color-text-muted);">No tickets submitted yet.</div>`;
+    return;
+  }
+
+  const statusLabel = {
+    'pending': 'Pending',
+    'dropped': 'Dropped',
+    'in-progress': 'In Progress',
+    'done': 'Done'
   };
 
-  const counts = { todo: 0, 'in-progress': 0, review: 0, done: 0 };
+  listEl.innerHTML = tickets.map(t => {
+    const d = t.createdAt?.toDate ? t.createdAt.toDate() : new Date(t.createdAt);
+    const dateStr = isNaN(d.getTime()) ? '' : d.toLocaleString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
 
-  tasks.forEach(task => {
-    const colId = statusMap[task.status] || 'col-todo';
-    const colEl = document.getElementById(colId);
-    if (!colEl) return;
+    const cleanStatus = t.status || 'pending';
+    const statusClass = cleanStatus.replace('-', ''); // in-progress -> inprogress
 
-    const countKey = task.status === 'blocked' ? 'todo' : (task.status || 'todo');
-    if (counts[countKey] !== undefined) counts[countKey]++;
-
-    const card = document.createElement('div');
-    card.className = 'portal-card';
-    
-    let priorityBorder = '';
-    if (task.priority === 'critical') priorityBorder = 'border-left:3px solid hsl(0,78%,55%)';
-    else if (task.priority === 'high') priorityBorder = 'border-left:3px solid hsl(25,90%,55%)';
-    
-    let dueDateHtml = '';
-    if (task.dueDate) {
-      const d = task.dueDate.toDate ? task.dueDate.toDate() : new Date(task.dueDate);
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const now = new Date();
-      const isOverdue = d < now && task.status !== 'done';
-      dueDateHtml = `
-        <div style="font-size:11px;font-weight:600;margin-top:6px;color:${isOverdue ? 'hsl(0,78%,55%)' : 'var(--color-text-muted)'};">
-          📅 ${isOverdue ? 'Overdue · ' : ''}${dateStr}
+    return `
+      <div class="ticket-item">
+        <div class="ticket-header">
+          <span class="ticket-title-text">${escapeHtml(t.title)}</span>
+          <span class="badge-status ${statusClass}">${statusLabel[cleanStatus] || cleanStatus}</span>
         </div>
-      `;
-    }
-
-    card.innerHTML = `
-      <div style="font-size:13px;font-weight:500;color:var(--color-text);line-height:1.4;${priorityBorder}${priorityBorder ? ';padding-left:8px' : ''}">
-        ${task.title}
+        <div class="ticket-desc">${escapeHtml(t.description)}</div>
+        <div class="ticket-meta">
+          <span class="ticket-date">Submitted: ${dateStr}</span>
+          ${t.convertedTaskId ? `<span style="font-size:10px; color:var(--color-primary-light); font-weight:600;">Linked to Active Task</span>` : ''}
+        </div>
       </div>
-      ${dueDateHtml}
     `;
+  }).join('');
+}
 
-    colEl.appendChild(card);
-  });
-
-  // Update count badges
-  Object.entries(counts).forEach(([status, count]) => {
-    const el = document.getElementById(`count-${status}`);
-    if (el) el.textContent = count;
-  });
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 boot();

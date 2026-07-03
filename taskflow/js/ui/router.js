@@ -16,6 +16,7 @@ const routes = {
   '#/projects':      () => import('./views/projects.js'),
   '#/team':          () => import('./views/team.js'),
   '#/clients':       () => import('./views/clients.js'),
+  '#/tickets':       () => import('./views/tickets.js'),
   '#/notifications': () => import('./views/notificationsView.js'),
   '#/settings':      () => import('./views/settings.js'),
   '#/profile':       () => import('./views/profile.js'),
