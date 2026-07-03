@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    match /workspaces/{workspaceId}/tasks/{taskId}/{fileName} {
+      // Allow read/write to any authenticated user for simplicity.
+      // In a production environment, you'd check workspace membership via a Cloud Function setting Custom Claims, 
+      // or duplicate member IDs into metadata since Storage rules can't query Firestore natively.
+      allow read, write: if isAuthenticated();
+    }
+    
+  }
+}

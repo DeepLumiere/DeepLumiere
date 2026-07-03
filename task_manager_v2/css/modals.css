@@ -1,0 +1,529 @@
+/* ═══════════════════════════════════════════════════
+   TaskFlow v2 — Modals, Drawers, Overlays
+═══════════════════════════════════════════════════ */
+
+/* ── Modal Overlay ───────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: hsla(222, 22%, 4%, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  animation: fadeIn var(--t-fast) both;
+}
+
+.modal-overlay.closing {
+  animation: fadeOut var(--t-fast) both;
+}
+
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* ── Modal Box ───────────────────────────────────── */
+.modal-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalIn var(--t-bounce) both;
+}
+
+.modal-box.modal-sm { max-width: 400px; }
+.modal-box.modal-lg { max-width: 720px; }
+
+.modal-overlay.closing .modal-box {
+  animation: modalOut var(--t-normal) both;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes modalOut {
+  from { opacity: 1; transform: scale(1)    translateY(0); }
+  to   { opacity: 0; transform: scale(0.95) translateY(8px); }
+}
+
+/* ── Modal Header ────────────────────────────────── */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 1px solid var(--color-border-subtle);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.modal-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.modal-close:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+}
+
+/* ── Modal Body ──────────────────────────────────── */
+.modal-body {
+  padding: var(--sp-6);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ── Modal Footer ────────────────────────────────── */
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-6);
+  border-top: 1px solid var(--color-border-subtle);
+  flex-shrink: 0;
+}
+
+/* ── Confirm Dialog ──────────────────────────────── */
+.confirm-dialog {
+  text-align: center;
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.confirm-dialog__icon {
+  width: 56px;
+  height: 56px;
+  background: var(--color-danger-alpha);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+}
+
+.confirm-dialog__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.confirm-dialog__desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  max-width: 340px;
+}
+
+/* ── Task Drawer ─────────────────────────────────── */
+.drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--sp-5) var(--sp-6);
+  border-bottom: 1px solid var(--color-border-subtle);
+  flex-shrink: 0;
+  gap: var(--sp-3);
+}
+
+.drawer-title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  outline: none;
+  resize: none;
+  line-height: 1.4;
+  border: 1px solid transparent;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.drawer-title-input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface-2);
+}
+
+.drawer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-4) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* ── Drawer Meta Grid ────────────────────────────── */
+.drawer-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+.drawer-meta-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.meta-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-subtle);
+}
+
+/* ── Drawer Section ──────────────────────────────── */
+.drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.drawer-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-subtle);
+}
+
+/* ── Subtasks ────────────────────────────────────── */
+.subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: background var(--t-fast), border-color var(--t-fast);
+  group: subtask-item;
+}
+
+.subtask-item:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-subtle);
+}
+
+.subtask-item.done .subtask-text-el {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.subtask-text-el {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  transition: color var(--t-fast);
+}
+
+.subtask-delete {
+  opacity: 0;
+  transition: opacity var(--t-fast);
+  color: var(--color-text-subtle);
+}
+
+.subtask-item:hover .subtask-delete { opacity: 1; }
+
+.subtask-add-input {
+  background: var(--color-surface-2);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  width: 100%;
+  outline: none;
+  transition: border-color var(--t-fast);
+}
+
+.subtask-add-input:focus {
+  border-color: var(--color-primary);
+  border-style: solid;
+}
+
+/* ── Comments ────────────────────────────────────── */
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.comment-item {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.comment-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-1);
+}
+
+.comment-author {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.comment-time {
+  font-size: 0.6875rem;
+  color: var(--color-text-subtle);
+}
+
+.comment-body {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.comment-mention {
+  color: var(--color-primary-light);
+  font-weight: 500;
+}
+
+.comment-actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.comment-item:hover .comment-actions { opacity: 1; }
+
+.comment-input-wrap {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.comment-textarea {
+  flex: 1;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  min-height: 72px;
+  resize: none;
+  outline: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.comment-textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha);
+}
+
+/* ── Activity Log ────────────────────────────────── */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}
+
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.activity-text {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  flex: 1;
+}
+
+.activity-text strong { color: var(--color-text); font-weight: 600; }
+.activity-time {
+  font-size: 0.6875rem;
+  color: var(--color-text-subtle);
+  white-space: nowrap;
+}
+
+/* ── Attachments ─────────────────────────────────── */
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--sp-3);
+}
+
+.attachment-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  cursor: pointer;
+  transition: border-color var(--t-fast);
+}
+
+.attachment-card:hover { border-color: var(--color-primary); }
+
+.attachment-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.attachment-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: hsla(0, 0%, 0%, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.attachment-card:hover .attachment-card__overlay { opacity: 1; }
+
+.attachment-card__name {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 0 var(--sp-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.attachment-upload-zone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.attachment-upload-zone:hover,
+.attachment-upload-zone.drag-over {
+  border-color: var(--color-primary);
+  background: var(--color-primary-alpha-sm);
+}
+
+/* ── Upload Progress ─────────────────────────────── */
+.upload-progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.upload-progress-bar {
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.2s ease;
+}
+
+/* ── Mention Dropdown ────────────────────────────── */
+.mention-dropdown {
+  position: absolute;
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-dropdown);
+  max-height: 200px;
+  overflow-y: auto;
+  min-width: 200px;
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+
+.mention-item:hover,
+.mention-item.selected { background: var(--color-surface-4); }
+
+@media (max-width: 768px) {
+  .modal-box { max-width: 100%; border-radius: var(--radius-lg); }
+  .drawer-meta-grid { grid-template-columns: 1fr; }
+}
