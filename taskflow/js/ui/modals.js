@@ -3,7 +3,8 @@
 // ═══════════════════════════════════════════════════
 
 import { State } from '../store/state.js';
-import { createWorkspace } from '../db/workspaces.js';
+import { createWorkspace, getWorkspace } from '../db/workspaces.js';
+import { addMember } from '../db/members.js';
 import { createTask } from '../db/tasks.js';
 import { Toast } from './toast.js';
 
@@ -64,20 +65,33 @@ export const Modals = {
   async openCreateWorkspace() {
     const html = `
       <div class="modal-header">
-        <h2 class="modal-title">Create Workspace</h2>
+        <h2 class="modal-title">Get Started</h2>
         <button class="modal-close" data-dismiss="modal">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Workspace Name</label>
-          <input type="text" class="form-input" id="ws-name-input" placeholder="e.g. Acme Corp" autofocus>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:var(--sp-4);">
+        <div class="form-group mb-0">
+          <label class="form-label">Create a New Workspace</label>
+          <div class="flex gap-2">
+            <input type="text" class="form-input" id="ws-name-input" placeholder="e.g. Acme Corp" autofocus style="flex:1;">
+            <button class="btn btn-primary" id="btn-submit-ws">Create</button>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" data-dismiss="modal">Cancel</button>
-        <button class="btn btn-primary" id="btn-submit-ws">Create Workspace</button>
+        
+        <div style="display:flex; align-items:center; gap:var(--sp-3);">
+          <div style="flex:1; height:1px; background:var(--color-border-subtle);"></div>
+          <span style="font-size:0.75rem; color:var(--color-text-muted); text-transform:uppercase; font-weight:600;">OR</span>
+          <div style="flex:1; height:1px; background:var(--color-border-subtle);"></div>
+        </div>
+        
+        <div class="form-group mb-0">
+          <label class="form-label">Join an Existing Workspace</label>
+          <div class="flex gap-2">
+            <input type="text" class="form-input" id="ws-join-input" placeholder="Paste Workspace ID here" style="flex:1;">
+            <button class="btn btn-primary" id="btn-submit-join">Join</button>
+          </div>
+        </div>
       </div>
     `;
 
@@ -85,25 +99,54 @@ export const Modals = {
 
     // Wait for DOM paint
     setTimeout(() => {
-      const input = document.getElementById('ws-name-input');
-      const submit = document.getElementById('btn-submit-ws');
-      if (input) input.focus();
+      const inputCreate = document.getElementById('ws-name-input');
+      const submitCreate = document.getElementById('btn-submit-ws');
+      const inputJoin = document.getElementById('ws-join-input');
+      const submitJoin = document.getElementById('btn-submit-join');
+      
+      if (inputCreate) inputCreate.focus();
 
-      submit.addEventListener('click', async () => {
-        const name = input.value.trim();
+      submitCreate.addEventListener('click', async () => {
+        const name = inputCreate.value.trim();
         if (!name) return;
-        submit.disabled = true;
-        submit.textContent = 'Creating...';
+        submitCreate.disabled = true;
+        submitCreate.textContent = '...';
         
         try {
           const ws = await createWorkspace(name);
           Toast.show('Workspace created!', 'success');
           this.close(ws);
-          // App.js should handle switching to it
         } catch (err) {
           console.error(err);
           Toast.show('Failed to create workspace.', 'error');
-          submit.disabled = false;
+          submitCreate.disabled = false;
+          submitCreate.textContent = 'Create';
+        }
+      });
+      
+      submitJoin.addEventListener('click', async () => {
+        const wsId = inputJoin.value.trim();
+        if (!wsId) return;
+        submitJoin.disabled = true;
+        submitJoin.textContent = '...';
+        
+        try {
+          const ws = await getWorkspace(wsId);
+          if (!ws) {
+            Toast.show('Workspace not found.', 'error');
+            submitJoin.disabled = false;
+            submitJoin.textContent = 'Join';
+            return;
+          }
+          
+          await addMember(wsId, State.get('user'), 'Member');
+          Toast.show('Joined workspace!', 'success');
+          this.close(ws);
+        } catch (err) {
+          console.error(err);
+          Toast.show('Failed to join workspace. Invalid ID or permissions.', 'error');
+          submitJoin.disabled = false;
+          submitJoin.textContent = 'Join';
         }
       });
     }, 0);

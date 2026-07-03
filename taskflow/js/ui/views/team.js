@@ -22,10 +22,13 @@ export async function render(container) {
         <h1 class="view-title">Team Members</h1>
         <p class="text-sm text-muted mt-1">Manage workspace access and roles.</p>
       </div>
-      <button class="btn btn-primary" id="btn-invite">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-        Invite Member
-      </button>
+      <div class="flex gap-2">
+        <input type="email" id="invite-email-input" class="form-input btn-sm" placeholder="Email address..." style="width: 200px;">
+        <button class="btn btn-primary btn-sm" id="btn-invite">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Invite
+        </button>
+      </div>
     </div>
     <div class="view-container">
       <div class="card p-0" style="overflow:hidden;">
@@ -47,31 +50,36 @@ export async function render(container) {
   `;
 
   document.getElementById('btn-invite').addEventListener('click', async () => {
-    const email = prompt('Enter email address to invite:');
-    if (email) {
-      try {
-        const wsName = State.get('currentWorkspace').name;
-        Toast.show('Sending invite...', 'info');
-        
-        const message = await window.Email.send({
-          Host : "smtp.gmail.com",
-          Username : "dudecomputerscience@gmail.com",
-          Password : "hqxv gmmr drsh auof",
-          To : email,
-          From : "dudecomputerscience@gmail.com",
-          Subject : `You have been invited to join ${wsName} on TaskFlow`,
-          Body : `Hello!<br><br>You have been invited to join the workspace <b>${wsName}</b> on TaskFlow.<br>Click here to join: <a href="${window.location.origin}${window.location.pathname}">TaskFlow App</a><br><br>Regards,<br>TaskFlow Team`
-        });
-        
-        if (message === 'OK') {
-          Toast.show('Invitation sent successfully!', 'success');
-        } else {
-          Toast.show(`Failed to send: ${message}`, 'error');
-        }
-      } catch (err) {
-        console.error(err);
-        Toast.show('Error sending invitation', 'error');
+    const input = document.getElementById('invite-email-input');
+    const email = input.value.trim();
+    if (!email) {
+      Toast.show('Please enter an email address', 'warning');
+      return;
+    }
+    
+    try {
+      const wsName = State.get('currentWorkspace').name;
+      Toast.show('Sending invite...', 'info');
+      
+      const message = await window.Email.send({
+        Host : "smtp.gmail.com",
+        Username : "dudecomputerscience@gmail.com",
+        Password : "hqxv gmmr drsh auof",
+        To : email,
+        From : "dudecomputerscience@gmail.com",
+        Subject : `You have been invited to join ${wsName} on TaskFlow`,
+        Body : `Hello!<br><br>You have been invited to join the workspace <b>${wsName}</b> on TaskFlow.<br>Click here to join: <a href="${window.location.origin}${window.location.pathname}">TaskFlow App</a><br><br>Regards,<br>TaskFlow Team`
+      });
+      
+      if (message === 'OK') {
+        Toast.show('Invitation sent successfully!', 'success');
+        input.value = '';
+      } else {
+        Toast.show(`Failed to send: ${message}`, 'error');
       }
+    } catch (err) {
+      console.error(err);
+      Toast.show('Error sending invitation', 'error');
     }
   });
 

@@ -51,7 +51,7 @@ service cloud.firestore {
     // 2. Workspaces
     match /workspaces/{workspaceId} {
       allow create: if isAuthenticated();
-      allow read: if isWorkspaceMember(workspaceId);
+      allow read: if isAuthenticated();
       allow update: if isOwner(workspaceId);
       allow delete: if false; // Too dangerous from client
     }
@@ -60,8 +60,8 @@ service cloud.firestore {
     match /workspace_members/{memberId} {
       // memberId is formatted as workspaceId_userId
       
-      // Anyone in the workspace can read the member list
-      allow read: if isWorkspaceMember(resource.data.workspaceId);
+      // Anyone in the workspace can read the member list, or a user can read their own membership
+      allow read: if (isAuthenticated() && resource.data.userId == request.auth.uid) || isWorkspaceMember(resource.data.workspaceId);
       
       // A user can create a member document if they just created the workspace (they are the Owner)
       allow create: if isAuthenticated(); // More complex validation omitted for brevity, rely on app logic for invites

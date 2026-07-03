@@ -21,10 +21,13 @@ export async function render(container) {
         <h1 class="view-title">Clients & Portals</h1>
         <p class="text-sm text-muted mt-1">Manage external clients and portal access links.</p>
       </div>
-      <button class="btn btn-primary" id="btn-new-client">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Client
-      </button>
+      <div class="flex gap-2">
+        <input type="text" id="new-client-name" class="form-input btn-sm" placeholder="Client Name..." style="width: 200px;">
+        <button class="btn btn-primary btn-sm" id="btn-new-client">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Client
+        </button>
+      </div>
     </div>
     <div class="view-container">
       <div class="card p-0" style="overflow:hidden;">
@@ -46,14 +49,18 @@ export async function render(container) {
   `;
 
   document.getElementById('btn-new-client').addEventListener('click', async () => {
-    const name = prompt('Enter Client Name:');
-    if (name) {
-      try {
-        await createClient(State.get('currentWorkspace').id, { name, projectIds: [] });
-        Toast.show('Client created', 'success');
-      } catch(e) {
-        Toast.show('Error creating client', 'error');
-      }
+    const input = document.getElementById('new-client-name');
+    const name = input.value.trim();
+    if (!name) {
+      Toast.show('Please enter a client name', 'warning');
+      return;
+    }
+    try {
+      await createClient(State.get('currentWorkspace').id, { name, projectIds: [] });
+      Toast.show('Client created', 'success');
+      input.value = '';
+    } catch(e) {
+      Toast.show('Error creating client', 'error');
     }
   });
 

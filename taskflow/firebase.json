@@ -17,15 +17,27 @@
     "headers": [
       {
         "source": "**/*.js",
-        "headers": [{ "key": "Cache-Control", "value": "max-age=3600" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          }
+        ]
       },
       {
         "source": "**/*.css",
-        "headers": [{ "key": "Cache-Control", "value": "max-age=86400" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=86400"
+          }
+        ]
       }
     ]
   },
   "firestore": {
+    "database": "(default)",
+    "location": "nam5",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },

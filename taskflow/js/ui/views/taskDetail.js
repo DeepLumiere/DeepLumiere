@@ -102,7 +102,7 @@ function renderContent(task) {
     <div class="drawer-header">
       <div style="flex:1; min-width:0; margin-top: 8px;">
         ${project ? `<div class="text-xs font-semibold text-muted mb-1 uppercase tracking-wide">${project.name}</div>` : ''}
-        <textarea id="drawer-title" class="drawer-title-input" rows="1" ${!canEdit ? 'readonly' : ''}>${task.title}</textarea>
+        <textarea id="drawer-title" class="drawer-title-input" rows="1" ${!canEdit ? 'readonly' : ''} style="font-size: 1.5rem; padding-left: 0;">${task.title}</textarea>
       </div>
       <div class="drawer-header-actions">
         <!-- Delete Button -->
@@ -119,77 +119,118 @@ function renderContent(task) {
     </div>
     
     <div class="drawer-body">
-      <!-- Meta Grid -->
-      <div class="drawer-meta-grid">
-        <div class="drawer-meta-row">
-          <span class="meta-label">Status</span>
-          <select class="form-select btn-sm" id="select-status" ${!canEdit ? 'disabled' : ''} style="width:auto; min-width:130px; font-weight: 500;">
-            <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>Todo</option>
-            <option value="inprogress" ${task.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
-            <option value="inreview" ${task.status === 'inreview' ? 'selected' : ''}>In Review</option>
-            <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
-          </select>
-        </div>
-        <div class="drawer-meta-row">
-          <span class="meta-label">Assignee</span>
-          <select class="form-select btn-sm" id="select-assignee" ${!canEdit ? 'disabled' : ''} style="width:auto; min-width:130px; font-weight: 500;">
-            <option value="">Unassigned</option>
-            ${members.map(m => `
-              <option value="${m.userId}" ${task.assigneeId === m.userId ? 'selected' : ''}>${m.name}</option>
-            `).join('')}
-          </select>
-        </div>
-        <div class="drawer-meta-row">
-          <span class="meta-label">Due Date</span>
-          <input type="date" class="form-input btn-sm" id="drawer-due" value="${formatDateForInput(task.dueDate)}" ${!canEdit ? 'readonly' : ''} style="max-width: 140px; border-color:transparent; background:var(--color-surface-2);">
-        </div>
-        <div class="drawer-meta-row">
-          <span class="meta-label">Priority</span>
-          <select class="form-select btn-sm" id="select-priority" ${!canEdit ? 'disabled' : ''} style="width:auto; min-width:130px; font-weight: 500;">
-            <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
-            <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
-            <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
-            <option value="critical" ${task.priority === 'critical' ? 'selected' : ''}>Critical</option>
-          </select>
-        </div>
-      </div>
+      <div class="drawer-layout">
+        <!-- Main Content Area -->
+        <div class="drawer-main">
+          
+          <!-- Description -->
+          <div class="drawer-section">
+            <textarea id="drawer-desc" class="form-textarea" placeholder="Add a more detailed description..." ${!canEdit ? 'readonly' : ''} style="border-color:transparent; background:var(--color-surface-2); min-height: 120px; font-size: 0.9375rem;">${task.description || ''}</textarea>
+          </div>
 
-      <!-- Description -->
-      <div class="drawer-section">
-        <div class="drawer-section-title">Description</div>
-        <textarea id="drawer-desc" class="form-textarea" placeholder="Add a more detailed description..." ${!canEdit ? 'readonly' : ''}>${task.description || ''}</textarea>
-      </div>
+          <!-- Subtasks Placeholder -->
+          <div class="drawer-section">
+            <div class="drawer-section-header mb-2">
+              <span class="drawer-section-title">Subtasks</span>
+            </div>
+            <div id="subtasks-container" class="subtask-list">
+              <div class="subtask-item">
+                <input type="checkbox" style="cursor:pointer;">
+                <span class="subtask-text-el">Design the new layout mockups</span>
+              </div>
+              <div class="subtask-item done">
+                <input type="checkbox" checked style="cursor:pointer;">
+                <span class="subtask-text-el">Gather user feedback</span>
+              </div>
+              ${canEdit ? `<input type="text" class="subtask-add-input mt-2" placeholder="+ Add a subtask...">` : ''}
+            </div>
+          </div>
 
-      <!-- Subtasks Placeholder -->
-      <div class="drawer-section">
-        <div class="drawer-section-header">
-          <span class="drawer-section-title">Subtasks</span>
-        </div>
-        <div id="subtasks-container">
-          <div class="text-sm text-muted">Subtasks will load here...</div>
-        </div>
-      </div>
+          <!-- Attachments Placeholder -->
+          <div class="drawer-section mt-2">
+            <div class="drawer-section-header mb-2">
+              <span class="drawer-section-title">Attachments</span>
+            </div>
+            <div id="attachments-container">
+              <div class="attachment-upload-zone" id="btn-upload">
+                <div class="text-sm text-muted">Drag & drop files or click to upload</div>
+              </div>
+            </div>
+          </div>
 
-      <!-- Attachments Placeholder -->
-      <div class="drawer-section">
-        <div class="drawer-section-header">
-          <span class="drawer-section-title">Attachments</span>
+          <!-- Comments Placeholder -->
+          <div class="drawer-section mt-6">
+            <div class="drawer-section-header mb-3">
+              <span class="drawer-section-title">Activity</span>
+            </div>
+            <div id="comments-container" class="comment-list">
+               <div class="comment-item">
+                 <div class="avatar avatar-sm bg-primary text-white">AJ</div>
+                 <div class="comment-content">
+                   <div class="comment-header">
+                     <span class="comment-author">Alice Johnson</span>
+                     <span class="comment-time">2 hours ago</span>
+                   </div>
+                   <div class="comment-body">I will take a look at this task this afternoon!</div>
+                 </div>
+               </div>
+               ${canEdit ? `
+               <div class="comment-item mt-4">
+                 <div class="avatar avatar-sm" style="background:var(--color-surface-3);"></div>
+                 <div class="comment-content">
+                   <textarea class="comment-textarea" placeholder="Write a comment..."></textarea>
+                   <div class="flex justify-end mt-2">
+                     <button class="btn btn-primary btn-sm">Comment</button>
+                   </div>
+                 </div>
+               </div>
+               ` : ''}
+            </div>
+          </div>
         </div>
-        <div id="attachments-container">
-          <div class="attachment-upload-zone" id="btn-upload">
-            <div class="text-sm text-muted">Drag & drop files or click to upload</div>
+
+        <!-- Sidebar (Metadata) -->
+        <div class="drawer-sidebar">
+          <div class="drawer-property-list">
+            
+            <div class="drawer-property-row">
+              <span class="meta-label">Status</span>
+              <select class="drawer-property-pill" id="select-status" ${!canEdit ? 'disabled' : ''}>
+                <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>Todo</option>
+                <option value="inprogress" ${task.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
+                <option value="inreview" ${task.status === 'inreview' ? 'selected' : ''}>In Review</option>
+                <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
+              </select>
+            </div>
+            
+            <div class="drawer-property-row">
+              <span class="meta-label">Assignee</span>
+              <select class="drawer-property-pill" id="select-assignee" ${!canEdit ? 'disabled' : ''}>
+                <option value="">Unassigned</option>
+                ${members.map(m => `
+                  <option value="${m.userId}" ${task.assigneeId === m.userId ? 'selected' : ''}>${m.name}</option>
+                `).join('')}
+              </select>
+            </div>
+            
+            <div class="drawer-property-row">
+              <span class="meta-label">Priority</span>
+              <select class="drawer-property-pill" id="select-priority" ${!canEdit ? 'disabled' : ''}>
+                <option value="low" ${task.priority === 'low' ? 'selected' : ''}>Low</option>
+                <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
+                <option value="critical" ${task.priority === 'critical' ? 'selected' : ''}>Critical</option>
+              </select>
+            </div>
+
+            <div class="drawer-property-row">
+              <span class="meta-label">Due Date</span>
+              <input type="date" class="drawer-property-pill" id="drawer-due" value="${formatDateForInput(task.dueDate)}" ${!canEdit ? 'readonly' : ''}>
+            </div>
+            
           </div>
         </div>
       </div>
-
-      <!-- Comments Placeholder -->
-      <div class="drawer-section mt-4">
-        <div class="drawer-section-title mb-2">Activity</div>
-        <div id="comments-container">
-           <div class="text-sm text-muted">Activity will load here...</div>
-        </div>
-      </div>
-      
     </div>
   `;
 
