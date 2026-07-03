@@ -65,6 +65,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ─── Global Loading Spinner ─────────────────────────────────── */
+.global-loader {
+  position: fixed; inset: 0; background: var(--bg); z-index: 10000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.5s ease;
+}
+.global-loader.hidden { opacity: 0; pointer-events: none; }
+.spinner {
+  width: 48px; height: 48px; border: 4px solid rgba(138, 120, 254, 0.2);
+  border-top-color: var(--primary); border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 24px;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
 /* ─── Typography & Utilities ─────────────────────────────────── */
 h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; color: var(--text); line-height: 1.2; }
 h1 { font-size: 32px; letter-spacing: -0.03em; }
