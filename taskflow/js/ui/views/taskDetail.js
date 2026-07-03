@@ -4,8 +4,10 @@
 
 import { State } from '../../store/state.js';
 import { updateTask, getTask, deleteTask } from '../../db/tasks.js';
+import { createSubtask, updateSubtask, deleteSubtask, subscribeToSubtasks } from '../../db/subtasks.js';
+import { addComment, subscribeToComments } from '../../db/comments.js';
 import { Permissions } from '../../auth/permissions.js';
-import { formatShortDate, formatDate } from '../../utils/helpers.js';
+import { formatShortDate, formatDate, timeAgo, getInitials, stringToColor } from '../../utils/helpers.js';
 import { StatusBadge, PriorityBadge } from '../components/badges.js';
 import { Router } from '../router.js';
 import { Toast } from '../toast.js';
@@ -14,6 +16,8 @@ let _taskId = null;
 let _drawerEl = null;
 let _overlayEl = null;
 let _unsubTask = null;
+let _unsubSubtasks = null;
+let _unsubComments = null;
 
 export async function openDrawer(taskId) {
   _taskId = taskId;
@@ -49,6 +53,14 @@ export async function openDrawer(taskId) {
     }
   });
 
+  _unsubSubtasks = subscribeToSubtasks(taskId, (subtasks) => {
+    renderSubtasks(subtasks, canEdit);
+  });
+
+  _unsubComments = subscribeToComments(taskId, (comments) => {
+    renderComments(comments, canEdit);
+  });
+
   State.set('currentTask', task); // triggers initial render
   
   bindEvents();
@@ -62,6 +74,14 @@ export function closeDrawer(updateHash = true) {
   if (_unsubTask) {
     _unsubTask();
     _unsubTask = null;
+  }
+  if (_unsubSubtasks) {
+    _unsubSubtasks();
+    _unsubSubtasks = null;
+  }
+  if (_unsubComments) {
+    _unsubComments();
+    _unsubComments = null;
   }
   
   State.set('currentTask', null);
@@ -134,16 +154,9 @@ function renderContent(task) {
               <span class="drawer-section-title">Subtasks</span>
             </div>
             <div id="subtasks-container" class="subtask-list">
-              <div class="subtask-item">
-                <input type="checkbox" style="cursor:pointer;">
-                <span class="subtask-text-el">Design the new layout mockups</span>
-              </div>
-              <div class="subtask-item done">
-                <input type="checkbox" checked style="cursor:pointer;">
-                <span class="subtask-text-el">Gather user feedback</span>
-              </div>
-              ${canEdit ? `<input type="text" class="subtask-add-input mt-2" placeholder="+ Add a subtask...">` : ''}
+              <!-- Rendered via JS -->
             </div>
+            ${canEdit ? `<input type="text" class="subtask-add-input mt-2" id="input-add-subtask" placeholder="+ Add a subtask...">` : ''}
           </div>
 
           <!-- Attachments Placeholder -->
@@ -164,28 +177,19 @@ function renderContent(task) {
               <span class="drawer-section-title">Activity</span>
             </div>
             <div id="comments-container" class="comment-list">
-               <div class="comment-item">
-                 <div class="avatar avatar-sm bg-primary text-white">AJ</div>
-                 <div class="comment-content">
-                   <div class="comment-header">
-                     <span class="comment-author">Alice Johnson</span>
-                     <span class="comment-time">2 hours ago</span>
-                   </div>
-                   <div class="comment-body">I will take a look at this task this afternoon!</div>
-                 </div>
-               </div>
-               ${canEdit ? `
-               <div class="comment-item mt-4">
-                 <div class="avatar avatar-sm" style="background:var(--color-surface-3);"></div>
-                 <div class="comment-content">
-                   <textarea class="comment-textarea" placeholder="Write a comment..."></textarea>
-                   <div class="flex justify-end mt-2">
-                     <button class="btn btn-primary btn-sm">Comment</button>
-                   </div>
-                 </div>
-               </div>
-               ` : ''}
+               <!-- Rendered via JS -->
             </div>
+            ${canEdit ? `
+            <div class="comment-item mt-4">
+              <div class="avatar avatar-sm" style="background:var(--color-surface-3);"></div>
+              <div class="comment-content">
+                <textarea id="input-add-comment" class="comment-textarea" placeholder="Write a comment..."></textarea>
+                <div class="flex justify-end mt-2">
+                  <button id="btn-add-comment" class="btn btn-primary btn-sm">Comment</button>
+                </div>
+              </div>
+            </div>
+            ` : ''}
           </div>
         </div>
 
@@ -315,8 +319,97 @@ function renderContent(task) {
     });
   }
 
-  // Load sub-modules (Subtasks, Comments, Attachments)
-  // For brevity in this architectural phase, we would mount them here.
+  // Bind Add Subtask
+  const addSubtaskInput = document.getElementById('input-add-subtask');
+  if (addSubtaskInput && canEdit) {
+    addSubtaskInput.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        const val = addSubtaskInput.value.trim();
+        if (!val) return;
+        addSubtaskInput.disabled = true;
+        try {
+          await createSubtask(task.id, val);
+          addSubtaskInput.value = '';
+        } catch (err) {
+          Toast.show('Failed to add subtask', 'error');
+        }
+        addSubtaskInput.disabled = false;
+        addSubtaskInput.focus();
+      }
+    });
+  }
+
+  // Bind Add Comment
+  const addCommentBtn = document.getElementById('btn-add-comment');
+  const addCommentInput = document.getElementById('input-add-comment');
+  if (addCommentBtn && addCommentInput && canEdit) {
+    addCommentBtn.addEventListener('click', async () => {
+      const val = addCommentInput.value.trim();
+      if (!val) return;
+      addCommentBtn.disabled = true;
+      try {
+        await addComment(task.workspaceId, task.id, val);
+        addCommentInput.value = '';
+      } catch (err) {
+        Toast.show('Failed to add comment', 'error');
+      }
+      addCommentBtn.disabled = false;
+    });
+  }
+}
+
+function renderSubtasks(subtasks, canEdit) {
+  const container = document.getElementById('subtasks-container');
+  if (!container) return;
+  if (subtasks.length === 0) {
+    container.innerHTML = `<div class="text-sm text-muted">No subtasks yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = subtasks.map(st => `
+    <div class="subtask-item ${st.isDone ? 'done' : ''}">
+      <input type="checkbox" data-id="${st.id}" ${st.isDone ? 'checked' : ''} ${!canEdit ? 'disabled' : ''} style="cursor:pointer;">
+      <span class="subtask-text-el">${escapeHtml(st.title)}</span>
+      ${canEdit ? `<button class="btn-icon subtask-delete" data-id="${st.id}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+    </div>
+  `).join('');
+
+  if (canEdit) {
+    container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        updateSubtask(cb.dataset.id, { isDone: cb.checked });
+      });
+    });
+    container.querySelectorAll('.subtask-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deleteSubtask(btn.dataset.id);
+      });
+    });
+  }
+}
+
+function renderComments(comments, canEdit) {
+  const container = document.getElementById('comments-container');
+  if (!container) return;
+  if (comments.length === 0) {
+    container.innerHTML = `<div class="text-sm text-muted">No activity yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = comments.map(c => `
+    <div class="comment-item">
+      <div class="avatar avatar-sm" style="background:${c.authorPhoto ? 'transparent' : stringToColor(c.authorName)}">
+        ${c.authorPhoto ? `<img src="${c.authorPhoto}" style="width:100%;height:100%;object-fit:cover"/>` : getInitials(c.authorName)}
+      </div>
+      <div class="comment-content">
+        <div class="comment-header">
+          <span class="comment-author">${escapeHtml(c.authorName)}</span>
+          <span class="comment-time">${timeAgo(c.createdAt)}</span>
+        </div>
+        <div class="comment-body">${escapeHtml(c.content)}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function bindEvents() {
@@ -346,4 +439,11 @@ function formatDateForInput(ts) {
   if (!ts) return '';
   const d = ts.toDate ? ts.toDate() : new Date(ts);
   return d.toISOString().split('T')[0];
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }

@@ -104,7 +104,8 @@ export const Router = {
     `;
 
     // ── Load and Render View ──
-    const importFn = routes[hash];
+    const routeKey = hash.split('?')[0];
+    const importFn = routes[routeKey];
     
     if (importFn) {
       try {
