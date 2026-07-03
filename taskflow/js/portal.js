@@ -9,12 +9,12 @@ import { getFirestore, doc, getDoc, collection, query, where, orderBy, getDocs }
 
 // ── Firebase Config (Same as main app) ──
 const firebaseConfig = {
-  apiKey: "AIzaSyDummyKeyForTaskFlowV2Implementation",
-  authDomain: "taskflow-v2.firebaseapp.com",
-  projectId: "taskflow-v2",
-  storageBucket: "taskflow-v2.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890abcdef"
+  apiKey: "AIzaSyAk_YmDpbaedj-McM2K7ALUqkJyIJBKcfM",
+  authDomain: "taskflow-e7f24.firebaseapp.com",
+  projectId: "taskflow-e7f24",
+  storageBucket: "taskflow-e7f24.firebasestorage.app",
+  messagingSenderId: "431732571375",
+  appId: "1:431732571375:web:b14d105be4058b0e79af1a"
 };
 
 const app = initializeApp(firebaseConfig);
