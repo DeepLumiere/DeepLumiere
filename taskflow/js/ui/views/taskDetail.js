@@ -201,8 +201,8 @@ function renderContent(task) {
               <span class="meta-label">Status</span>
               <select class="drawer-property-pill" id="select-status" ${!canEdit ? 'disabled' : ''}>
                 <option value="todo" ${task.status === 'todo' ? 'selected' : ''}>Todo</option>
-                <option value="inprogress" ${task.status === 'inprogress' ? 'selected' : ''}>In Progress</option>
-                <option value="inreview" ${task.status === 'inreview' ? 'selected' : ''}>In Review</option>
+                <option value="in-progress" ${task.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                <option value="review" ${task.status === 'review' ? 'selected' : ''}>In Review</option>
                 <option value="done" ${task.status === 'done' ? 'selected' : ''}>Done</option>
               </select>
             </div>

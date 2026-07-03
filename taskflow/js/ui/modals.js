@@ -274,5 +274,53 @@ export const Modals = {
         if (btn) btn.addEventListener('click', () => this.close(true));
       }, 0);
     });
+  },
+
+  async prompt(title, desc, placeholder = '') {
+    const html = `
+      <div class="modal-header">
+        <h2 class="modal-title">${title}</h2>
+        <button class="modal-close" data-dismiss="modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" style="display:flex; flex-direction:column; gap:var(--sp-4);">
+        <div class="form-group mb-0">
+          <label class="form-label">${desc}</label>
+          <div class="flex gap-2">
+            <input type="text" class="form-input" id="prompt-input" placeholder="${placeholder}" autofocus style="flex:1;">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-prompt">Submit</button>
+      </div>
+    `;
+
+    return new Promise((resolve) => {
+      this.open(html, { size: 'sm' }).then(res => {
+        if (res !== true) resolve(null); // Cancelled
+      });
+
+      setTimeout(() => {
+        const input = document.getElementById('prompt-input');
+        const submit = document.getElementById('btn-submit-prompt');
+        if (input) input.focus();
+
+        if (submit && input) {
+          submit.addEventListener('click', () => {
+            resolve(input.value.trim());
+            this.close(true);
+          });
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              resolve(input.value.trim());
+              this.close(true);
+            }
+          });
+        }
+      }, 0);
+    });
   }
 };

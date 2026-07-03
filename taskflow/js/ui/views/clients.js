@@ -22,7 +22,6 @@ export async function render(container) {
         <p class="text-sm text-muted mt-1">Manage external clients and portal access links.</p>
       </div>
       <div class="flex gap-2">
-        <input type="text" id="new-client-name" class="form-input btn-sm" placeholder="Client Name..." style="width: 200px;">
         <button class="btn btn-primary btn-sm" id="btn-new-client">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           New Client
@@ -49,16 +48,13 @@ export async function render(container) {
   `;
 
   document.getElementById('btn-new-client').addEventListener('click', async () => {
-    const input = document.getElementById('new-client-name');
-    const name = input.value.trim();
-    if (!name) {
-      Toast.show('Please enter a client name', 'warning');
-      return;
-    }
+    const modals = await import('../modals.js');
+    const name = await modals.Modals.prompt('New Client', 'Client Name', 'e.g., Acme Corp');
+    if (!name) return; // cancelled or empty
+
     try {
       await createClient(State.get('currentWorkspace').id, { name, projectIds: [] });
       Toast.show('Client created', 'success');
-      input.value = '';
     } catch(e) {
       Toast.show('Error creating client', 'error');
     }

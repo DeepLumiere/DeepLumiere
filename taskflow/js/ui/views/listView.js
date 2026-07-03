@@ -55,6 +55,7 @@ export async function render(container) {
                 ${memOptions}
               </select>
             </div>
+
             <div class="form-group">
               <label class="form-label">Priority</label>
               <select class="form-select" id="itask-priority">

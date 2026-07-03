@@ -126,9 +126,9 @@ function updateDashboard() {
       .filter(t => t.status !== 'done')
       .sort((a, b) => {
         if (a.dueDate && b.dueDate) {
-          const dA = a.dueDate.toDate ? a.dueDate.toDate() : new Date(a.dueDate);
-          const dB = b.dueDate.toDate ? b.dueDate.toDate() : new Date(b.dueDate);
-          return dA - dB;
+          const dA = (a.dueDate.toDate ? a.dueDate.toDate() : new Date(a.dueDate)).getTime();
+          const dB = (b.dueDate.toDate ? b.dueDate.toDate() : new Date(b.dueDate)).getTime();
+          if (!isNaN(dA) && !isNaN(dB)) return dA - dB;
         }
         if (a.dueDate) return -1;
         if (b.dueDate) return 1;
