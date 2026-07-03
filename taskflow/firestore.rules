@@ -8,12 +8,13 @@ service cloud.firestore {
     }
     
     function getUserTeamDoc(orgId) {
-      return get(/databases/$(database)/documents/team/$("tm_" + orgId + "_" + request.auth.uid));
+      let teamId = "tm_" + orgId + "_" + request.auth.uid;
+      return get(/databases/$(database)/documents/team/$(teamId));
     }
     
     function getUserRole(orgId) {
-      let teamDoc = getUserTeamDoc(orgId);
-      return teamDoc != null ? teamDoc.data.role : 'None';
+      let teamId = "tm_" + orgId + "_" + request.auth.uid;
+      return exists(/databases/$(database)/documents/team/$(teamId)) ? get(/databases/$(database)/documents/team/$(teamId)).data.role : 'None';
     }
     
     function isAdminOrOwner(orgId) {
@@ -22,8 +23,8 @@ service cloud.firestore {
     }
     
     function isInOrg(orgId) {
-      let teamDoc = getUserTeamDoc(orgId);
-      return teamDoc != null && teamDoc.data.orgId == orgId;
+      let teamId = "tm_" + orgId + "_" + request.auth.uid;
+      return exists(/databases/$(database)/documents/team/$(teamId)) && get(/databases/$(database)/documents/team/$(teamId)).data.orgId == orgId;
     }
 
     // Rules
@@ -61,17 +62,18 @@ service cloud.firestore {
     // Tickets
     match /tickets/{ticketId} {
       allow create: if (isAuthenticated() && isInOrg(request.resource.data.orgId)) || 
-                       (request.resource.data.source == 'portal' && exists(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)) && get(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)).data.orgId == request.resource.data.orgId);
+                       (request.resource.data.source == 'portal' && request.resource.data.clientToken != null && request.resource.data.clientToken != '' && exists(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)) && get(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)).data.orgId == request.resource.data.orgId);
       
       // All workspace members can read tasks, and portal clients can read theirs
       allow read: if (isAuthenticated() && isInOrg(resource.data.orgId)) || 
-                     (resource.data.source == 'portal' && resource.data.clientToken != null && exists(/databases/$(database)/documents/clients/$(resource.data.clientToken)));
+                     (resource.data.source == 'portal' && resource.data.clientToken != null && resource.data.clientToken != '' && exists(/databases/$(database)/documents/clients/$(resource.data.clientToken)));
       
       // Only admins or assignees can edit
       allow update: if isAuthenticated() && isInOrg(resource.data.orgId) && (
         isAdminOrOwner(resource.data.orgId) || 
         resource.data.assignee == "tm_" + resource.data.orgId + "_" + request.auth.uid || 
-        resource.data.assignee == ""
+        resource.data.assignee == "" ||
+        request.resource.data.status != resource.data.status // allow status updates by anyone in org
       );
       
       allow delete: if isAuthenticated() && isAdminOrOwner(resource.data.orgId);
