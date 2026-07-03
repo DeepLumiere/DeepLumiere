@@ -42,7 +42,7 @@ service cloud.firestore {
     
     // Team Members
     match /team/{teamId} {
-      allow read: if isAuthenticated() && (isInOrg(resource.data.orgId) || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email);
+      allow read: if isAuthenticated() && (resource.data.email == request.auth.token.email || resource.data.uid == request.auth.uid || isInOrg(resource.data.orgId));
       allow write: if isAuthenticated() && (isAdminOrOwner(request.resource.data.orgId) || request.auth.uid == request.resource.data.uid);
     }
     
@@ -61,11 +61,11 @@ service cloud.firestore {
     // Tickets
     match /tickets/{ticketId} {
       allow create: if (isAuthenticated() && isInOrg(request.resource.data.orgId)) || 
-                       (request.resource.data.source == 'portal' && get(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)).data.orgId == request.resource.data.orgId);
+                       (request.resource.data.source == 'portal' && exists(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)) && get(/databases/$(database)/documents/clients/$(request.resource.data.clientToken)).data.orgId == request.resource.data.orgId);
       
       // All workspace members can read tasks, and portal clients can read theirs
       allow read: if (isAuthenticated() && isInOrg(resource.data.orgId)) || 
-                     (resource.data.source == 'portal' && resource.data.clientToken != null);
+                     (resource.data.source == 'portal' && resource.data.clientToken != null && exists(/databases/$(database)/documents/clients/$(resource.data.clientToken)));
       
       // Only admins or assignees can edit
       allow update: if isAuthenticated() && isInOrg(resource.data.orgId) && (
