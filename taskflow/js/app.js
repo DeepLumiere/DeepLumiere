@@ -1,6 +1,5 @@
 // ═══════════════════════════════════════════════════
 // TaskFlow v2 — App Entry Point (Bootstrapper)
-// This is the brain of the entire application.
 // Executed once, it wires auth → state → UI.
 // ═══════════════════════════════════════════════════
 
