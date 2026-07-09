@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Deep Joshi</title>
-
 <meta name="description" content="Resume of Deep Joshi, Undergraduate Researcher at Nirma University specializing in Green AI, Computer Vision, and Federated Learning."/>
 <meta name="keywords" content="Deep Joshi, AI Researcher, Green AI, Computer Vision, Federated Learning, Nirma University, Computer Science, Portfolio, CV, Machine Learning"/>
 <meta name="author" content="Deep Joshi"/>
@@ -16,11 +15,9 @@
 <meta name="twitter:title" content="Deep Joshi — CV"/>
 <meta name="twitter:description" content="Undergraduate Researcher at Nirma University focusing on Green AI, Computer Vision, and efficient neural architectures."/>
 <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/173024745?v=4"/>
-
 <link rel="icon" href="https://avatars.githubusercontent.com/u/173024745?v=4" type="image/jpeg"/>
 <link rel="apple-touch-icon" href="https://avatars.githubusercontent.com/u/173024745?v=4"/>
-<link rel="canonical" href="https://deeplumiere.github.io/" />
-
+<link rel="canonical" href="https://deeplumiere.github.io/"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -66,7 +63,7 @@
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 #scroller{
   height:100vh;
-  overflow-y:hidden; /* Starts locked until animation finishes */
+  overflow-y:hidden;
   overflow-x:hidden;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
@@ -80,12 +77,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   pointer-events:none;
   z-index:0;
 }
+/* transition: background for colour surprises, filter for glow changes */
 .blob{
   position:absolute;
   filter:blur(80px);
   will-change:transform,border-radius;
+  transition:background 2.8s ease, filter 1.2s ease;
 }
-/* Increased opacity for darker theme visibility */
+
+/* Default colours per theme — JS overrides inline for surprises */
 [data-theme="dark"] .blob.c1{background:rgba(126,184,247,.35)}
 [data-theme="dark"] .blob.c2{background:rgba(74,128,212,.30)}
 [data-theme="dark"] .blob.c3{background:rgba(138,154,196,.28)}
@@ -93,7 +93,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 [data-theme="light"] .blob.c2{background:rgba(42,84,232,.13)}
 [data-theme="light"] .blob.c3{background:rgba(105,119,158,.11)}
 
-/* 5 fixed blobs rising infinitely — staggered so screen is always populated */
+/* Float animations — CSS translate property (parallax) composes with these */
 .blob:nth-child(1){width:40vw;height:40vw;left:5vw;
   animation:rise1 28s linear infinite,morph 9s ease-in-out infinite alternate;}
 .blob:nth-child(2){width:30vw;height:30vw;left:55vw;
@@ -136,6 +136,64 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   100%{border-radius:40% 60% 70% 30% / 40% 40% 60% 50%}
 }
 
+/* ── SVG NAME (crisp vector text in resting state) ──────── */
+#intro-name-svg{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .5s ease;
+  overflow:visible;
+}
+/* Crisp rendering + theme-aware fill via CSS custom properties */
+#svg-name{
+  font-family:var(--serif);
+  font-weight:400;
+  fill:var(--text);
+  text-rendering:geometricPrecision;
+  font-kerning:auto;
+  transition:fill .4s;
+}
+#svg-name-accent{
+  fill:var(--accent);
+  font-style:italic;
+  transition:fill .4s;
+}
+/* Subtle glow on the SVG name — theme-aware */
+[data-theme="dark"] #intro-name-svg{
+  filter:drop-shadow(0 0 32px rgba(126,184,247,.20));
+}
+[data-theme="light"] #intro-name-svg{
+  filter:drop-shadow(0 0 22px rgba(26,59,204,.14));
+}
+
+/* ── CLICK RIPPLE RING ────────────────────── */
+.click-ring{
+  position:fixed;
+  width:150px;height:150px;
+  border:1.5px solid var(--accent);
+  border-radius:50%;
+  pointer-events:none;
+  margin-left:-75px;
+  margin-top:-75px;
+  animation:ripple-ring 1s cubic-bezier(0,.5,.5,1) forwards;
+  z-index:500;
+}
+.click-ring-2{
+  width:80px;height:80px;
+  margin-left:-40px;
+  margin-top:-40px;
+  border-color:var(--accent2);
+  animation-duration:.65s;
+  animation-delay:.08s;
+  opacity:.6;
+}
+@keyframes ripple-ring{
+  0%  {transform:scale(0);opacity:.85}
+  100%{transform:scale(1);opacity:0}
+}
+
 /* ── INTRO SECTION ────────────────────────── */
 #intro{
   position:relative;
@@ -144,19 +202,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  z-index: 1;
+  z-index:1;
 }
 #intro-canvas{
-  position:fixed; 
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
+  position:fixed;
+  top:0;left:0;
+  width:100vw;height:100vh;
   pointer-events:none;
   z-index:2;
 }
 
-/* Hints */
+/* Scroll hints */
 #hint{
   position:absolute;
   bottom:36px;left:50%;
@@ -206,16 +262,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   gap:14px;
   padding:20px 32px;
   background:transparent;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   border-bottom:1px solid transparent;
-  opacity:0; 
+  opacity:0;
   transition:border-color .4s;
   pointer-events:none;
 }
-#nav-inner.show-border{
-  border-color:var(--line);
-}
+#nav-inner.show-border{border-color:var(--line)}
 #nav-chip-ring{
   width:32px;height:32px;
   border-radius:50%;
@@ -226,36 +280,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 #nav-chip-ring img{width:100%;height:100%;object-fit:cover}
 #nav-name{
   font-family:var(--serif);
-  font-size:18px; /* Hardcoded pixel size to match canvas math flawlessly */
-  font-weight:400; /* Fixed to properly match visual thinness */
+  font-size:18px;
+  font-weight:400;
   color:var(--text);
-  /* Removed letter-spacing so it perfectly mirrors canvas rendering */
-  opacity: 0; /* Starts completely invisible to allow particles to render */
+  opacity:0;
+  transition:color .4s;
 }
 #nav-name em{font-style:italic;color:var(--accent)}
 
 /* ── CV PAGE ─────────────────────────────── */
 #cv{
-  background:transparent; 
+  background:transparent;
   min-height:100vh;
   position:relative;
   z-index:1;
 }
 .wrap{max-width:1040px;margin:0 auto;padding:60px 32px 100px}
 
-/* Intro Tagline Quote */
-.intro-quote {
-  margin-top: 70px;
-  margin-bottom: 70px;
-  max-width: 850px;
-}
+.intro-quote{margin-top:70px;margin-bottom:70px;max-width:850px}
 .about-text{
   font-family:var(--serif);font-size:1.65rem;font-style:italic;font-weight:400;
-  color:var(--body);line-height:1.75;
-  transition:color .4s;
+  color:var(--body);line-height:1.75;transition:color .4s;
 }
 
-/* Body Cols */
+/* Body columns */
 .body-cols{display:grid;grid-template-columns:252px 1fr;gap:0 52px;align-items:start}
 .sidebar{position:sticky;top:90px;display:flex;flex-direction:column;gap:36px}
 
@@ -301,7 +349,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 .sidebar-link .arr{margin-left:auto;font-size:.65rem;opacity:.28;transition:opacity .18s,transform .18s}
 .sidebar-link:hover .arr{opacity:1;transform:translate(2px,-2px)}
 
-/* Main Content */
+/* Main content */
 .main-col{display:flex;flex-direction:column;gap:56px}
 .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;padding-bottom:10px;border-bottom:1px solid var(--line);transition:border-color .4s}
 .sec-title{font-family:var(--serif);font-size:1.65rem;font-weight:500;color:var(--text);letter-spacing:-.01em;line-height:1;transition:color .4s}
@@ -323,7 +371,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 footer{padding:28px 32px 44px;max-width:1040px;margin:0 auto;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;transition:border-color .4s}
 footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:var(--muted);transition:color .4s}
 
-/* ── THEME BTN ───────────────────────────── */
+/* ── THEME BUTTON ────────────────────────── */
 .theme-btn{
   position:fixed;top:18px;right:28px;z-index:300;
   display:flex;align-items:center;gap:8px;padding:7px 14px;
@@ -335,6 +383,7 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
 .theme-btn .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);transition:box-shadow .2s,background .4s}
 .theme-btn:hover .dot{box-shadow:0 0 8px var(--accent)}
 
+/* ── RESPONSIVE ──────────────────────────── */
 @media(max-width:840px){
   .body-cols{grid-template-columns:1fr}
   .sidebar{position:static;top:0}
@@ -346,8 +395,8 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
   footer{padding:24px 18px 40px}
   .cv-item{grid-template-columns:1fr;gap:5px 0}
   .cv-date{padding-top:0}
-  .intro-quote { margin-top: 40px; margin-bottom: 50px; }
-  .about-text { font-size: 1.4rem; }
+  .intro-quote{margin-top:40px;margin-bottom:50px}
+  .about-text{font-size:1.4rem}
 }
 </style>
 <script type="application/ld+json">
@@ -382,6 +431,17 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
 
   <section id="intro">
     <canvas id="intro-canvas"></canvas>
+
+    <!--
+      Crisp SVG name — replaces pixelated canvas rasterisation in the resting state.
+      Canvas particles handle the explosion + scroll animation;
+      this SVG fades in only when animation finishes and scroll = 0.
+    -->
+    <svg id="intro-name-svg" aria-hidden="true">
+      <text id="svg-name" x="50%" y="50%"
+            text-anchor="middle" dominant-baseline="middle">Deep&nbsp;<tspan id="svg-name-accent">Joshi</tspan></text>
+    </svg>
+
     <p id="hint">Scroll to Begin</p>
     <div id="scroll-hint">
       <span>Scroll</span>
@@ -392,448 +452,721 @@ footer span{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:
   <div id="nav">
     <div id="nav-inner">
       <div id="nav-chip-ring">
-        <img src="https://avatars.githubusercontent.com/u/173024745?v=4" alt="Deep Joshi"/>
+        <img id="nav-avatar" src="" alt="Deep Joshi"/>
       </div>
-      <span id="nav-name">Deep <em>Joshi</em></span>
+      <span id="nav-name"></span>
     </div>
   </div>
 
   <div id="cv">
-    <div class="wrap">
-      
-      <div class="intro-quote">
-        <p class="about-text">"I dive into what I’m not good at—because the easy stuff doesn’t ignite my spirit."</p>
-      </div>
-
-      <div class="body-cols">
-        <aside class="sidebar">
-          <div>
-            <span class="s-label">Education</span>
-            <div class="s-row">
-              <div class="s-item">
-                <span class="s-item-label">Degree</span>
-                <span class="s-item-value">BTech in Computer Science</span>
-              </div>
-              <div class="s-item">
-                <span class="s-item-label">University</span>
-                <span class="s-item-value">Nirma University</span>
-              </div>
-              <div class="s-item">
-                <span class="s-item-label">Duration</span>
-                <span class="s-item-value">Aug 2024 — Aug 2028</span>
-              </div>
-              <div class="s-item">
-                <span class="s-item-label">Grade</span>
-                <div class="cgpa-badge">
-                  <span class="cgpa-num">8.6</span>
-                  <span class="cgpa-of">CGPA / 10</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <span class="s-label">Research Interests</span>
-            <div class="focus-tags">
-              <div class="focus-tag">GreenAI &amp; Sustainable ML</div>
-              <div class="focus-tag">Benchmarking &amp; Evaluation</div>
-              <div class="focus-tag">Computer Vision</div>
-              <div class="focus-tag">Federated Learning</div>
-            </div>
-          </div>
-          <div>
-            <span class="s-label">Contact</span>
-            <div class="sidebar-links">
-              <a class="sidebar-link" href="mailto:24bce152@nirmauni.ac.in">24bce152@nirmauni.ac.in <span class="arr">↗</span></a>
-              <a class="sidebar-link" href="mailto:deep@computer.org">deep@computer.org <span class="arr">↗</span></a>
-              <a class="sidebar-link" href="tel:+919265641668">+91 92656 41668 <span class="arr">↗</span></a>
-              <span class="sidebar-link" style="pointer-events:none; color:var(--muted)">Ahmedabad, India</span>
-            </div>
-          </div>
-          <div>
-            <span class="s-label">Profiles</span>
-            <div class="sidebar-links">
-              <a class="sidebar-link" href="https://www.linkedin.com/in/deep-lumiere" target="_blank" rel="noreferrer">LinkedIn <span class="arr">↗</span></a>
-              <a class="sidebar-link" href="https://github.com/DeepLumiere" target="_blank" rel="noreferrer">GitHub <span class="arr">↗</span></a>
-              <a class="sidebar-link" href="https://www.semanticscholar.org/author/Deep-Joshi/2057963700" target="_blank" rel="noreferrer">Semantic Scholar <span class="arr">↗</span></a>
-              <a class="sidebar-link" href="http://unsplash.com/@deep_erudite" target="_blank" rel="noreferrer">Unsplash <span class="arr">↗</span></a>
-            </div>
-          </div>
-          <div>
-            <span class="s-label">Availability</span>
-            <p class="cv-desc" style="font-size:.86rem;font-weight:300">Open to research collaborations, internships, and technical leadership roles.</p>
-          </div>
-        </aside>
-
-        <main class="main-col">
-          
-          <section>
-            <div class="sec-head"><h2 class="sec-title">Experience</h2><span class="sec-num">01</span></div>
-            <div class="cv-item">
-              <div class="cv-date">Sep 2025<br/>— Present</div>
-              <div>
-                <p class="cv-role">Technical Head</p>
-                <p class="cv-org">IEEE Computer Society · Nirma University Chapter</p>
-                <p class="cv-desc">Directing chapter technical initiatives and mentoring project teams across AI and systems domains. Coordinating external collaborations including speaker engagements and workshops.</p>
-              </div>
-            </div>
-          </section>
-          
-          <section>
-            <div class="sec-head"><h2 class="sec-title">Projects</h2><span class="sec-num">02</span></div>
-            <div class="cv-item">
-              <div class="cv-date">Ongoing</div>
-              <div>
-                <p class="cv-role">Bit-per-Buck</p>
-                <p class="cv-org">AI Evaluation Framework</p>
-                <p class="cv-desc">An evaluation framework that ranks AI models by both utility and compute cost, surfacing performance-efficiency trade-offs and identifying diminishing returns from scale.</p>
-              </div>
-            </div>
-            <div class="cv-item">
-              <div class="cv-date">Ongoing</div>
-              <div>
-                <p class="cv-role">Agent Bodhi</p>
-                <p class="cv-org">IEEE CS Chapter Initiative · Technical Lead</p>
-                <p class="cv-desc">Leading technical execution for an IEEE CS initiative exploring agentic AI workflows for research automation and student-led innovation.</p>
-              </div>
-            </div>
-          </section>
-          
-          <section>
-            <div class="sec-head"><h2 class="sec-title">Publications</h2><span class="sec-num">03</span></div>
-            <div class="cv-item">
-              <div class="cv-date">2025</div>
-              <div>
-                <span class="pub-venue">FIDTA @ ACM MobiHoc '25</span>
-                <p class="cv-role">FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud Detection</p>
-                <p class="cv-desc" style="margin-top:8px">Research detailing a federated learning approach for financial fraud detection, incorporating quantum-enforced privacy guarantees across distributed banking nodes.</p>
-                <a class="paper-link" href="https://dl.acm.org/doi/10.1145/3704413.3765511" target="_blank" rel="noreferrer">Read Paper</a>
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
-    </div>
-    <footer>
-      <span>Deep Joshi · CV · 2026</span>
-      <span>Nirma University · Ahmedabad 382481</span>
-    </footer>
+    <!-- Populated by renderCV(SITE_DATA) at runtime -->
   </div>
 
-</div><button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">
+</div>
+
+<button class="theme-btn" id="themeBtn" aria-label="Toggle colour theme">
   <span class="dot"></span>
   <span id="themeLbl">Light</span>
 </button>
 
 <script>
-(function(){
+(function () {
 'use strict';
 
-/* ═══ THEME ════════════════════════════════ */
-const root=document.documentElement;
-const tBtn=document.getElementById('themeBtn');
-const tLbl=document.getElementById('themeLbl');
-let theme=(()=>{try{return localStorage.getItem('dj-th')}catch{return null}})()
-          ||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');
-function applyTheme(t){
-  theme=t; root.setAttribute('data-theme',t);
-  tLbl.textContent=t==='dark'?'Light':'Dark';
-  try{localStorage.setItem('dj-th',t)}catch{}
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   §1  SITE DATA
+   Edit this object to update all page content.
+   • Add a section → append to sections[]
+   • Add a publication → push into sections[2].items
+   • Change name/avatar → edit person{}
+   No HTML wiring needed anywhere else.
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const SITE_DATA = {
+
+  meta: {
+    year: '2026',
+  },
+
+  person: {
+    name:   { first: 'Deep', last: 'Joshi' },
+    avatar: 'https://avatars.githubusercontent.com/u/173024745?v=4',
+    quote:  '\u201cI dive into what I\u2019m not good at\u2014because the easy stuff doesn\u2019t ignite my spirit.\u201d',
+  },
+
+  footer: {
+    university: 'Nirma University',
+    address:    'Ahmedabad 382481',
+  },
+
+  education: {
+    degree:     'BTech in Computer Science',
+    university: 'Nirma University',
+    duration:   'Aug 2024 \u2014 Aug 2028',
+    cgpa:       '8.6',
+  },
+
+  interests: [
+    'GreenAI & Sustainable ML',
+    'Benchmarking & Evaluation',
+    'Computer Vision',
+    'Federated Learning',
+  ],
+
+  contact: [
+    { label: '24bce152@nirmauni.ac.in', href: 'mailto:24bce152@nirmauni.ac.in' },
+    { label: 'deep@computer.org',        href: 'mailto:deep@computer.org' },
+    { label: '+91 92656 41668',           href: 'tel:+919265641668' },
+    { label: 'Ahmedabad, India',          href: null },
+  ],
+
+  profiles: [
+    { label: 'LinkedIn',         href: 'https://www.linkedin.com/in/deep-lumiere' },
+    { label: 'GitHub',           href: 'https://github.com/DeepLumiere' },
+    { label: 'Semantic Scholar', href: 'https://www.semanticscholar.org/author/Deep-Joshi/2057963700' },
+    { label: 'Unsplash',         href: 'http://unsplash.com/@deep_erudite' },
+  ],
+
+  availability: 'Open to research collaborations, internships, and technical leadership roles.',
+
+  /*
+    sections[] — each object renders one CV section.
+    Fields per item:
+      date    (string, use \n for line break)   required
+      role    (string)                           required
+      org     (string)                           optional
+      desc    (string)                           optional
+      bullets ([string])                         optional
+      venue   (string, e.g. conference tag)      optional
+      link    ({ label, href })                  optional
+  */
+  sections: [
+    {
+      id: 'experience', title: 'Experience', num: '01',
+      items: [
+        {
+          date: 'Sep 2025\n\u2014 Present',
+          role: 'Technical Head',
+          org:  'IEEE Computer Society \u00b7 Nirma University Chapter',
+          desc: 'Directing chapter technical initiatives and mentoring project teams across AI and systems domains. Coordinating external collaborations including speaker engagements and workshops.',
+        },
+      ],
+    },
+    {
+      id: 'projects', title: 'Projects', num: '02',
+      items: [
+        {
+          date: 'Ongoing',
+          role: 'Bit-per-Buck',
+          org:  'AI Evaluation Framework',
+          desc: 'An evaluation framework that ranks AI models by both utility and compute cost, surfacing performance-efficiency trade-offs and identifying diminishing returns from scale.',
+        },
+        {
+          date: 'Ongoing',
+          role: 'Agent Bodhi',
+          org:  'IEEE CS Chapter Initiative \u00b7 Technical Lead',
+          desc: 'Leading technical execution for an IEEE CS initiative exploring agentic AI workflows for research automation and student-led innovation.',
+        },
+      ],
+    },
+    {
+      id: 'publications', title: 'Publications', num: '03',
+      items: [
+        {
+          date:  '2025',
+          venue: 'FIDTA @ ACM MobiHoc \u201925',
+          role:  'FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud Detection',
+          desc:  'Research detailing a federated learning approach for financial fraud detection, incorporating quantum-enforced privacy guarantees across distributed banking nodes.',
+          link:  { label: 'Read Paper', href: 'https://dl.acm.org/doi/10.1145/3704413.3765511' },
+        },
+      ],
+    },
+  ],
+
+}; /* END SITE_DATA */
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   §2  RENDER CV  — generates all HTML from SITE_DATA
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/** Escape HTML-special characters (prevents XSS, handles entities). */
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
 }
-tBtn.addEventListener('click',()=>applyTheme(theme==='dark'?'light':'dark'));
+
+function renderItem(item) {
+  let h = `<div class="cv-item">
+    <div class="cv-date">${esc(item.date).replace(/\n/g,'<br/>')}</div>
+    <div>`;
+  if (item.venue) h += `<span class="pub-venue">${esc(item.venue)}</span>`;
+  h += `<p class="cv-role">${esc(item.role)}</p>`;
+  if (item.org) h += `<p class="cv-org">${esc(item.org)}</p>`;
+  if (item.desc) {
+    const mt = item.venue ? ' style="margin-top:8px"' : '';
+    h += `<p class="cv-desc"${mt}>${esc(item.desc)}</p>`;
+  }
+  if (item.bullets && item.bullets.length) {
+    h += `<ul class="cv-list">${item.bullets.map(b => `<li>${esc(b)}</li>`).join('')}</ul>`;
+  }
+  if (item.link) {
+    h += `<a class="paper-link" href="${esc(item.link.href)}" target="_blank" rel="noreferrer">${esc(item.link.label)}</a>`;
+  }
+  h += `</div></div>`;
+  return h;
+}
+
+function renderCV(data) {
+  const { person, education: ed, interests, contact, profiles, availability, sections, meta, footer } = data;
+
+  const sidebar = `<aside class="sidebar">
+    <div>
+      <span class="s-label">Education</span>
+      <div class="s-row">
+        <div class="s-item"><span class="s-item-label">Degree</span><span class="s-item-value">${esc(ed.degree)}</span></div>
+        <div class="s-item"><span class="s-item-label">University</span><span class="s-item-value">${esc(ed.university)}</span></div>
+        <div class="s-item"><span class="s-item-label">Duration</span><span class="s-item-value">${esc(ed.duration)}</span></div>
+        <div class="s-item">
+          <span class="s-item-label">Grade</span>
+          <div class="cgpa-badge">
+            <span class="cgpa-num">${esc(ed.cgpa)}</span>
+            <span class="cgpa-of">CGPA / 10</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span class="s-label">Research Interests</span>
+      <div class="focus-tags">
+        ${interests.map(i => `<div class="focus-tag">${esc(i)}</div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <span class="s-label">Contact</span>
+      <div class="sidebar-links">
+        ${contact.map(c => c.href
+          ? `<a class="sidebar-link" href="${esc(c.href)}">${esc(c.label)}<span class="arr">↗</span></a>`
+          : `<span class="sidebar-link" style="pointer-events:none;color:var(--muted)">${esc(c.label)}</span>`
+        ).join('')}
+      </div>
+    </div>
+    <div>
+      <span class="s-label">Profiles</span>
+      <div class="sidebar-links">
+        ${profiles.map(p => `<a class="sidebar-link" href="${esc(p.href)}" target="_blank" rel="noreferrer">${esc(p.label)}<span class="arr">↗</span></a>`).join('')}
+      </div>
+    </div>
+    <div>
+      <span class="s-label">Availability</span>
+      <p class="cv-desc" style="font-size:.86rem;font-weight:300">${esc(availability)}</p>
+    </div>
+  </aside>`;
+
+  const main = `<main class="main-col">
+    ${sections.map(sec => `
+      <section id="sec-${esc(sec.id)}">
+        <div class="sec-head">
+          <h2 class="sec-title">${esc(sec.title)}</h2>
+          <span class="sec-num">${esc(sec.num)}</span>
+        </div>
+        ${sec.items.map(renderItem).join('')}
+      </section>`).join('')}
+  </main>`;
+
+  document.getElementById('cv').innerHTML = `
+    <div class="wrap">
+      <div class="intro-quote">
+        <p class="about-text">${esc(person.quote)}</p>
+      </div>
+      <div class="body-cols">${sidebar}${main}</div>
+    </div>
+    <footer>
+      <span>${esc(person.name.first)} ${esc(person.name.last)} &middot; CV &middot; ${esc(meta.year)}</span>
+      <span>${esc(footer.university)} &middot; ${esc(footer.address)}</span>
+    </footer>`;
+
+  /* Hydrate nav from data */
+  document.getElementById('nav-avatar').src = person.avatar;
+  document.getElementById('nav-avatar').alt = `${person.name.first} ${person.name.last}`;
+  document.getElementById('nav-name').innerHTML =
+    `${esc(person.name.first)} <em>${esc(person.name.last)}</em>`;
+}
+
+renderCV(SITE_DATA);
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   §3  THEME
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const root = document.documentElement;
+const tBtn = document.getElementById('themeBtn');
+const tLbl = document.getElementById('themeLbl');
+let theme = (()=>{ try { return localStorage.getItem('dj-th'); } catch { return null; } })()
+             || (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
+
+function applyTheme(t) {
+  theme = t;
+  root.setAttribute('data-theme', t);
+  tLbl.textContent = t === 'dark' ? 'Light' : 'Dark';
+  try { localStorage.setItem('dj-th', t); } catch {}
+}
+tBtn.addEventListener('click', () => applyTheme(theme === 'dark' ? 'light' : 'dark'));
 applyTheme(theme);
 
-/* ═══ LAVA LAMP — pure CSS, no JS needed ═══ */
 
-/* ═══ ELEMENTS & SIZES ═════════════════════ */
-const scroller = document.getElementById('scroller');
-const intro = document.getElementById('intro');
-const canvas = document.getElementById('intro-canvas');
-const ctx = canvas.getContext('2d'); 
-const hintEl = document.getElementById('hint');
-const scrollHint = document.getElementById('scroll-hint');
-const navInner = document.getElementById('nav-inner');
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   §4  INTERACTIVE BACKGROUND
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* ─ §4a  Mouse-parallax blobs ─────────────────────────────── */
+/*
+  The CSS `translate` individual-transform property composes WITH the
+  CSS `transform` animation (rise1…rise5) without interfering.
+  Each blob has a different strength to simulate depth layers.
+*/
+const blobs = Array.from(document.querySelectorAll('.blob'));
+const PARALLAX_STR = [22, -15, 9, -20, 13]; /* px per half-viewport, per blob */
+
+let targetMX = 0, targetMY = 0;
+let smoothMX = 0, smoothMY = 0;
+
+function onMouseMove(e) {
+  targetMX = e.clientX / window.innerWidth  - 0.5;
+  targetMY = e.clientY / window.innerHeight - 0.5;
+}
+window.addEventListener('mousemove',  onMouseMove);
+window.addEventListener('touchmove', e => {
+  if (e.touches[0]) onMouseMove(e.touches[0]);
+}, { passive: true });
+
+
+/* ─ §4b  Colorful blob surprises ──────────────────────────── */
+/*
+  Every 18–38 s a random blob quietly shifts hue then drifts back.
+  Setting blob.style.background overrides the CSS class color;
+  clearing it restores the theme default.
+*/
+const SURPRISE_COLORS = [
+  'rgba(185,80,255,.34)',   /* vivid violet  */
+  'rgba(255,65,140,.32)',   /* hot pink      */
+  'rgba(55,220,175,.32)',   /* electric teal */
+  'rgba(255,172,38,.30)',   /* amber         */
+  'rgba(75,240,115,.28)',   /* electric mint */
+  'rgba(255,95,75,.32)',    /* coral         */
+  'rgba(100,200,255,.32)',  /* sky           */
+];
+
+let surprisedBlobIdx = -1;
+
+function triggerBlobSurprise() {
+  /* Pick a different blob than the last one surprised */
+  let idx;
+  do { idx = Math.floor(Math.random() * blobs.length); } while (idx === surprisedBlobIdx);
+  surprisedBlobIdx = idx;
+
+  const blob  = blobs[idx];
+  const color = SURPRISE_COLORS[Math.floor(Math.random() * SURPRISE_COLORS.length)];
+
+  blob.style.background = color;
+  blob.style.filter     = 'blur(65px)'; /* slight focus-in as it brightens */
+
+  const hold = 4500 + Math.random() * 4000; /* 4.5–8.5 s visible */
+  setTimeout(() => {
+    blob.style.background = ''; /* fall back to CSS class colour */
+    blob.style.filter     = '';
+    surprisedBlobIdx      = -1;
+  }, hold);
+
+  /* Schedule next surprise */
+  setTimeout(triggerBlobSurprise, 18000 + Math.random() * 20000);
+}
+
+setTimeout(triggerBlobSurprise, 22000); /* first surprise after ~22 s */
+
+
+/* ─ §4c  Click ripple explosion ───────────────────────────── */
+/*
+  On click:
+    • Two DOM rings expand from the click point (CSS animation)
+    • Canvas particles burst outward with physics + gravity
+*/
+const RIPPLE_COLORS = [
+  { r:126, g:184, b:247 },  /* accent blue  */
+  { r:185, g:120, b:255 },  /* violet       */
+  { r:55,  g:220, b:175 },  /* teal         */
+  { r:255, g:160, b:75  },  /* amber        */
+  { r:255, g:95,  b:145 },  /* pink         */
+  { r:100, g:235, b:255 },  /* sky          */
+];
+
+let rippleParticles = [];
+
+window.addEventListener('click', e => {
+  /* DOM rings */
+  ['', ' click-ring-2'].forEach(extra => {
+    const ring       = document.createElement('div');
+    ring.className   = 'click-ring' + extra;
+    ring.style.left  = e.clientX + 'px';
+    ring.style.top   = e.clientY + 'px';
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 1100);
+  });
+
+  /* Canvas burst */
+  const px    = e.clientX;
+  const py    = e.clientY;
+  const count = 44 + Math.floor(Math.random() * 20);
+
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i / count) + (Math.random() - 0.5) * 0.6;
+    const speed = 1.8 + Math.random() * 6;
+    const c     = RIPPLE_COLORS[Math.floor(Math.random() * RIPPLE_COLORS.length)];
+    rippleParticles.push({
+      x: px, y: py,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life:  1,
+      decay: 0.011 + Math.random() * 0.018,
+      size:  1.8 + Math.random() * 4.2,
+      r: c.r, g: c.g, b: c.b,
+    });
+  }
+});
+
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   §5  CANVAS INTRO ANIMATION
+   Phase 1  (prog 0→1): avatar photo pixels explode → form name text
+   Phase 2  (prog=1, scroll=0): canvas hides; crisp SVG name fades in
+   Phase 3  (scroll 0→H): SVG hides; canvas particles scroll to nav
+   Phase 4  (scroll≥H):  particles hide; HTML nav name shows
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* — Element refs — */
+const scroller    = document.getElementById('scroller');
+const introEl     = document.getElementById('intro');
+const canvas      = document.getElementById('intro-canvas');
+const ctx         = canvas.getContext('2d');
+const hintEl      = document.getElementById('hint');
+const scrollHint  = document.getElementById('scroll-hint');
+const navInner    = document.getElementById('nav-inner');
 const navNameSpan = document.getElementById('nav-name');
+const svgNameEl   = document.getElementById('intro-name-svg');
+const svgNameText = document.getElementById('svg-name');
 
-let W=0, H=0, CX=0, CY=0, FR=0; 
-let navStartX = 82, navCenterY = 38;
-let navScale = 1;
+/* — Sizing state — */
+let W = 0, H = 0, CX = 0, CY = 0, FR = 0;
+let navStartX = 82, navCenterY = 38, navScale = 1;
 let textStartX = 0, textCenterY = 0;
 
 function updateNavTarget() {
-  const style = getComputedStyle(navInner);
-  const pl = parseFloat(style.paddingLeft) || 32;
-  const pt = parseFloat(style.paddingTop) || 20;
-  // This explicitly maps to the 36px avatar + 14px flex gap to perfectly align the snap
-  navStartX = pl + 36 + 14; 
-  navCenterY = pt + 18;     
+  const st = getComputedStyle(navInner);
+  const pl = parseFloat(st.paddingLeft) || 32;
+  const pt = parseFloat(st.paddingTop)  || 20;
+  navStartX  = pl + 36 + 14; /* avatar(36px) + gap(14px) */
+  navCenterY = pt + 18;      /* half of 36px avatar height */
 }
 
-function resize(){
-  W = canvas.width = window.innerWidth;
+function resize() {
+  W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
-  CX = W/2; CY = H/2;
-  FR = Math.min(W*.105, 115);
+  CX = W / 2; CY = H / 2;
+  FR = Math.min(W * .105, 115);
   updateNavTarget();
-  if(imageLoaded && fontReady) setTimeout(rebuildTargets, 0);
+  if (imageLoaded && fontReady) setTimeout(rebuildTargets, 0);
 }
 window.addEventListener('resize', resize);
 
-/* ═══ MATH HELPERS ═════════════════════════ */
-function clamp(v,lo,hi){return v<lo?lo:v>hi?hi:v;}
+/* — Helpers — */
+function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+function easeIO(t) { return t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2; }
 
-/* ═══ IMAGE & FONT LOADING ═════════════════ */
-let fontReady=false, imageLoaded=false;
-let imgData=null; 
-let imgObj = new Image();
-imgObj.crossOrigin = "anonymous";
-imgObj.src = "https://avatars.githubusercontent.com/u/173024745?v=4";
-imgObj.onload = () => { imageLoaded = true; checkReady(); };
-imgObj.onerror = () => { imageLoaded = true; checkReady(); }; 
-document.fonts.ready.then(()=>{ fontReady=true; checkReady(); });
+/* — Asset loading — */
+let fontReady = false, imageLoaded = false, imgData = null;
+const imgObj  = new Image();
+imgObj.crossOrigin = 'anonymous';
+imgObj.src         = SITE_DATA.person.avatar;
+imgObj.onload      = () => { imageLoaded = true; checkReady(); };
+imgObj.onerror     = () => { imageLoaded = true; checkReady(); }; /* degrade gracefully */
+document.fonts.ready.then(() => { fontReady = true; checkReady(); });
 
 function checkReady() {
   if (imageLoaded && fontReady) resize();
 }
 
-/* ═══ HIGH-RES ANTI-ALIASED PARTICLES ══════ */
-let particles=[]; 
+/* — Particle array — */
+let particles = [];
 
-function rebuildTargets(){
+/**
+ * rebuildTargets()
+ * 1. Rasterises the avatar into a circle → pixel colours become particle start colours
+ * 2. Rasterises "Deep Joshi" text at HD resolution → pixel positions become targets
+ * 3. Updates the SVG name element to the current display font size
+ * 4. Builds the particles[] array
+ */
+function rebuildTargets() {
+
+  /* ① Avatar → circle pixel data */
+  const iSize   = Math.floor(FR * 2);
   const iCanvas = document.createElement('canvas');
-  const iSize = Math.floor(FR * 2);
-  iCanvas.width = iSize; iCanvas.height = iSize;
-  const iCtx = iCanvas.getContext('2d');
-  
-  let sWidth = imgObj.width;
-  let sHeight = imgObj.height;
-  let sSize = Math.min(sWidth, sHeight);
-  let sx = (sWidth - sSize) / 2;
-  let sy = (sHeight - sSize) / 2;
-  
+  iCanvas.width = iCanvas.height = iSize;
+  const iCtx    = iCanvas.getContext('2d');
+
+  const sSize = Math.min(imgObj.width, imgObj.height);
+  const sx    = (imgObj.width  - sSize) / 2;
+  const sy    = (imgObj.height - sSize) / 2;
+
   iCtx.beginPath();
-  iCtx.arc(iSize/2, iSize/2, iSize/2, 0, Math.PI*2);
+  iCtx.arc(iSize/2, iSize/2, iSize/2, 0, Math.PI * 2);
   iCtx.clip();
   try {
     iCtx.drawImage(imgObj, sx, sy, sSize, sSize, 0, 0, iSize, iSize);
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
-  } catch(e) {
+  } catch (_) {
     iCtx.fillStyle = '#445566'; iCtx.fill();
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
   }
 
-  // Drastically reduced initial font size for much better performance (less particles)
-  const HD_fs = 160; 
+  /* ② Text → pixel targets (HD canvas for sampling quality) */
+  const HD_fs   = 160;
   const tCanvas = document.createElement('canvas');
-  tCanvas.width = 800; 
-  tCanvas.height = 240;
+  tCanvas.width  = 900;
+  tCanvas.height = 260;
   const tCtx = tCanvas.getContext('2d');
   tCtx.textBaseline = 'middle';
-  
-  // Set font to 400 weight to fix "feels bolder" issue and match visual look properly
+
   tCtx.font = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
-  const w1 = tCtx.measureText("Deep ").width;
+  const w1  = tCtx.measureText('Deep ').width;
   tCtx.font = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
-  const w2 = tCtx.measureText("Joshi").width;
-  const totalW = w1 + w2;
-  
-  const hdStartX = Math.floor(tCanvas.width/2 - totalW/2);
-  const hdCenterY = Math.floor(tCanvas.height/2);
+  const w2  = tCtx.measureText('Joshi').width;
+  const totalW   = w1 + w2;
+  const hdStartX = Math.floor(tCanvas.width/2  - totalW/2);
+  const hdCY     = Math.floor(tCanvas.height/2);
 
   tCtx.fillStyle = '#ff0000';
-  tCtx.font = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
-  tCtx.fillText("Deep ", hdStartX, hdCenterY);
-  
-  tCtx.fillStyle = '#0000ff';
-  tCtx.font = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
-  tCtx.fillText("Joshi", hdStartX + w1, hdCenterY);
+  tCtx.font      = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.fillText('Deep ', hdStartX, hdCY);
 
-  const tData = tCtx.getImageData(0,0,tCanvas.width,tCanvas.height).data;
+  tCtx.fillStyle = '#0000ff';
+  tCtx.font      = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.fillText('Joshi', hdStartX + w1, hdCY);
+
+  const tData      = tCtx.getImageData(0, 0, tCanvas.width, tCanvas.height).data;
   const textPixels = [];
-  
-  // Always use a step to heavily reduce generated particles and fix extreme lagging
-  const step = 2; 
-  
-  for(let y=0; y<tCanvas.height; y+=step) {
-      for(let x=0; x<tCanvas.width; x+=step) {
-          const idx = (y*tCanvas.width + x)*4;
-          if(tData[idx+3] > 60) {
-              textPixels.push({ x, y, isAccent: tData[idx+2] > 128 });
-          }
+  const step       = 2; /* stride — keeps particle count manageable */
+
+  for (let y = 0; y < tCanvas.height; y += step) {
+    for (let x = 0; x < tCanvas.width; x += step) {
+      const idx = (y * tCanvas.width + x) * 4;
+      if (tData[idx+3] > 60) {
+        textPixels.push({ x, y, isAccent: tData[idx+2] > 128 });
       }
+    }
   }
-  
   window.particleStep = step;
 
-  const explosion_fs = clamp(W*.086, 40, 84);
-  const renderScale = explosion_fs / HD_fs;
-  
-  textStartX = (W/2) - (totalW * renderScale) / 2;
+  /* ③ Display-scale geometry */
+  const explosion_fs = clamp(W * .086, 40, 84);
+  const renderScale  = explosion_fs / HD_fs;
+
+  textStartX  = W/2 - (totalW * renderScale) / 2;
   textCenterY = H/2;
-  
-  const targetFs = 18; // Exact matched size for smooth snapping
-  navScale = targetFs / explosion_fs; 
 
+  navScale = 18 / explosion_fs; /* 18px is the nav font size */
+
+  /* ④ Update SVG name to match particle display size — crisp vector rendering */
+  svgNameText.setAttribute('font-size', explosion_fs + 'px');
+
+  /* ⑤ Build particles */
   particles = [];
-  for(let i=0; i<textPixels.length; i++) {
-      const tp = textPixels[i];
-      const r = Math.sqrt(Math.random()) * (iSize/2);
-      const theta = Math.random() * Math.PI * 2;
-      const ix = iSize/2 + r * Math.cos(theta);
-      const iy = iSize/2 + r * Math.sin(theta);
-      
-      const pIdx = (Math.floor(iy) * iSize + Math.floor(ix)) * 4;
-      let ir = imgData[pIdx], ig = imgData[pIdx+1], ib = imgData[pIdx+2];
-      if(imgData[pIdx+3] < 10) { ir=120; ig=130; ib=140; } 
+  for (let i = 0; i < textPixels.length; i++) {
+    const tp = textPixels[i];
 
-      const dist = r / (iSize/2);
-      const delay = (1 - dist) * 0.4; 
-      
-      const offsetX = tp.x - hdStartX;
-      const offsetY = tp.y - hdCenterY;
-      const screenTargetX = textStartX + offsetX * renderScale;
-      const screenTargetY = textCenterY + offsetY * renderScale;
+    /* Random point inside the avatar circle (weighted toward centre) */
+    const r  = Math.sqrt(Math.random()) * (iSize/2);
+    const th = Math.random() * Math.PI * 2;
+    const ix = iSize/2 + r * Math.cos(th);
+    const iy = iSize/2 + r * Math.sin(th);
 
-      particles.push({
-          startX: CX - iSize/2 + ix,
-          startY: CY - iSize/2 + iy,
-          startR: ir, startG: ig, startB: ib,
-          targetX: screenTargetX,
-          targetY: screenTargetY,
-          isAccent: tp.isAccent,
-          delay: delay
-      });
+    const pIdx = (Math.floor(iy) * iSize + Math.floor(ix)) * 4;
+    let ir = imgData[pIdx], ig = imgData[pIdx+1], ib = imgData[pIdx+2];
+    if (imgData[pIdx+3] < 10) { ir = 120; ig = 130; ib = 140; }
+
+    const dist  = r / (iSize/2);
+    const delay = (1 - dist) * 0.4; /* inner particles animate first */
+
+    particles.push({
+      startX: CX - iSize/2 + ix,
+      startY: CY - iSize/2 + iy,
+      startR: ir, startG: ig, startB: ib,
+      targetX: textStartX + (tp.x - hdStartX) * renderScale,
+      targetY: textCenterY + (tp.y - hdCY) * renderScale,
+      isAccent: tp.isAccent,
+      delay,
+    });
   }
 }
 
-/* ═══ ANIMATION STATE & AUTOTRIGGER ════════ */
-let prog=0; 
-let mouseMoved=false;
-let revealDone=false;
+/* — Animation state — */
+let prog       = 0;
+let mouseMoved = false;
+let revealDone = false;
 
-// This intercepts ANY scroll/swipe to start the animation
-// but prevents actual page scrolling until animation finishes.
-function onUserInteraction(e){
-  if(!mouseMoved){
-    mouseMoved=true;
-    hintEl.style.opacity='0';
-    setTimeout(() => hintEl.style.display='none', 500);
+function onUserInteraction() {
+  if (!mouseMoved) {
+    mouseMoved = true;
+    hintEl.style.opacity = '0';
+    setTimeout(() => hintEl.style.display = 'none', 500);
   }
 }
+window.addEventListener('wheel',      onUserInteraction, { passive: true });
+window.addEventListener('touchstart', onUserInteraction, { passive: true });
+introEl.addEventListener('mousemove', onUserInteraction);
 
-window.addEventListener('wheel', onUserInteraction, {passive: true});
-window.addEventListener('touchstart', onUserInteraction, {passive: true});
-intro.addEventListener('mousemove', onUserInteraction);
-
-/* ═══ DRAW LOOP ════════════════════════════ */
-function draw(){
+/* ─ MAIN DRAW LOOP ─────────────────────────────────────────── */
+function draw() {
   requestAnimationFrame(draw);
-  
+
+  /* — Parallax blob update (merged into main rAF for efficiency) — */
+  smoothMX += (targetMX - smoothMX) * 0.04;
+  smoothMY += (targetMY - smoothMY) * 0.04;
+  blobs.forEach((b, i) => {
+    const s = PARALLAX_STR[i] !== undefined ? PARALLAX_STR[i] : 10;
+    /* CSS `translate` property composes with `transform` animation — no conflict */
+    b.style.translate = `${smoothMX * s}px ${smoothMY * s}px`;
+  });
+
   ctx.clearRect(0, 0, W, H);
+  if (!fontReady || !imageLoaded || particles.length === 0) return;
 
-  if(!fontReady || !imageLoaded || particles.length === 0) return;
+  /* — Advance explosion progress — */
+  if (mouseMoved) prog = Math.min(prog + 0.045, 1);
 
-  if(mouseMoved) {
-      prog = Math.min(prog + 0.045, 1); // Increment morph frame
+  if (prog >= 1 && !revealDone) {
+    revealDone = true;
+    scrollHint.style.opacity = '1';
+    scroller.style.overflowY = 'scroll';
   }
-
-  // Once morph hits 100%, unlock the scrollbar!
-  if(prog >= 1 && !revealDone){
-      revealDone = true;
-      scrollHint.style.opacity = '1';
-      scroller.style.overflowY = 'scroll'; // UNLOCK SCROLL
-  }
-
-  const tc = theme === 'dark' ? {r:238, g:240, b:250} : {r:10, g:14, b:36};
-  const ac = theme === 'dark' ? {r:126, g:184, b:247} : {r:26, g:59, b:204};
 
   const scrollOffset = scroller.scrollTop;
-  const targetScroll = H; 
-  const scrollT = clamp(scrollOffset / targetScroll, 0, 1);
-  const easeSt = scrollT < 0.5 ? 2 * scrollT * scrollT : 1 - Math.pow(-2 * scrollT + 2, 2) / 2;
+  const scrollT      = clamp(scrollOffset / H, 0, 1);
+  const easeSt       = easeIO(scrollT);
 
-  if(prog < 1){
-      ctx.globalAlpha = Math.max(0, 1 - prog * 2.5); 
-      ctx.save();
-      const imgCenterY = CY - scrollOffset;
-      ctx.beginPath(); ctx.arc(CX, imgCenterY, FR, 0, Math.PI*2); ctx.clip();
-      
-      let sSize = Math.min(imgObj.width, imgObj.height);
-      let sx = (imgObj.width - sSize) / 2;
-      let sy = (imgObj.height - sSize) / 2;
-      ctx.drawImage(imgObj, sx, sy, sSize, sSize, CX - FR, imgCenterY - FR, FR*2, FR*2);
-      
-      ctx.restore();
-      ctx.globalAlpha = 1;
+  const tc = theme === 'dark' ? { r:238, g:240, b:250 } : { r:10,  g:14,  b:36  };
+  const ac = theme === 'dark' ? { r:126, g:184, b:247 } : { r:26,  g:59,  b:204 };
+
+  /* — Draw avatar (fades as explosion starts) — */
+  if (prog < 1) {
+    ctx.globalAlpha = Math.max(0, 1 - prog * 2.5);
+    ctx.save();
+    const imgCY = CY - scrollOffset;
+    ctx.beginPath(); ctx.arc(CX, imgCY, FR, 0, Math.PI * 2); ctx.clip();
+    const ss = Math.min(imgObj.width, imgObj.height);
+    ctx.drawImage(imgObj,
+      (imgObj.width - ss)/2, (imgObj.height - ss)/2, ss, ss,
+      CX - FR, imgCY - FR, FR*2, FR*2);
+    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
-  // Fade bounds for the background nav container ONLY
-  const fadeStart = H - 90;
-  const fadeEnd = H;
-  let navBgAlpha = 0;
-
-  if (scrollOffset >= fadeEnd) {
-      navBgAlpha = 1;
-  } else if (scrollOffset > fadeStart) {
-      navBgAlpha = Math.max(0, Math.min(1, (scrollOffset - fadeStart) / (fadeEnd - fadeStart)));
-  }
-
+  /* — Nav fade — */
+  const navBgAlpha = scrollOffset >= H
+    ? 1 : scrollOffset > H - 90
+    ? (scrollOffset - (H - 90)) / 90
+    : 0;
   navInner.style.opacity = navBgAlpha;
-  if (navBgAlpha >= 1) navInner.classList.add('show-border');
-  else navInner.classList.remove('show-border');
+  navInner.classList.toggle('show-border', navBgAlpha >= 1);
 
-  // PERFECT SNAP TRANSITION LOGIC:
-  // When scrolled to top, make particles invisible, and HTML text visible
+  /* ─ Phase decision:
+       SVG name   → prog complete, at rest (scroll ≈ 0)
+       Canvas pts → animating OR actively scrolling
+       HTML name  → scrolled fully past intro
+  ─────────────────────────────────────────────────────── */
   let pAlpha = 1;
-  if (scrollOffset >= H - 1) { 
-      navNameSpan.style.opacity = '1';
-      pAlpha = 0;
+
+  if (scrollOffset >= H - 1) {
+    navNameSpan.style.opacity = '1';
+    svgNameEl.style.opacity   = '0';
+    pAlpha = 0;
+  } else if (prog >= 1 && scrollOffset < 14) {
+    /* Resting state — show crisp SVG name */
+    navNameSpan.style.opacity = '0';
+    svgNameEl.style.opacity   = '1';
+    pAlpha = 0;
   } else {
-      navNameSpan.style.opacity = '0';
-      pAlpha = 1;
+    /* Animating or scrolling — show particles */
+    navNameSpan.style.opacity = '0';
+    svgNameEl.style.opacity   = '0';
+    pAlpha = 1;
   }
 
+  /* — Canvas particles (name formation + scroll-to-nav) — */
   if (pAlpha > 0) {
-      const baseGap = window.particleStep || 2;
-      const explosionGap = baseGap * (clamp(W*.086, 40, 84) / 180);
-      const finalGap = explosionGap * navScale;
-      
-      const currentGap = explosionGap + (finalGap - explosionGap) * easeSt;
-      const size = Math.max(0.5, currentGap * 1.5); 
+    const baseGap      = window.particleStep || 2;
+    const explosionGap = baseGap * (clamp(W * .086, 40, 84) / 180);
+    const finalGap     = explosionGap * navScale;
+    const currentGap   = explosionGap + (finalGap - explosionGap) * easeSt;
+    const size         = Math.max(0.5, currentGap * 1.5);
 
-      for (let i = 0; i < particles.length; i++) {
-          const p = particles[i];
-          let pt = clamp((prog - p.delay) / 0.5, 0, 1);
-          pt = pt < 0.5 ? 2 * pt * pt : 1 - Math.pow(-2 * pt + 2, 2) / 2;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
 
-          if(pt === 0 && prog < 0.1) continue; 
+      let pt = clamp((prog - p.delay) / 0.5, 0, 1);
+      pt     = easeIO(pt);
+      if (pt === 0 && prog < 0.1) continue;
 
-          let docX = p.startX + (p.targetX - p.startX) * pt;
-          let docY = p.startY + (p.targetY - p.startY) * pt;
+      /* World position after explosion */
+      let docX = p.startX + (p.targetX - p.startX) * pt;
+      let docY = p.startY + (p.targetY - p.startY) * pt;
 
-          let endDocX = navStartX + (docX - textStartX) * navScale;
-          let endDocY = H + navCenterY + (docY - textCenterY) * navScale;
-          
-          let finalDocX = docX + (endDocX - docX) * easeSt;
-          let finalDocY = docY + (endDocY - docY) * easeSt;
+      /* World position after scroll-to-nav */
+      const endDocX = navStartX + (docX - textStartX) * navScale;
+      const endDocY = H + navCenterY + (docY - textCenterY) * navScale;
 
-          let screenX = finalDocX;
-          let screenY = finalDocY - scrollOffset;
+      const finalDocX = docX + (endDocX - docX) * easeSt;
+      const finalDocY = docY + (endDocY - docY) * easeSt;
 
-          if(screenY < -10 || screenY > H + 10) continue;
+      /* Screen position (canvas is fixed) */
+      const screenX = finalDocX;
+      const screenY = finalDocY - scrollOffset;
 
-          const destC = p.isAccent ? ac : tc;
-          const cr = Math.round(p.startR + (destC.r - p.startR) * pt);
-          const cg = Math.round(p.startG + (destC.g - p.startG) * pt);
-          const cb = Math.round(p.startB + (destC.b - p.startB) * pt);
-          
-          ctx.fillStyle = `rgba(${cr},${cg},${cb},${pAlpha})`;
-          ctx.fillRect(screenX, screenY, size, size);
-      }
+      if (screenY < -10 || screenY > H + 10) continue;
+
+      const destC = p.isAccent ? ac : tc;
+      ctx.fillStyle = `rgba(
+        ${Math.round(p.startR + (destC.r - p.startR) * pt)},
+        ${Math.round(p.startG + (destC.g - p.startG) * pt)},
+        ${Math.round(p.startB + (destC.b - p.startB) * pt)},
+        ${pAlpha})`;
+      ctx.fillRect(screenX, screenY, size, size);
+    }
   }
 
-  if(scrollOffset > 10){
-      scrollHint.style.opacity = '0';
+  /* — Click ripple particles — */
+  for (let i = rippleParticles.length - 1; i >= 0; i--) {
+    const rp = rippleParticles[i];
+    rp.x  += rp.vx;
+    rp.y  += rp.vy;
+    rp.vx *= 0.96;              /* air friction  */
+    rp.vy *= 0.96;
+    rp.vy += 0.05;              /* subtle gravity */
+    rp.life -= rp.decay;
+
+    if (rp.life <= 0) { rippleParticles.splice(i, 1); continue; }
+
+    ctx.globalAlpha = rp.life * rp.life; /* quadratic fade — lingers then snaps */
+    ctx.fillStyle   = `rgb(${rp.r},${rp.g},${rp.b})`;
+    ctx.beginPath();
+    ctx.arc(rp.x, rp.y, rp.size * rp.life, 0, Math.PI * 2);
+    ctx.fill();
   }
+  ctx.globalAlpha = 1;
+
+  /* — Scroll hint — */
+  if (scrollOffset > 10) scrollHint.style.opacity = '0';
 }
 
 requestAnimationFrame(draw);
