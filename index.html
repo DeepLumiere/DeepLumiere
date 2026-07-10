@@ -147,7 +147,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   overflow:visible;
 }
 #svg-name{
-  font-family:var(--serif);
+  font-family:var(--sans);
   font-weight:400;
   fill:var(--text);
   text-rendering:geometricPrecision;
@@ -156,7 +156,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 }
 #svg-name-accent{
   fill:var(--accent);
-  font-style:italic;
+  font-weight:500;
   transition:fill .4s;
 }
 [data-theme="dark"] #intro-name-svg{
@@ -421,7 +421,7 @@ footer span{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:va
     -->
     <svg id="intro-name-svg" aria-hidden="true">
       <text id="svg-name" x="50%" y="50%"
-            text-anchor="middle" dominant-baseline="middle">Deep&nbsp;<tspan id="svg-name-accent">Joshi</tspan></text>
+            text-anchor="middle" dominant-baseline="middle" xml:space="preserve">Deep <tspan id="svg-name-accent">Joshi</tspan></text>
     </svg>
 
     <p id="hint">Scroll to Begin</p>
@@ -863,9 +863,19 @@ window.addEventListener('click', e => {
     }, 1200 + Math.random() * 800);
 
   } else {
-    /* ── No blob hit: spawn an ephemeral blob at cursor ── */
+    /* ── No blob hit: spawn a persistent blob at cursor ── */
+    /* Cap at 4 persistent blobs — fade out the oldest when exceeded */
+    const MAX_PERSISTENT = 4;
+    if (ephemeralBlobs.length >= MAX_PERSISTENT) {
+      const oldest = ephemeralBlobs.shift();
+      oldest.style.transition = 'opacity 1.4s ease, filter 1.6s ease';
+      oldest.style.opacity    = '0';
+      oldest.style.filter     = 'blur(110px)';
+      setTimeout(() => oldest.remove(), 1700);
+    }
+
     const col  = BLOB_COLORS[Math.floor(Math.random() * BLOB_COLORS.length)];
-    const size = 180 + Math.random() * 120; /* px */
+    const size = 200 + Math.random() * 140;
     const el   = document.createElement('div');
     el.style.cssText = [
       'position:fixed',
@@ -875,25 +885,17 @@ window.addEventListener('click', e => {
       `height:${size}px`,
       'border-radius:50%',
       `background:${col}`,
-      'filter:blur(60px)',
+      'filter:blur(70px)',
       'pointer-events:none',
       'z-index:0',
       'opacity:0',
-      'transition:opacity .5s ease',
+      'transition:opacity .6s ease',
     ].join(';');
     document.getElementById('blob-container').appendChild(el);
     ephemeralBlobs.push(el);
 
-    /* Fade in */
+    /* Fade in and stay */
     requestAnimationFrame(() => { el.style.opacity = '1'; });
-
-    /* Dissolve out after a moment */
-    setTimeout(() => {
-      el.style.transition = 'opacity 1.8s ease, filter 1.8s ease';
-      el.style.opacity    = '0';
-      el.style.filter     = 'blur(100px)';
-      setTimeout(() => { el.remove(); ephemeralBlobs = ephemeralBlobs.filter(x => x !== el); }, 1900);
-    }, 900 + Math.random() * 600);
 
     smallBurst(ex, ey, null);
   }
@@ -982,19 +984,19 @@ function rebuildTargets() {
   const tCtx    = tCanvas.getContext('2d');
   tCtx.textBaseline = 'middle';
 
-  tCtx.font = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `400 ${HD_fs}px 'Outfit', system-ui, sans-serif`;
   const w1  = tCtx.measureText('Deep ').width;
-  tCtx.font = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font = `500 ${HD_fs}px 'Outfit', system-ui, sans-serif`;
   const w2  = tCtx.measureText('Joshi').width;
   const totalW   = w1 + w2;
   const hdStartX = Math.floor(tCanvas.width / 2 - totalW / 2);
   const hdCY     = Math.floor(tCanvas.height / 2);
 
   tCtx.fillStyle = '#ff0000';
-  tCtx.font      = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font      = `400 ${HD_fs}px 'Outfit', system-ui, sans-serif`;
   tCtx.fillText('Deep ', hdStartX, hdCY);
   tCtx.fillStyle = '#0000ff';
-  tCtx.font      = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
+  tCtx.font      = `500 ${HD_fs}px 'Outfit', system-ui, sans-serif`;
   tCtx.fillText('Joshi', hdStartX + w1, hdCY);
 
   const tData      = tCtx.getImageData(0, 0, tCanvas.width, tCanvas.height).data;
@@ -1136,14 +1138,20 @@ function draw() {
     if (prog >= 1) {
       state      = 'CROSSFADE';
       crossfadeT = 0;
-      scrollHint.style.opacity = '1';
-      scroller.style.overflowY = 'scroll';
+      /* Scroll is NOT unlocked here — wait until crossfade finishes.
+         If scroll were enabled now, the SVG (inside the scrolling #intro)
+         would separate from canvas particles (position:fixed) mid-crossfade. */
     }
   }
 
   if (state === 'CROSSFADE') {
     crossfadeT = Math.min(crossfadeT + XFADE_SPEED, 1);
-    if (crossfadeT >= 1) state = 'RESTING';
+    if (crossfadeT >= 1) {
+      state = 'RESTING';
+      /* Unlock scroll only now — SVG is the sole visible layer, safe to scroll */
+      scroller.style.overflowY = 'scroll';
+      scrollHint.style.opacity = '1';
+    }
   }
 
   if (state === 'RESTING' && scrollOffset >= H) state = 'PAST';
