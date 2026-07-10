@@ -137,17 +137,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   100%{border-radius:40% 60% 70% 30% / 40% 40% 60% 50%}
 }
 
-/* ── SVG NAME (crisp vector text in resting state) ──────── */
+/* ── SVG NAME — JS owns opacity entirely, no CSS transition ── */
 #intro-name-svg{
   position:absolute;
   top:0;left:0;
   width:100%;height:100%;
   pointer-events:none;
-  opacity:0;
-  transition:opacity .5s ease;
+  opacity:0;          /* JS sets this every frame */
   overflow:visible;
 }
-/* Crisp rendering + theme-aware fill via CSS custom properties */
 #svg-name{
   font-family:var(--serif);
   font-weight:400;
@@ -161,12 +159,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
   font-style:italic;
   transition:fill .4s;
 }
-/* Subtle glow on the SVG name — theme-aware */
 [data-theme="dark"] #intro-name-svg{
-  filter:drop-shadow(0 0 32px rgba(126,184,247,.20));
+  filter:drop-shadow(0 0 28px rgba(126,184,247,.18));
 }
 [data-theme="light"] #intro-name-svg{
-  filter:drop-shadow(0 0 22px rgba(26,59,204,.14));
+  filter:drop-shadow(0 0 18px rgba(26,59,204,.12));
 }
 
 /* ── CLICK RIPPLE RING ────────────────────── */
@@ -904,11 +901,12 @@ window.addEventListener('click', e => {
 
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   §5  CANVAS INTRO ANIMATION
-   Phase 1  (prog 0→1): avatar photo pixels explode → form name text
-   Phase 2  (prog=1, scroll=0): canvas hides; crisp SVG name fades in
-   Phase 3  (scroll 0→H): SVG hides; canvas particles scroll to nav
-   Phase 4  (scroll≥H):  particles hide; HTML nav name shows
+   §5  CANVAS INTRO ANIMATION  —  clean 4-state machine
+
+   FORMING   → canvas only (avatar → particle explosion → name)
+   CROSSFADE → canvas alpha = (1-t), SVG alpha = t  (always sum to 1)
+   RESTING   → SVG only; opacity = direct linear scroll function
+   PAST      → nav HTML name only  (RESTING ⇄ PAST on scroll-back)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 /* — Element refs — */
@@ -923,32 +921,22 @@ const navNameSpan = document.getElementById('nav-name');
 const svgNameEl   = document.getElementById('intro-name-svg');
 const svgNameText = document.getElementById('svg-name');
 
-/* — Sizing state — */
+/* — Sizing — */
 let W = 0, H = 0, CX = 0, CY = 0, FR = 0;
-let navStartX = 82, navCenterY = 38, navScale = 1;
 let textStartX = 0, textCenterY = 0;
-
-function updateNavTarget() {
-  const st = getComputedStyle(navInner);
-  const pl = parseFloat(st.paddingLeft) || 32;
-  const pt = parseFloat(st.paddingTop)  || 20;
-  navStartX  = pl + 36 + 14; /* avatar(36px) + gap(14px) */
-  navCenterY = pt + 18;      /* half of 36px avatar height */
-}
 
 function resize() {
   W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
   CX = W / 2; CY = H / 2;
   FR = Math.min(W * .105, 115);
-  updateNavTarget();
   if (imageLoaded && fontReady) setTimeout(rebuildTargets, 0);
 }
 window.addEventListener('resize', resize);
 
 /* — Helpers — */
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
-function easeIO(t) { return t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2; }
+function easeIO(t) { return t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2; }
 
 /* — Asset loading — */
 let fontReady = false, imageLoaded = false, imgData = null;
@@ -956,35 +944,25 @@ const imgObj  = new Image();
 imgObj.crossOrigin = 'anonymous';
 imgObj.src         = SITE_DATA.person.avatar;
 imgObj.onload      = () => { imageLoaded = true; checkReady(); };
-imgObj.onerror     = () => { imageLoaded = true; checkReady(); }; /* degrade gracefully */
+imgObj.onerror     = () => { imageLoaded = true; checkReady(); };
 document.fonts.ready.then(() => { fontReady = true; checkReady(); });
 
 function checkReady() {
   if (imageLoaded && fontReady) resize();
 }
 
-/* — Particle array — */
+/* — Particles — */
 let particles = [];
 
-/**
- * rebuildTargets()
- * 1. Rasterises the avatar into a circle → pixel colours become particle start colours
- * 2. Rasterises "Deep Joshi" text at HD resolution → pixel positions become targets
- * 3. Updates the SVG name element to the current display font size
- * 4. Builds the particles[] array
- */
 function rebuildTargets() {
-
-  /* ① Avatar → circle pixel data */
+  /* ① Avatar circle → pixel colours */
   const iSize   = Math.floor(FR * 2);
   const iCanvas = document.createElement('canvas');
   iCanvas.width = iCanvas.height = iSize;
   const iCtx    = iCanvas.getContext('2d');
-
-  const sSize = Math.min(imgObj.width, imgObj.height);
-  const sx    = (imgObj.width  - sSize) / 2;
-  const sy    = (imgObj.height - sSize) / 2;
-
+  const sSize   = Math.min(imgObj.width, imgObj.height);
+  const sx      = (imgObj.width  - sSize) / 2;
+  const sy      = (imgObj.height - sSize) / 2;
   iCtx.beginPath();
   iCtx.arc(iSize/2, iSize/2, iSize/2, 0, Math.PI * 2);
   iCtx.clip();
@@ -996,12 +974,12 @@ function rebuildTargets() {
     imgData = iCtx.getImageData(0, 0, iSize, iSize).data;
   }
 
-  /* ② Text → pixel targets (HD canvas for sampling quality) */
+  /* ② Rasterise name text → pixel target positions */
   const HD_fs   = 160;
   const tCanvas = document.createElement('canvas');
   tCanvas.width  = 900;
   tCanvas.height = 260;
-  const tCtx = tCanvas.getContext('2d');
+  const tCtx    = tCanvas.getContext('2d');
   tCtx.textBaseline = 'middle';
 
   tCtx.font = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
@@ -1009,78 +987,82 @@ function rebuildTargets() {
   tCtx.font = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   const w2  = tCtx.measureText('Joshi').width;
   const totalW   = w1 + w2;
-  const hdStartX = Math.floor(tCanvas.width/2  - totalW/2);
-  const hdCY     = Math.floor(tCanvas.height/2);
+  const hdStartX = Math.floor(tCanvas.width / 2 - totalW / 2);
+  const hdCY     = Math.floor(tCanvas.height / 2);
 
   tCtx.fillStyle = '#ff0000';
   tCtx.font      = `400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   tCtx.fillText('Deep ', hdStartX, hdCY);
-
   tCtx.fillStyle = '#0000ff';
   tCtx.font      = `italic 400 ${HD_fs}px 'Cormorant Garant', Georgia, serif`;
   tCtx.fillText('Joshi', hdStartX + w1, hdCY);
 
   const tData      = tCtx.getImageData(0, 0, tCanvas.width, tCanvas.height).data;
   const textPixels = [];
-  const step       = 2; /* stride — keeps particle count manageable */
+  const step       = 2;
 
   for (let y = 0; y < tCanvas.height; y += step) {
     for (let x = 0; x < tCanvas.width; x += step) {
       const idx = (y * tCanvas.width + x) * 4;
-      if (tData[idx+3] > 60) {
-        textPixels.push({ x, y, isAccent: tData[idx+2] > 128 });
+      if (tData[idx + 3] > 60) {
+        textPixels.push({ x, y, isAccent: tData[idx + 2] > 128 });
       }
     }
   }
-  window.particleStep = step;
+  window._pStep = step;
 
   /* ③ Display-scale geometry */
-  const explosion_fs = clamp(W * .086, 40, 84);
-  const renderScale  = explosion_fs / HD_fs;
+  const dispFS   = clamp(W * .086, 40, 84);
+  const scale    = dispFS / HD_fs;
+  textStartX     = W / 2 - (totalW * scale) / 2;
+  textCenterY    = H / 2;
 
-  textStartX  = W/2 - (totalW * renderScale) / 2;
-  textCenterY = H/2;
-
-  navScale = 18 / explosion_fs; /* 18px is the nav font size */
-
-  /* ④ Update SVG name to match particle display size — crisp vector rendering */
-  svgNameText.setAttribute('font-size', explosion_fs + 'px');
+  /* ④ SVG font-size must exactly match particle render size for seamless crossfade */
+  svgNameText.setAttribute('font-size', dispFS + 'px');
 
   /* ⑤ Build particles */
   particles = [];
   for (let i = 0; i < textPixels.length; i++) {
-    const tp = textPixels[i];
-
-    /* Random point inside the avatar circle (weighted toward centre) */
-    const r  = Math.sqrt(Math.random()) * (iSize/2);
-    const th = Math.random() * Math.PI * 2;
-    const ix = iSize/2 + r * Math.cos(th);
-    const iy = iSize/2 + r * Math.sin(th);
-
+    const tp   = textPixels[i];
+    const r    = Math.sqrt(Math.random()) * (iSize / 2);
+    const th   = Math.random() * Math.PI * 2;
+    const ix   = iSize / 2 + r * Math.cos(th);
+    const iy   = iSize / 2 + r * Math.sin(th);
     const pIdx = (Math.floor(iy) * iSize + Math.floor(ix)) * 4;
     let ir = imgData[pIdx], ig = imgData[pIdx+1], ib = imgData[pIdx+2];
-    if (imgData[pIdx+3] < 10) { ir = 120; ig = 130; ib = 140; }
-
-    const dist  = r / (iSize/2);
-    const delay = (1 - dist) * 0.4; /* inner particles animate first */
-
+    if (imgData[pIdx + 3] < 10) { ir = 120; ig = 130; ib = 140; }
+    const dist  = r / (iSize / 2);
+    const delay = (1 - dist) * 0.4;
     particles.push({
       startX: CX - iSize/2 + ix,
       startY: CY - iSize/2 + iy,
       startR: ir, startG: ig, startB: ib,
-      targetX: textStartX + (tp.x - hdStartX) * renderScale,
-      targetY: textCenterY + (tp.y - hdCY) * renderScale,
+      targetX: textStartX + (tp.x - hdStartX) * scale,
+      targetY: textCenterY + (tp.y - hdCY) * scale,
       isAccent: tp.isAccent,
       delay,
     });
   }
 }
 
-/* — Animation state — */
+/* ─────────────────────────────────────────────────────────────────
+   STATE MACHINE
+   'FORMING'   → canvas only (particle animation running)
+   'CROSSFADE' → canvas fades out, SVG fades in (complements, sum=1)
+   'RESTING'   → SVG only; opacity = direct linear scroll formula
+   'PAST'      → nav HTML name only
+   Transitions:
+     FORMING    → CROSSFADE : prog reaches 1
+     CROSSFADE  → RESTING   : crossfadeT reaches 1
+     RESTING   ⇄ PAST       : scroll crosses H boundary
+───────────────────────────────────────────────────────────────── */
+let state      = 'FORMING';
 let prog       = 0;
+let crossfadeT = 0;
 let mouseMoved = false;
-let revealDone = false;
-let svgAlpha   = 0;   /* 0 = hidden, 1 = fully visible; smooth crossfade */
+
+const PROG_SPEED  = 0.022;   /* ~45 frames ≈ 0.75 s @ 60 fps */
+const XFADE_SPEED = 0.040;   /* ~25 frames ≈ 0.42 s @ 60 fps */
 
 function onUserInteraction() {
   if (!mouseMoved) {
@@ -1093,142 +1075,139 @@ window.addEventListener('wheel',      onUserInteraction, { passive: true });
 window.addEventListener('touchstart', onUserInteraction, { passive: true });
 introEl.addEventListener('mousemove', onUserInteraction);
 
-/* ─ MAIN DRAW LOOP ─────────────────────────────────────────── */
-function draw() {
-  requestAnimationFrame(draw);
-
-  /* — Parallax blob update (merged into main rAF for efficiency) — */
-  smoothMX += (targetMX - smoothMX) * 0.04;
-  smoothMY += (targetMY - smoothMY) * 0.04;
-  blobs.forEach((b, i) => {
-    const s = PARALLAX_STR[i] !== undefined ? PARALLAX_STR[i] : 10;
-    /* CSS `translate` property composes with `transform` animation — no conflict */
-    b.style.translate = `${smoothMX * s}px ${smoothMY * s}px`;
-  });
-
-  ctx.clearRect(0, 0, W, H);
-  if (!fontReady || !imageLoaded || particles.length === 0) return;
-
-  /* — Advance explosion progress — */
-  if (mouseMoved) prog = Math.min(prog + 0.022, 1);
-
-  if (prog >= 1 && !revealDone) {
-    revealDone = true;
-    scrollHint.style.opacity = '1';
-    scroller.style.overflowY = 'scroll';
+/* ─ DRAW HELPERS ───────────────────────────────────────────── */
+function drawParticles(alpha, tc, ac, dotSize) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  for (let i = 0; i < particles.length; i++) {
+    const p  = particles[i];
+    let pt   = clamp((prog - p.delay) / 0.5, 0, 1);
+    pt       = easeIO(pt);
+    if (pt === 0 && prog < 0.1) continue;
+    const sx = p.startX + (p.targetX - p.startX) * pt;
+    const sy = p.startY + (p.targetY - p.startY) * pt;
+    if (sy < -10 || sy > H + 10) continue;
+    const d = p.isAccent ? ac : tc;
+    ctx.fillStyle = `rgb(${Math.round(p.startR+(d.r-p.startR)*pt)},${Math.round(p.startG+(d.g-p.startG)*pt)},${Math.round(p.startB+(d.b-p.startB)*pt)})`;
+    ctx.fillRect(sx, sy, dotSize, dotSize);
   }
+  ctx.globalAlpha = 1;
+}
 
-  const scrollOffset = scroller.scrollTop;
-  const scrollT      = clamp(scrollOffset / H, 0, 1);
-  const easeSt       = easeIO(scrollT);
-
-  const tc = theme === 'dark' ? { r:238, g:240, b:250 } : { r:10,  g:14,  b:36  };
-  const ac = theme === 'dark' ? { r:126, g:184, b:247 } : { r:26,  g:59,  b:204 };
-
-  /* — Draw avatar (fades as explosion starts) — */
-  if (prog < 1) {
-    ctx.globalAlpha = Math.max(0, 1 - prog * 2.5);
-    ctx.save();
-    const imgCY = CY - scrollOffset;
-    ctx.beginPath(); ctx.arc(CX, imgCY, FR, 0, Math.PI * 2); ctx.clip();
-    const ss = Math.min(imgObj.width, imgObj.height);
-    ctx.drawImage(imgObj,
-      (imgObj.width - ss)/2, (imgObj.height - ss)/2, ss, ss,
-      CX - FR, imgCY - FR, FR*2, FR*2);
-    ctx.restore();
-    ctx.globalAlpha = 1;
-  }
-
-  /* — Nav fade — */
-  const navBgAlpha = scrollOffset >= H
-    ? 1 : scrollOffset > H - 90
-    ? (scrollOffset - (H - 90)) / 90
-    : 0;
-  navInner.style.opacity = navBgAlpha;
-  navInner.classList.toggle('show-border', navBgAlpha >= 1);
-
-  /* ─ Phase decision:
-       SVG name   → prog complete, at rest (scroll ≈ 0) — cross-fades with canvas
-       Canvas pts → animating OR scrolling — fades out on scroll
-       HTML name  → scrolled fully past intro
-  ─────────────────────────────────────────────────────── */
-
-  /* Target SVG alpha */
-  const wantSVG = (prog >= 1 && scrollOffset < 40) ? 1 : 0;
-  svgAlpha += (wantSVG - svgAlpha) * 0.08;          /* smooth lerp */
-  if (svgAlpha < 0.005) svgAlpha = 0;
-  if (svgAlpha > 0.995) svgAlpha = 1;
-
-  /* Canvas particle alpha — complement of SVG + fade on scroll */
-  const scrollFade = clamp(1 - scrollOffset / (H * 0.45), 0, 1); /* fade out at 45% scroll */
-  let pAlpha = (1 - svgAlpha) * scrollFade;
-
-  if (scrollOffset >= H - 1) {
-    /* Scrolled past intro — show nav name only */
-    navNameSpan.style.opacity = '1';
-    svgNameEl.style.opacity   = '0';
-    svgAlpha = 0;
-    pAlpha   = 0;
-  } else {
-    navNameSpan.style.opacity = '0';
-    svgNameEl.style.opacity   = svgAlpha;
-  }
-
-  /* — Canvas particles (name formation; simple vertical parallax on scroll) — */
-  if (pAlpha > 0.005) {
-    /* Particle dot size — fixed at explosion scale, no nav-shrink */
-    const baseGap = window.particleStep || 2;
-    const dispFS  = clamp(W * .086, 40, 84);
-    const size    = Math.max(0.6, baseGap * (dispFS / 180) * 1.4);
-
-    /* Vertical parallax: text moves up slightly as page scrolls (0.3× scroll rate) */
-    const parallaxY = scrollOffset * 0.3;
-
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-
-      let pt = clamp((prog - p.delay) / 0.5, 0, 1);
-      pt     = easeIO(pt);
-      if (pt === 0 && prog < 0.1) continue;
-
-      /* World position after explosion — stays centered, no lateral nav slide */
-      const screenX = p.startX + (p.targetX - p.startX) * pt;
-      const screenY = p.startY + (p.targetY - p.startY) * pt - parallaxY;
-
-      if (screenY < -10 || screenY > H + 10) continue;
-
-      const destC = p.isAccent ? ac : tc;
-      ctx.globalAlpha = pAlpha;
-      ctx.fillStyle = `rgb(
-        ${Math.round(p.startR + (destC.r - p.startR) * pt)},
-        ${Math.round(p.startG + (destC.g - p.startG) * pt)},
-        ${Math.round(p.startB + (destC.b - p.startB) * pt)})`;
-      ctx.fillRect(screenX, screenY, size, size);
-    }
-    ctx.globalAlpha = 1;
-  }
-
-  /* — Click ripple particles — */
+function drawRipples() {
   for (let i = rippleParticles.length - 1; i >= 0; i--) {
     const rp = rippleParticles[i];
-    rp.x  += rp.vx;
-    rp.y  += rp.vy;
-    rp.vx *= 0.96;              /* air friction  */
-    rp.vy *= 0.96;
-    rp.vy += 0.05;              /* subtle gravity */
+    rp.x  += rp.vx; rp.y  += rp.vy;
+    rp.vx *= 0.96;  rp.vy *= 0.96;
+    rp.vy += 0.05;
     rp.life -= rp.decay;
-
     if (rp.life <= 0) { rippleParticles.splice(i, 1); continue; }
-
-    ctx.globalAlpha = rp.life * rp.life; /* quadratic fade — lingers then snaps */
+    ctx.globalAlpha = rp.life * rp.life;
     ctx.fillStyle   = `rgb(${rp.r},${rp.g},${rp.b})`;
     ctx.beginPath();
     ctx.arc(rp.x, rp.y, rp.size * rp.life, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.globalAlpha = 1;
+}
 
-  /* — Scroll hint — */
+/* ─ MAIN DRAW LOOP ─────────────────────────────────────────── */
+function draw() {
+  requestAnimationFrame(draw);
+
+  /* Blob parallax — always runs */
+  smoothMX += (targetMX - smoothMX) * 0.04;
+  smoothMY += (targetMY - smoothMY) * 0.04;
+  blobs.forEach((b, i) => {
+    const s = PARALLAX_STR[i] !== undefined ? PARALLAX_STR[i] : 10;
+    b.style.translate = `${smoothMX * s}px ${smoothMY * s}px`;
+  });
+
+  ctx.clearRect(0, 0, W, H);
+  drawRipples();   /* click particles always visible regardless of state */
+
+  if (!fontReady || !imageLoaded || particles.length === 0) return;
+
+  const scrollOffset = scroller.scrollTop;
+
+  /* ── State transitions ── */
+  if (state === 'FORMING') {
+    if (mouseMoved) prog = Math.min(prog + PROG_SPEED, 1);
+    if (prog >= 1) {
+      state      = 'CROSSFADE';
+      crossfadeT = 0;
+      scrollHint.style.opacity = '1';
+      scroller.style.overflowY = 'scroll';
+    }
+  }
+
+  if (state === 'CROSSFADE') {
+    crossfadeT = Math.min(crossfadeT + XFADE_SPEED, 1);
+    if (crossfadeT >= 1) state = 'RESTING';
+  }
+
+  if (state === 'RESTING' && scrollOffset >= H) state = 'PAST';
+  if (state === 'PAST'    && scrollOffset  < H) state = 'RESTING';
+
+  /* ── Nav bar background — scroll driven, always ── */
+  const navBgAlpha = scrollOffset >= H ? 1
+    : scrollOffset > H - 90 ? (scrollOffset - (H - 90)) / 90
+    : 0;
+  navInner.style.opacity = navBgAlpha;
+  navInner.classList.toggle('show-border', navBgAlpha >= 1);
+
+  /* ── Theme colours ── */
+  const tc = theme === 'dark' ? { r:238, g:240, b:250 } : { r:10,  g:14,  b:36  };
+  const ac = theme === 'dark' ? { r:126, g:184, b:247 } : { r:26,  g:59,  b:204 };
+  const dispFS  = clamp(W * .086, 40, 84);
+  const dotSize = Math.max(0.6, (window._pStep || 2) * (dispFS / 180) * 1.4);
+
+  /* ── Per-state rendering — exactly ONE name layer visible at any time ── */
+  switch (state) {
+
+    case 'FORMING': {
+      /* Canvas only. Avatar fades out, particles build the name. */
+      navNameSpan.style.opacity = '0';
+      svgNameEl.style.opacity   = '0';
+
+      if (prog < 1) {
+        ctx.globalAlpha = Math.max(0, 1 - prog * 2.5);
+        ctx.save();
+        ctx.beginPath(); ctx.arc(CX, CY, FR, 0, Math.PI * 2); ctx.clip();
+        const ss = Math.min(imgObj.width, imgObj.height);
+        ctx.drawImage(imgObj,
+          (imgObj.width-ss)/2, (imgObj.height-ss)/2, ss, ss,
+          CX-FR, CY-FR, FR*2, FR*2);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      }
+      drawParticles(1, tc, ac, dotSize);
+      break;
+    }
+
+    case 'CROSSFADE': {
+      /* Canvas alpha + SVG alpha = 1.0 exactly. No double-visible name. */
+      navNameSpan.style.opacity = '0';
+      svgNameEl.style.opacity   = crossfadeT;
+      drawParticles(1 - crossfadeT, tc, ac, dotSize);
+      break;
+    }
+
+    case 'RESTING': {
+      /* SVG only. Opacity = direct linear scroll — no lerp, no lag. */
+      navNameSpan.style.opacity = '0';
+      svgNameEl.style.opacity   = clamp(1 - scrollOffset / (H * 0.5), 0, 1);
+      break;
+    }
+
+    case 'PAST': {
+      /* Nav name only. */
+      svgNameEl.style.opacity   = '0';
+      navNameSpan.style.opacity = '1';
+      break;
+    }
+  }
+
   if (scrollOffset > 10) scrollHint.style.opacity = '0';
 }
 
