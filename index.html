@@ -1080,6 +1080,7 @@ function rebuildTargets() {
 let prog       = 0;
 let mouseMoved = false;
 let revealDone = false;
+let svgAlpha   = 0;   /* 0 = hidden, 1 = fully visible; smooth crossfade */
 
 function onUserInteraction() {
   if (!mouseMoved) {
@@ -1147,35 +1148,41 @@ function draw() {
   navInner.classList.toggle('show-border', navBgAlpha >= 1);
 
   /* ─ Phase decision:
-       SVG name   → prog complete, at rest (scroll ≈ 0)
-       Canvas pts → animating OR actively scrolling
+       SVG name   → prog complete, at rest (scroll ≈ 0) — cross-fades with canvas
+       Canvas pts → animating OR scrolling — fades out on scroll
        HTML name  → scrolled fully past intro
   ─────────────────────────────────────────────────────── */
-  let pAlpha = 1;
+
+  /* Target SVG alpha */
+  const wantSVG = (prog >= 1 && scrollOffset < 40) ? 1 : 0;
+  svgAlpha += (wantSVG - svgAlpha) * 0.08;          /* smooth lerp */
+  if (svgAlpha < 0.005) svgAlpha = 0;
+  if (svgAlpha > 0.995) svgAlpha = 1;
+
+  /* Canvas particle alpha — complement of SVG + fade on scroll */
+  const scrollFade = clamp(1 - scrollOffset / (H * 0.45), 0, 1); /* fade out at 45% scroll */
+  let pAlpha = (1 - svgAlpha) * scrollFade;
 
   if (scrollOffset >= H - 1) {
+    /* Scrolled past intro — show nav name only */
     navNameSpan.style.opacity = '1';
     svgNameEl.style.opacity   = '0';
-    pAlpha = 0;
-  } else if (prog >= 1 && scrollOffset < 30) {
-    /* Resting state — show crisp SVG name */
-    navNameSpan.style.opacity = '0';
-    svgNameEl.style.opacity   = '1';
-    pAlpha = 0;
+    svgAlpha = 0;
+    pAlpha   = 0;
   } else {
-    /* Animating or scrolling — show particles */
     navNameSpan.style.opacity = '0';
-    svgNameEl.style.opacity   = '0';
-    pAlpha = 1;
+    svgNameEl.style.opacity   = svgAlpha;
   }
 
-  /* — Canvas particles (name formation + scroll-to-nav) — */
-  if (pAlpha > 0) {
-    const baseGap      = window.particleStep || 2;
-    const explosionGap = baseGap * (clamp(W * .086, 40, 84) / 180);
-    const finalGap     = explosionGap * navScale;
-    const currentGap   = explosionGap + (finalGap - explosionGap) * easeSt;
-    const size         = Math.max(0.5, currentGap * 1.5);
+  /* — Canvas particles (name formation; simple vertical parallax on scroll) — */
+  if (pAlpha > 0.005) {
+    /* Particle dot size — fixed at explosion scale, no nav-shrink */
+    const baseGap = window.particleStep || 2;
+    const dispFS  = clamp(W * .086, 40, 84);
+    const size    = Math.max(0.6, baseGap * (dispFS / 180) * 1.4);
+
+    /* Vertical parallax: text moves up slightly as page scrolls (0.3× scroll rate) */
+    const parallaxY = scrollOffset * 0.3;
 
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
@@ -1184,31 +1191,21 @@ function draw() {
       pt     = easeIO(pt);
       if (pt === 0 && prog < 0.1) continue;
 
-      /* World position after explosion */
-      let docX = p.startX + (p.targetX - p.startX) * pt;
-      let docY = p.startY + (p.targetY - p.startY) * pt;
-
-      /* World position after scroll-to-nav */
-      const endDocX = navStartX + (docX - textStartX) * navScale;
-      const endDocY = H + navCenterY + (docY - textCenterY) * navScale;
-
-      const finalDocX = docX + (endDocX - docX) * easeSt;
-      const finalDocY = docY + (endDocY - docY) * easeSt;
-
-      /* Screen position (canvas is fixed) */
-      const screenX = finalDocX;
-      const screenY = finalDocY - scrollOffset;
+      /* World position after explosion — stays centered, no lateral nav slide */
+      const screenX = p.startX + (p.targetX - p.startX) * pt;
+      const screenY = p.startY + (p.targetY - p.startY) * pt - parallaxY;
 
       if (screenY < -10 || screenY > H + 10) continue;
 
       const destC = p.isAccent ? ac : tc;
-      ctx.fillStyle = `rgba(
+      ctx.globalAlpha = pAlpha;
+      ctx.fillStyle = `rgb(
         ${Math.round(p.startR + (destC.r - p.startR) * pt)},
         ${Math.round(p.startG + (destC.g - p.startG) * pt)},
-        ${Math.round(p.startB + (destC.b - p.startB) * pt)},
-        ${pAlpha})`;
+        ${Math.round(p.startB + (destC.b - p.startB) * pt)})`;
       ctx.fillRect(screenX, screenY, size, size);
     }
+    ctx.globalAlpha = 1;
   }
 
   /* — Click ripple particles — */
