@@ -1,0 +1,92 @@
+{
+  "seo": {
+    "title": "Deep Joshi - CV",
+    "description": "Resume of Deep Joshi, Undergraduate Researcher at Nirma University specializing in Green AI, Computer Vision, and Federated Learning.",
+    "keywords": ["Deep Joshi", "AI Researcher", "Green AI", "Computer Vision", "Federated Learning", "Nirma University", "Computer Science", "Portfolio", "CV", "Machine Learning"]
+  },
+  "meta": {
+    "year": "2026"
+  },
+  "person": {
+    "name":   { "first": "Deep", "last": "Joshi" },
+    "avatar": "https://avatars.githubusercontent.com/u/173024745?v=4",
+    "quote":  "“I dive into what I’m not good at—because the easy stuff doesn’t ignite my spirit.”"
+  },
+  "footer": {
+    "university": "Nirma University",
+    "address":    "Ahmedabad 382481"
+  },
+  "education": {
+    "degree":     "BTech in Computer Science",
+    "university": "Nirma University",
+    "duration":   "Aug 2024 — Aug 2028",
+    "cgpa":       "8.6"
+  },
+  "interests": [
+    "GreenAI & Sustainable ML",
+    "Benchmarking & Evaluation",
+    "Computer Vision",
+    "Federated Learning"
+  ],
+  "contact": [
+    { "label": "24bce152@nirmauni.ac.in", "href": "mailto:24bce152@nirmauni.ac.in" },
+    { "label": "deep@computer.org",        "href": "mailto:deep@computer.org" },
+    { "label": "+91 92656 41668",           "href": "tel:+919265641668" },
+    { "label": "Ahmedabad, India",          "href": null }
+  ],
+  "profiles": [
+    { "label": "LinkedIn",         "href": "https://www.linkedin.com/in/deep-lumiere" },
+    { "label": "GitHub",           "href": "https://github.com/DeepLumiere" },
+    { "label": "Semantic Scholar", "href": "https://www.semanticscholar.org/author/Deep-Joshi/2057963700" },
+    { "label": "Unsplash",         "href": "http://unsplash.com/@deep_erudite" }
+  ],
+  "availability": "Open to research collaborations, internships, and technical leadership roles.",
+  "sections": [
+    {
+      "id": "experience",
+      "title": "Experience",
+      "num": "01",
+      "items": [
+        {
+          "date": "Sep 2025\n— Present",
+          "role": "Technical Head",
+          "org":  "IEEE Computer Society · Nirma University Chapter",
+          "desc": "Directing chapter technical initiatives and mentoring project teams across AI and systems domains. Coordinating external collaborations including speaker engagements and workshops."
+        }
+      ]
+    },
+    {
+      "id": "projects",
+      "title": "Projects",
+      "num": "02",
+      "items": [
+        {
+          "date": "Ongoing",
+          "role": "Bit-per-Buck",
+          "org":  "AI Evaluation Framework",
+          "desc": "An evaluation framework that ranks AI models by both utility and compute cost, surfacing performance-efficiency trade-offs and identifying diminishing returns from scale."
+        },
+        {
+          "date": "Ongoing",
+          "role": "Agent Bodhi",
+          "org":  "IEEE CS Chapter Initiative · Technical Lead",
+          "desc": "Leading technical execution for an IEEE CS initiative exploring agentic AI workflows for research automation and student-led innovation."
+        }
+      ]
+    },
+    {
+      "id": "publications",
+      "title": "Publications",
+      "num": "03",
+      "items": [
+        {
+          "date":  "2025",
+          "venue": "FIDTA @ ACM MobiHoc ’25",
+          "role":  "FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud Detection",
+          "desc":  "Research detailing a federated learning approach for financial fraud detection, incorporating quantum-enforced privacy guarantees across distributed banking nodes.",
+          "link":  { "label": "Read Paper", "href": "https://dl.acm.org/doi/10.1145/3704413.3765511" }
+        }
+      ]
+    }
+  ]
+}
