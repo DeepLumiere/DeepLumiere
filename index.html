@@ -626,12 +626,21 @@ function updateSEO(seo) {
 }
 
 fetch('profile.json')
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    return res.json();
+  })
   .then(data => {
     updateSEO(data.seo);
     renderCV(data);
   })
-  .catch(err => console.error('Error loading profile data:', err));
+  .catch(err => {
+    console.error('Error loading profile data:', err);
+    const cv = document.getElementById('cv');
+    if (cv) {
+      cv.innerHTML = `<div style="padding: 100px 32px; text-align: center; color: var(--muted); font-family: var(--mono);">Unable to load profile data. Please try refreshing.</div>`;
+    }
+  });
 
 
 
