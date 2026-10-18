@@ -49,15 +49,15 @@
       "items": [
         {
           "date": "Jun 2026\n— Present",
-          "role": "Chair",
-          "org":  "IEEE Computer Society · Nirma University Chapter",
-          "desc": "Leading the IEEE Computer Society student branch chapter, steering technical strategy, academic partnerships, and research initiatives."
+          "role": "Member",
+          "org":  "EvalEval Coalition",
+          "desc": "Working in partnerships and evaluations in the EveryEvalEver Project."
         },
         {
           "date": "Jun 2026\n— Present",
-          "role": "Member",
-          "org":  "EvalEval Coalition",
-          "desc": "Working in partnerships (including UK AISI and more) and evaluations in the EveryEvalEver Project."
+          "role": "Chair",
+          "org":  "IEEE Computer Society · Nirma University Chapter",
+          "desc": "Leading the IEEE Computer Society student  chapter, steering technical strategy, academic partnerships, and research initiatives."
         },
         {
           "date": "Sep 2025\n— May 2026",
@@ -74,16 +74,10 @@
       "items": [
         {
           "date": "Ongoing",
-          "role": "Bit-per-Buck",
-          "org":  "AI Evaluation Framework",
-          "desc": "An evaluation framework that ranks AI models by both utility and compute cost, surfacing performance-efficiency trade-offs and identifying diminishing returns from scale."
+          "role": "FoViT",
+          "org":  "Independent",
+          "desc": "Building low resource foveated vision model, 6.7M Params achieved 79.6% in ImageNet-1K with training done on just 8GB VRAM trained from scratch."
         },
-        {
-          "date": "Ongoing",
-          "role": "Agent Bodhi",
-          "org":  "IEEE CS Chapter Initiative · Technical Lead",
-          "desc": "Leading technical execution for an IEEE CS initiative exploring agentic AI workflows for research automation and student-led innovation."
-        }
       ]
     },
     {
@@ -108,9 +102,9 @@
         {
           "date": "Sep 22, 2026",
           "role": "How UK AISI and EvalEval Are Making Benchmark Results Reproducible",
-          "org": "EvalEval Blog",
+          "org": "EvalEval Coalition",
           "desc": "The EvalEval Coalition is thrilled to share that the UK AI Security Institute (AISI) is using EvalEval’s infrastructure to openly share evaluation results, supporting more reproducible and verifiable evaluation science.",
-          "link": { "label": "Read Article", "href": "https://evalevalai.com/infrastructure/2026/09/22/uk-aisi-evaleval-reproducible-benchmark-results/" }
+          "link": { "label": "Read Now!", "href": "https://evalevalai.com/infrastructure/2026/09/22/uk-aisi-evaleval-reproducible-benchmark-results/", "HuggingFace Blog": "https://huggingface.co/blog/evaleval-aisi"}
         }
       ]
     }
