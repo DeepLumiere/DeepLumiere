@@ -1,11 +1,11 @@
 # 👋 Hi there, I’m Deep Joshi
 
-I’m an undergrad student in **BTech CSE @ Nirma University**. Along with that I'm interested in research and leadership, working at my college and at IEEE CS Nirma University
+I’m a BTech CSE undergrad at **Nirma University, India**. I work in Computer Vision and want to explore Robotics/Autonomous Vehicles, and eager to connect, work & explore!
 
 ## 👀 Interests
+- Computer Vision 👁️
 - AI Evaluation 📊
 - Benchmarking & Evaluation 🎯
-- Computer Vision 👁️
 - Anything in tech!  
 
 ## 🌱 Currently Learning
@@ -13,8 +13,6 @@ I’m an undergrad student in **BTech CSE @ Nirma University**. Along with that 
 - C# 💻  
 - SQL 🛢️
 - Triton 🕷️
-
-## 💞️ Open to Collaborate On  
 
 ## 🧑‍💼 Leadership & Positions
 - Chair, IEEE Computer Society Nirma University
@@ -31,8 +29,6 @@ I’m an undergrad student in **BTech CSE @ Nirma University**. Along with that 
 [![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Deep%20Joshi-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/deeplumiere)
 [![Kaggle](https://img.shields.io/badge/Kaggle-Deep%20Joshi-20BEFF?style=flat-square&logo=kaggle&logoColor=white)](https://www.kaggle.com/deeplumiere)
 
-## 😄 Pronouns
-He / Him
 
 ## ⚡ Fun Fact
 I love taking up challenges and I'm always open to talk and team up. Feel free to connect!
