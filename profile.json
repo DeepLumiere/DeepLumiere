@@ -76,7 +76,7 @@
           "role": "FoViT",
           "org":  "Independent",
           "desc": "Building low resource foveated vision model, 6.7M Params achieved 79.6% in ImageNet-1K with training done on just 8GB VRAM trained from scratch."
-        },
+        }
       ]
     },
     {
