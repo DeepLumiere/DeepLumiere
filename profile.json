@@ -23,9 +23,8 @@
     "cgpa":       "8.6"
   },
   "interests": [
+    "Computer Vision",
     "AI Evaluation",
-    "Benchmarking & Evaluation",
-    "Computer Vision"
   ],
   "contact": [
     { "label": "24bce152@nirmauni.ac.in", "href": "mailto:24bce152@nirmauni.ac.in" },
