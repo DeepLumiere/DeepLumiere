@@ -1,6 +1,6 @@
 {
   "seo": {
-    "title": "Deep Joshi - CV",
+    "title": "Deep Joshi",
     "description": "Resume of Deep Joshi, Undergraduate Researcher at Nirma University specializing in AI Evaluation, Benchmarking, and Computer Vision.",
     "keywords": ["Deep Joshi", "AI Researcher", "AI Evaluation", "Benchmarking & Evaluation", "Computer Vision", "Nirma University", "Computer Science", "Portfolio", "CV", "Machine Learning"]
   },
@@ -13,18 +13,18 @@
     "quote":  "“I dive into what I’m not good at—because the easy stuff doesn’t ignite my spirit.”"
   },
   "footer": {
-    "university": "Nirma University",
+    "university": "E May Gene!",
     "address":    "Ahmedabad 382481"
   },
   "education": {
     "degree":     "BTech in Computer Science",
     "university": "Nirma University",
     "duration":   "Aug 2024 — Aug 2028",
-    "cgpa":       "8.6"
+    "cgpa":       "8.5"
   },
   "interests": [
     "Computer Vision",
-    "AI Evaluation",
+    "AI Evaluation"
   ],
   "contact": [
     { "label": "24bce152@nirmauni.ac.in", "href": "mailto:24bce152@nirmauni.ac.in" },
