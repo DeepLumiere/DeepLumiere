@@ -103,7 +103,7 @@
           "role": "How UK AISI and EvalEval Are Making Benchmark Results Reproducible",
           "org": "EvalEval Coalition",
           "desc": "The EvalEval Coalition is thrilled to share that the UK AI Security Institute (AISI) is using EvalEval’s infrastructure to openly share evaluation results, supporting more reproducible and verifiable evaluation science.",
-          "link": { "label": "Read Now!", "href": "https://evalevalai.com/infrastructure/2026/09/22/uk-aisi-evaleval-reproducible-benchmark-results/", "HuggingFace Blog": "https://huggingface.co/blog/evaleval-aisi"}
+          "link": { "label": "Read Now!", "href": "https://evalevalai.com/infrastructure/2026/09/22/uk-aisi-evaleval-reproducible-benchmark-results/"}
         }
       ]
     }
