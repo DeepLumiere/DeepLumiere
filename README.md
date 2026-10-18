@@ -3,7 +3,8 @@
 I’m an undergrad student in **BTech CSE @ Nirma University**. Along with that I'm interested in research and leadership, working at my college and at IEEE CS Nirma University
 
 ## 👀 Interests
-- GreenAI 🌱   
+- AI Evaluation 📊
+- Benchmarking & Evaluation 🎯
 - Computer Vision 👁️
 - Anything in tech!  
 
@@ -15,8 +16,9 @@ I’m an undergrad student in **BTech CSE @ Nirma University**. Along with that 
 
 ## 💞️ Open to Collaborate On  
 
-## 🧑‍💼 Leadership
-- Technical Head, IEEE Computer Society Nirma University  
+## 🧑‍💼 Leadership & Positions
+- Chair, IEEE Computer Society Nirma University
+- Member, EvalEval Coalition
 
 ## 📝 Publications
 - [FedQ-Fraud — FIDTA Workshop at MobiHoc'25](https://dl.acm.org/doi/10.1145/3704413.3765511)
@@ -26,7 +28,8 @@ I’m an undergrad student in **BTech CSE @ Nirma University**. Along with that 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Deep%20Joshi-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/deep-lumiere)
 [![Gmail](https://img.shields.io/badge/Gmail-Deep%20Joshi-EA4335?style=flat-square&logo=gmail&logoColor=white)](mailto:24bce152@nirmauni.ac.in)
 [![Instagram](https://img.shields.io/badge/Instagram-Deep%20Joshi-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/deep.lumiere)
-[![Unsplash](https://img.shields.io/badge/Unsplash-Deep%20Joshi-fcba03?style=flat-square&logo=unsplash&logoColor=white)](https://unsplash.com/@deep_erudite)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Deep%20Joshi-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/deeplumiere)
+[![Kaggle](https://img.shields.io/badge/Kaggle-Deep%20Joshi-20BEFF?style=flat-square&logo=kaggle&logoColor=white)](https://www.kaggle.com/deeplumiere)
 
 ## 😄 Pronouns
 He / Him
