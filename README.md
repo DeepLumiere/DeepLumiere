@@ -1,6 +1,5 @@
 # 👋 Hi there, I’m Deep Joshi
-[Backup](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd_lpw.zip)
-I’m a BTech CSE undergrad at **Nirma University, India**. I work in Computer Vision and want to explore Robotics/Autonomous Vehicles, and eager to connect, work & explore!
+I’m a BTech CSE undergrad at Nirma University, India. I work in Computer Vision and want to explore Robotics/Autonomous Vehicles, and eager to connect, work & explore!
 
 ## 👀 Interests
 - Computer Vision 👁️
@@ -9,11 +8,10 @@ I’m a BTech CSE undergrad at **Nirma University, India**. I work in Computer V
 - Anything in tech!  
 
 ## 🌱 Currently Learning
-- [Rust](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd_lpw.zip) 🪗
-- [Python](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd_milan.zip) 🐍  
-- [C#](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/SMS.zip) 💻  
-- [SQL](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/bootstrapvue.zip) 🛢️
-- [Triton](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd.zip) 🕷️
+- Python 🐍  
+- C#💻  
+- SQL🛢️
+- Triton🕷️
 
 ## 🧑‍💼 Leadership & Positions
 - Chair, IEEE Computer Society Nirma University
