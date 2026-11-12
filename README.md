@@ -4,7 +4,6 @@ I’m a BTech CSE undergrad at Nirma University, India. I work in Computer Visio
 ## 👀 Interests
 - Computer Vision 👁️
 - AI Evaluation 📊
-- Benchmarking & Evaluation 🎯
 - Anything in tech!  
 
 ## 🌱 Currently Learning
