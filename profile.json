@@ -79,20 +79,7 @@
         }
       ]
     },
-    {
-      "id": "publications",
-      "title": "Publications",
-      "num": "03",
-      "items": [
-        {
-          "date":  "2025",
-          "venue": "FIDTA @ ACM MobiHoc ’25",
-          "role":  "FedQ-Fraud: A Quantum-Enforced Federated Learning Framework for Financial Fraud Detection",
-          "desc":  "Research detailing a federated learning approach for financial fraud detection, incorporating quantum-enforced privacy guarantees across distributed banking nodes.",
-          "link":  { "label": "Read Paper", "href": "https://dl.acm.org/doi/10.1145/3704413.3765511" }
-        }
-      ]
-    },
+    
     {
       "id": "blogs",
       "title": "Blogs",
